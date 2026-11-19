@@ -36,6 +36,10 @@ The Next button in Spotlight moves to the right tab by itself. Keys 1, 2 and 3 a
 
 iPad in landscape, tap only: add `#ipad`. Spotlight stays on the left, and the right side shows one view at a time (Fight, Stat blocks, Voices, Roll call, Evidence, Speeches, Sealed) with a number pad for damage. An iPad opening the base address in landscape gets this view by itself. State is kept per device, so the iPad and the Mac do not share it.
 
+Initiative: tap Edit to change a roll, remove someone, or add a name from the cast. Tap Done to sort.
+
+Export, in the top bar: a text record of the board (beats, evidence found and not found, roll call, the fight, initiative). Copy it, share it or save it as a file, and give it to Claude with the session summary and transcript. Pasting an export back in and tapping Restore puts the board back, on any device.
+
 Single panels, one per 5e.tools Embed. Use these on a landscape screen:
 
 | Panel | Add |

@@ -109,6 +109,21 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 .ir small{color:var(--soft);font-size:12.5px}
 .ir.cur{border-color:var(--gold);background:#3a2c14}
 .ir.off{opacity:.38}
+.ir{cursor:pointer}
+.ir.ed{grid-template-columns:44px 1fr;cursor:default}
+.ied{grid-column:1 / -1;display:flex;gap:6px;flex-wrap:wrap}
+.ied button{flex:1;padding:6px 4px;min-width:44px}
+.iadd{margin-top:10px}
+.iadd .dmg input{flex:1;width:auto;font:600 16px/1.2 system-ui,sans-serif;text-align:left}
+.sm{padding:5px 12px;font-size:14px}
+.hint{color:var(--soft);font-size:14px;line-height:1.3;margin-top:6px}
+.btns .sp{flex:1}
+.modal{position:fixed;inset:0;background:#000c;display:flex;padding:14px;z-index:10}
+.mbox{flex:1;min-height:0;min-width:0;max-width:900px;margin:0 auto;background:var(--panel);border:2px solid var(--gold);border-radius:10px;display:flex;flex-direction:column;gap:6px;padding:4px 12px 4px}
+.mbox .ph{padding:6px 0 0}
+.mbox textarea{flex:1;min-height:0;resize:none;background:#120f0d;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:10px;font:14px/1.4 ui-monospace,Menlo,Consolas,monospace}
+.mbox textarea:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.xmsg{color:var(--gold);font-size:14px;align-self:center}
 
 /* evidence */
 .ev{display:grid;grid-template-columns:26px 1fr;gap:4px 9px;padding:7px 8px;border-radius:7px;border:1px solid var(--line);margin-bottom:6px;cursor:pointer;background:var(--tile)}
@@ -175,6 +190,7 @@ table.ck td:first-child{font-weight:700;white-space:nowrap}
 .touch,.touch *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .touch .pb,.touch .spg{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .touch button{min-height:44px}
+.touch input,.touch textarea{-webkit-user-select:text;user-select:text}
 .touch .bar{padding:5px 8px}
 .touch .bar .tabb{padding:8px 16px}
 .tgrid{flex:1;min-height:0;display:grid;gap:6px;padding:6px;grid-template-columns:minmax(0,39fr) minmax(0,61fr);grid-template-rows:minmax(0,1fr)}
@@ -380,12 +396,15 @@ const CLOCKS=[
 ];
 
 const KEY="osse-s13-v1";
-function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false,tv:{1:0,2:0,3:0}};}
+function seedInit(){let last=0;return INIT.map(r=>{const num=/^\d+$/.test(r[2]);if(num)last=+r[2];return {id:r[0],name:r[1],v:last,lab:num?"":r[2],note:r[3]};});}
+function normalize(){if(!Array.isArray(S.init)||!S.init.every(e=>e&&e.id&&e.name))S.init=seedInit();S.init.forEach(e=>{if(typeof e.v!=="number")e.v=0;});if(!S.init.some(e=>e.id===S.turnId))S.turnId=S.init.length?S.init[0].id:null;if(!S.tv)S.tv={1:0,2:0,3:0};}
+function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,init:seedInit(),turnId:INIT[0][0],ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false,tv:{1:0,2:0,3:0}};}
 let S=fresh();
-try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll){S=Object.assign(fresh(),j);S.sealOpen=false;S.armReset=false;S.armHp=false;}}catch(e){}
+try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll){S=Object.assign(fresh(),j);if(j.turnId===undefined&&INIT[j.turn])S.turnId=INIT[j.turn][0];normalize();S.sealOpen=false;S.armReset=false;S.armHp=false;}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false,tv:S.tv};S=Object.assign(fresh(),j,mine);render();}}catch(_){}});
-let single=null,touch=false,pad="";
+window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false,tv:S.tv};S=Object.assign(fresh(),j,mine);normalize();render();}}catch(_){}});
+let single=null,touch=false,pad="",iniEdit=false,armDel=null,modal=false,xdraft=null,xnote="",armRestore=false;
+const ALIAS={cassian:"cas",corvane:"cor"};
 const autoTouch=()=>{try{return matchMedia("(pointer:coarse)").matches&&innerWidth>innerHeight&&innerHeight<=900;}catch(e){return false;}};
 const TV={
 1:[["Fight",["hand","init"]],["Stat blocks",["stats"]],["Voices",["voices"]],["Roll call",["roll"]]],
@@ -427,9 +446,18 @@ P.hand=()=>{const dead=S.hp<=0;return `${head("The Hand",`<span class="mv">Round
  <div class="btns"><button data-a="rnd" data-v="-1">Round −</button><button data-a="rnd" data-v="1">Round +</button></div>
  <ul class="notes"><li>The ward clock is stopped while a PC holds the room. One ward still burns.</li><li>Round 2: Corvane arrives and finishes him. No exit, no capture.</li><li>Cassian fights from the bed and never leaves it.</li><li>Gus takes 10 from a blade (poison resistance).</li><li>The body stays in the house.</li></ul></div>`;};
 
-function iniActive(i){const id=INIT[i][0];if(id==="cor"&&S.round<2)return false;if(id==="hand"&&S.hp<=0)return false;return true;}
-P.init=()=>`${head("Initiative",`<span class="mv">Round ${S.round}</span>`)}<div class="pb"><div class="ini">${INIT.map((r,i)=>`<div class="ir${i===S.turn?" cur":""}${iniActive(i)?"":" off"}"><b>${r[2].length<3?r[2]:"·"}</b><span>${PCN[r[0]]?chip(r[0],1,r[1]):`<strong>${esc(r[1])}</strong>`} <small>${r[2].length<3?"":esc(r[2])+" · "}${esc(r[3])}</small></span><span></span></div>`).join("")}</div>
- <div class="btns"><button data-a="turn" data-v="-1">◀ Back</button><button class="pri" data-a="turn" data-v="1" style="flex:1">Next turn ▶</button></div></div>`;
+function iniActive(e){if(e.id==="cor"&&S.round<2)return false;if(e.id==="hand"&&S.hp<=0)return false;return true;}
+function sortInit(){S.init=S.init.map((e,i)=>[e,i]).sort((a,b)=>(b[0].v-a[0].v)||(a[1]-b[1])).map(x=>x[0]);}
+P.init=()=>{const L=S.init;
+ const row=e=>{const cur=e.id===S.turnId,who=PCN[e.id]?chip(e.id,1,e.name):`<strong>${esc(e.name)}</strong>`;
+  if(iniEdit)return `<div class="ir ed${cur?" cur":""}"><b>${e.v}</b><span>${who}</span><div class="ied"><button data-a="iadj" data-v="${e.id}:-5">−5</button><button data-a="iadj" data-v="${e.id}:-1">−1</button><button data-a="iadj" data-v="${e.id}:1">+1</button><button data-a="iadj" data-v="${e.id}:5">+5</button><button class="quiet" data-a="idel" data-v="${e.id}" aria-label="Remove ${esc(e.name)}">${armDel===e.id?"Remove?":"✕"}</button></div></div>`;
+  return `<div class="ir${cur?" cur":""}${iniActive(e)?"":" off"}" data-a="iset" data-v="${e.id}" role="button" tabindex="0"><b>${e.lab?"·":e.v}</b><span>${who} <small>${e.lab?esc(e.lab)+(e.note?" · ":""):""}${esc(e.note||"")}</small></span><span></span></div>`;};
+ const have=new Set(L.map(e=>e.id)),cast=ROLL.filter(r=>S.roll[r[0]]!=="dead"&&!have.has(r[0])&&!have.has(ALIAS[r[0]]||"-"));
+ return `${head("Initiative",`<span class="mv">Round ${S.round}</span><button class="sm${iniEdit?" on":""}" data-a="iedit">${iniEdit?"Done":"Edit"}</button>`)}<div class="pb"><div class="ini">${L.map(row).join("")}</div>
+ ${iniEdit?`<div class="iadd"><div class="lab" style="margin-bottom:6px">Add to the order</div><div class="schips">${cast.map(r=>`<button data-a="iadd" data-v="${r[0]}">${esc(r[1])}</button>`).join("")}<button data-a="iadd" data-v="">Someone else</button></div>
+ <div class="dmg"><input id="iname" type="text" autocomplete="off" placeholder="or type a name" aria-label="Name to add"><button data-a="iaddname">Add</button></div>
+ <p class="hint">A new name starts at 10. Set each roll with the buttons, then tap Done to sort the order.</p></div>`
+ :`<div class="btns"><button data-a="turn" data-v="-1">◀ Back</button><button class="pri" data-a="turn" data-v="1" style="flex:1">Next turn ▶</button></div><p class="hint">Tap a name to jump to its turn.</p>`}</div>`;};
 
 P.evidence=()=>`${head("Evidence",`<span class="mv">${EVID.filter(e=>S.ev[e[0]]).length} of ${EVID.length} found</span>`)}<div class="pb">${EVID.map(e=>{const d=S.ev[e[0]];return `<div class="ev${d?" done":""}" data-a="ev" data-v="${e[0]}" role="button" tabindex="0"><i>${d?"✓":""}</i><div><div class="evh"><b>${e[1]?'<span class="flag">⚑ </span>':""}${esc(e[2])}</b><u>${esc(e[3])}</u>${e[5].map(k=>chip(k,0)).join(" ")}</div><div class="evt">${esc(e[4])}</div></div></div>`;}).join("")}</div>`;
 
@@ -466,6 +494,25 @@ P.sealed=()=>{if(!S.sealOpen)return `<button class="sealbtn" data-a="seal" data-
  const view=S.sealView||(S.tab===3?"clocks":"secrets");
  return `${head("Sealed",`<button class="${view==="secrets"?"on":""}" data-a="sview" data-v="secrets">Do not reveal</button><button class="${view==="clocks"?"on":""}" data-a="sview" data-v="clocks">Clocks</button><button class="pri" data-a="seal" data-v="0">Close</button>`)}<div class="pb">${view==="secrets"?`<ul class="sec">${SECRETS.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:`<table class="ck"><tr><th>Who</th><th>Next move</th><th>If the party stalls</th></tr>${CLOCKS.map(c=>`<tr><td>${esc(c[0])}</td><td>${esc(c[1])}</td><td>${esc(c[2])}</td></tr>`).join("")}</table>`}</div>`;};
 
+function report(){const L=[],d=new Date(),z=n=>String(n).padStart(2,"0");
+ L.push("# Ossë S13 board export","",`Exported: ${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`,`Movement reached: ${S.mv+1} of ${MOVES.length}, ${MOVES[S.mv].t}`,"Key: [x] done or found, [ ] not. ⚑ marks a flagged item.","","## Beats");
+ MOVES.forEach((m,i)=>{L.push("",`### ${i+1}. ${m.t}${i>S.mv?" (not reached)":""}`,"");m.beats.forEach((b,j)=>L.push(`- [${S.beats[i+"-"+j]?"x":" "}] ${b[0]?"⚑ ":""}${b[1]}`));});
+ L.push("",`## Evidence (${EVID.filter(e=>S.ev[e[0]]).length} of ${EVID.length} found)`,"");
+ EVID.forEach(e=>L.push(`- [${S.ev[e[0]]?"x":" "}] ${e[1]?"⚑ ":""}${e[2]} (${e[3]}; for ${e[5].map(k=>PCN[k]).join(", ")})${S.ev[e[0]]?"":": NOT FOUND"+(e[1]?", carries to the next session":"")}`));
+ L.push("","## Roll call","");
+ ROLL.forEach(r=>{const st=S.roll[r[0]];L.push(`- ${r[1]}: ${st}${r[0]==="noemie"&&st==="down"?(S.pip?", 1 pip left":", no pips, dying"):""}${st!==r[3]?` (started ${r[3]})`:""}`);});
+ L.push("","## The fight","",`- The Hand: ${S.hp} of 91 HP${S.hp<=0?", dead":""}`,`- Round: ${S.round}`,`- Initiative: ${S.init.map(e=>`${e.name} ${e.lab||e.v}`).join(", ")}`);
+ L.push("","## Had the floor","",...PCO.map(k=>`- ${PCN[k]}: ${S.tally[k]}`));
+ const st={mv:S.mv,beats:S.beats,tally:S.tally,roll:S.roll,pip:S.pip,hp:S.hp,round:S.round,ev:S.ev,init:S.init,turnId:S.turnId};
+ L.push("","## Board state","","Paste this whole export back into the screen's Export box to restore the board.","","```json",JSON.stringify({key:KEY,state:st}),"```","");
+ return L.join("\n");}
+const xval=()=>{const e=document.getElementById("xtext");return e?e.value:"";};
+const xsay=t=>{xnote=t;const e=document.getElementById("xmsg");if(e)e.textContent=t;};
+const modalHTML=()=>`<div class="modal"><div class="mbox"><div class="ph"><span class="lab">Export the board</span><span class="sp"></span><button class="pri" data-a="xclose">Close</button></div>
+ <p class="hint" style="margin:0">Give this text to Claude with the summary and transcript. It lists every beat, clue, name and roll as the board stands now.</p>
+ <textarea id="xtext" spellcheck="false" aria-label="Board export">${esc(xdraft!==null?xdraft:report())}</textarea>
+ <div class="btns"><button class="on" data-a="xcopy">Copy</button>${navigator.share?'<button data-a="xshare">Share</button>':""}<button data-a="xfile">Save as file</button><span class="xmsg" id="xmsg">${esc(xnote)}</span><span class="sp"></span><button class="quiet" data-a="xrestore">${armRestore?"Tap again to replace the board":"Restore from pasted export"}</button></div></div></div>`;
+
 const ROWS={1:"fit-content(45%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) repeat(5,minmax(0,1fr))"};
 const LAYOUT={
 1:[["spot","1 / -1","1"],["stats","1","2 / 6"],["hand","2","2 / 4"],["init","2","4 / 6"],["voices","1","6"],["roll","2","6","mini"]],
@@ -477,13 +524,14 @@ function render(){const app=document.getElementById("app");const keep={};
  app.querySelectorAll("[data-k]").forEach(el=>{const s=el.querySelector(".pb")||el.querySelector(".spg")||el;keep[el.dataset.k]=s.scrollTop;});
  app.className=touch&&!single?"touch":"";
  if(touch&&!single){const views=TV[S.tab],vi=Math.min((S.tv&&S.tv[S.tab])||0,views.length-1),v=views[vi];
-  app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
+  app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
   <div class="tgrid"><section class="pn spot" data-k="t-spot">${P.spot()}</section>
   <div class="tright"><div class="seg">${views.map((x,i)=>`<button class="${i===vi?"on":""}" data-a="tv" data-v="${i}">${x[0]}</button>`).join("")}</div>
   <div class="tview" style="--n:${v[1].length}">${v[1].map(k=>`<section class="pn" data-k="t-${S.tab}-${k}">${P[k]()}</section>`).join("")}</div></div></div>`;}
  else if(single){app.innerHTML=`<div class="grid one"><section class="pn${single==="spot"?" spot":""}" data-k="one-${single}">${P[single]()}</section></div>`;}
- else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
+ else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
  <div class="grid" style="grid-template-rows:${ROWS[S.tab]}">${LAYOUT[S.tab].map(l=>`<section class="pn${l[0]==="spot"?" spot":""}${l[3]?" "+l[3]:""}" data-k="${S.tab}-${l[0]}" style="grid-column:${l[1]};grid-row:${l[2]}">${P[l[0]]()}</section>`).join("")}</div>`;}
+ if(modal&&!single)app.insertAdjacentHTML("beforeend",modalHTML());
  app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el.querySelector(".spg")||el;s.scrollTop=v;}});}
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -502,7 +550,19 @@ const A={
  hpset:()=>{if(S.armHp){S.hp=91;S.roll.hand="standing";}else{S.armHp=true;return "keephp";}},
  dmg:()=>{const el=document.getElementById("dmg"),n=parseInt(el&&el.value,10);if(n>0)A.hp(-n);},
  rnd:v=>{S.round=clamp(S.round+ +v,1,20);},
- turn:v=>{const n=INIT.length;let i=S.turn,g=0;do{i+= +v;if(i>=n){i=0;S.round=clamp(S.round+1,1,20);}if(i<0){i=n-1;S.round=clamp(S.round-1,1,20);}g++;}while(!iniActive(i)&&g<2*n);S.turn=i;},
+ turn:v=>{const L=S.init,n=L.length;if(!n)return;let i=L.findIndex(x=>x.id===S.turnId),g=0;if(i<0)i=+v>0?-1:0;do{i+= +v;if(i>=n){i=0;S.round=clamp(S.round+1,1,20);}if(i<0){i=n-1;S.round=clamp(S.round-1,1,20);}g++;}while(!iniActive(L[i])&&g<2*n);S.turnId=L[i].id;},
+ iset:v=>{S.turnId=v;},
+ iedit:()=>{iniEdit=!iniEdit;if(!iniEdit)sortInit();},
+ iadj:v=>{const k=v.lastIndexOf(":"),e=S.init.find(x=>x.id===v.slice(0,k));if(e){e.v=clamp(e.v+ +v.slice(k+1),-10,40);e.lab="";}},
+ idel:v=>{if(armDel!==v){armDel=v;return "keepdel";}const i=S.init.findIndex(x=>x.id===v);if(i<0)return;if(S.turnId===v&&S.init.length>1)S.turnId=S.init[(i+1)%S.init.length].id;S.init.splice(i,1);normalize();},
+ iadd:v=>{let id=v,name;if(v){name=ROLL.find(x=>x[0]===v)[1];}else{let n=1;while(S.init.some(x=>x.id==="x"+n))n++;id="x"+n;name="Extra "+n;}if(!S.init.some(x=>x.id===id))S.init.push({id,name,v:10,lab:"",note:"Added"});},
+ iaddname:()=>{const el=document.getElementById("iname"),name=((el&&el.value)||"").trim().slice(0,40);if(!name)return;let n=1;while(S.init.some(x=>x.id==="x"+n))n++;S.init.push({id:"x"+n,name,v:10,lab:"",note:"Added"});},
+ xopen:()=>{modal=true;xdraft=null;xnote="";armRestore=false;},
+ xclose:()=>{modal=false;xdraft=null;xnote="";armRestore=false;},
+ xcopy:()=>{const t=xval(),ok=()=>xsay("Copied"),fb=()=>{try{const el=document.getElementById("xtext");el.focus();el.select();if(!document.execCommand("copy"))throw 0;ok();}catch(e){xsay("Select the text and copy it by hand");}};try{navigator.clipboard.writeText(t).then(ok,fb);}catch(e){fb();}return "stay";},
+ xshare:()=>{try{navigator.share({title:"Ossë S13 board export",text:xval()}).catch(()=>{});}catch(e){xsay("Sharing is not available here");}return "stay";},
+ xfile:()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([xval()],{type:"text/markdown"}));a.download="osse-s13-board.md";document.body.appendChild(a);a.click();a.remove();xsay("Saved as osse-s13-board.md");}catch(e){xsay("Could not save a file here");}return "stay";},
+ xrestore:()=>{const t=xval();if(!armRestore){armRestore=true;xdraft=t;return;}armRestore=false;try{const m=/```json\s*([\s\S]*?)\s*```/.exec(t),o=JSON.parse(m[1]);if(o.key!==KEY||!o.state||!o.state.roll)throw 0;Object.assign(S,o.state);normalize();modal=false;xdraft=null;xnote="";}catch(e){xdraft=t;xnote="That text has no board state for this session";}},
  ev:v=>{S.ev[v]=!S.ev[v];},
  vc:v=>{S.voice=+v;},
  vb:()=>{S.voice=null;},
@@ -512,10 +572,11 @@ const A={
  sview:v=>{S.sealView=v;},
  reset:()=>{if(S.armReset){S=fresh();}else{S.armReset=true;return "keep";}}
 };
-function act(el){const a=el.dataset.a;if(!A[a])return;const r=A[a](el.dataset.v);if(r!=="keep")S.armReset=false;if(r!=="keephp")S.armHp=false;save();render();if(a==="dmg"){const i=document.getElementById("dmg");if(i)i.focus();}}
+function act(el){const a=el.dataset.a;if(!A[a])return;const r=A[a](el.dataset.v);if(r==="stay")return;if(r!=="keepdel")armDel=null;if(r!=="keep")S.armReset=false;if(r!=="keephp")S.armHp=false;save();render();if(a==="dmg"){const i=document.getElementById("dmg");if(i)i.focus();}}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(el&&!el.disabled){e.preventDefault();act(el);}});
 document.addEventListener("keydown",e=>{const t=e.target;
- if(t&&t.tagName==="INPUT"){if(e.key==="Enter"){e.preventDefault();act({dataset:{a:"dmg"}});}return;}
+ if(t&&t.tagName==="TEXTAREA")return;
+ if(t&&t.tagName==="INPUT"){if(e.key==="Enter"){e.preventDefault();act({dataset:{a:t.id==="iname"?"iaddname":"dmg"}});}return;}
  if((e.key==="Enter"||e.key===" ")&&t&&t.dataset&&t.dataset.a&&t.tagName!=="BUTTON"){e.preventDefault();act(t);return;}
  if(e.ctrlKey||e.metaKey||e.altKey)return;
  if(e.key==="1"||e.key==="2"||e.key==="3"){A.tab(e.key);save();render();}});
