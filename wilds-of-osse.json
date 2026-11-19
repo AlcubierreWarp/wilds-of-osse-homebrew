@@ -10,11 +10,11 @@
 				],
 				"version": "2.1.0",
 				"dateAdded": 1789869156,
-				"dateLastModified": 1793546020
+				"dateLastModified": 1795052365
 			}
 		],
 		"dateAdded": 1789869156,
-		"dateLastModified": 1793546020
+		"dateLastModified": 1795052365
 	},
 	"monster": [
 		{
@@ -35,7 +35,7 @@
 			],
 			"ac": [
 				{
-					"ac": 15,
+					"ac": 16,
 					"from": [
 						"chain shirt",
 						"shield"
@@ -136,7 +136,7 @@
 			],
 			"ac": [
 				{
-					"ac": 17,
+					"ac": 18,
 					"from": [
 						"chain mail",
 						"shield"
@@ -349,7 +349,7 @@
 					"type": "spellcasting",
 					"ability": "int",
 					"headerEntries": [
-						"The lieutenant is a 8th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 15}, {@hit 7} to hit with spell attacks). It has the following spells prepared:"
+						"The lieutenant is an 8th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 15}, {@hit 7} to hit with spell attacks). It has the following spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -374,7 +374,7 @@
 							"spells": [
 								"{@spell hold person}",
 								"{@spell see invisibility}",
-								"{@spell zone of truth}"
+								"{@spell detect thoughts}"
 							]
 						},
 						"3": {
@@ -405,13 +405,19 @@
 				{
 					"name": "Rune-Etched Baton",
 					"entries": [
-						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}6 ({@damage 1d6 + 2}) bludgeoning damage plus 7 ({@damage 2d6}) force damage."
+						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) bludgeoning damage plus 7 ({@damage 2d6}) force damage."
 					]
 				},
 				{
 					"name": "Writ of Restraint (Recharge 5-6)",
 					"entries": [
 						"The lieutenant names one creature it can see within 60 feet and speaks the terms of its warrant. The target must succeed on a {@dc 15} Wisdom saving throw or be {@condition restrained} by bands of light for 1 minute. The target repeats the save at the end of each of its turns, ending the effect on a success. While restrained this way the target's spellcasting requires a successful {@dc 15} Constitution check."
+					]
+				},
+				{
+					"name": "Truth Sigil (1/Day)",
+					"entries": [
+						"The lieutenant's sigil of office casts {@spell zone of truth} (save {@dc 15}), requiring no components."
 					]
 				}
 			],
@@ -551,7 +557,7 @@
 							"spells": [
 								"{@spell hold person}",
 								"{@spell see invisibility}",
-								"{@spell zone of truth}"
+								"{@spell detect thoughts}"
 							]
 						},
 						"3": {
@@ -609,6 +615,12 @@
 					"name": "Clear the Ring (1/Day)",
 					"entries": [
 						"Elowen strikes his baton on the ground. Every creature of his choice within 30 feet must make a {@dc 16} Strength saving throw. On a failure a creature takes 21 ({@damage 6d6}) force damage and is pushed 20 feet away and knocked {@condition prone}. On a success it takes half damage and is not moved. Ongoing spells of 3rd level or lower in the area end."
+					]
+				},
+				{
+					"name": "Truth Sigil (1/Day)",
+					"entries": [
+						"Elowen's sigil of office casts {@spell zone of truth} (save {@dc 16}), requiring no components."
 					]
 				}
 			],
@@ -1289,8 +1301,8 @@
 				}
 			],
 			"hp": {
-				"average": 138,
-				"formula": "16d8 + 64"
+				"average": 144,
+				"formula": "17d8 + 68"
 			},
 			"speed": {
 				"walk": 30
@@ -1302,7 +1314,7 @@
 			"wis": 15,
 			"cha": 17,
 			"passive": 16,
-			"cr": "7",
+			"cr": "9",
 			"save": {
 				"str": "+8",
 				"con": "+8",
@@ -1312,7 +1324,7 @@
 				"athletics": "+8",
 				"deception": "+7",
 				"insight": "+6",
-				"intimidation": "+10",
+				"intimidation": "+11",
 				"perception": "+6",
 				"persuasion": "+7"
 			},
@@ -1340,57 +1352,120 @@
 					]
 				},
 				{
+					"name": "Pact Weapon",
+					"entries": [
+						"Corvane's crested warhammer is his pact weapon. It counts as magical, and he can call it to his empty hand as a bonus action."
+					]
+				},
+				{
 					"name": "Nothing Left to Lose but One Thing",
 					"entries": [
-						"While a creature Corvane regards as his heir is {@condition incapacitated} or in danger and within his sight, Corvane makes all attack rolls with advantage and has resistance to all damage."
+						"While a creature Corvane regards as his heir is {@condition incapacitated} or in danger and within his sight, Corvane is reckless: he has advantage on melee weapon attack rolls, and attack rolls against him have advantage until the start of his next turn."
 					]
+				}
+			],
+			"spellcasting": [
+				{
+					"name": "Pact Magic",
+					"type": "spellcasting",
+					"ability": "cha",
+					"headerEntries": [
+						"Corvane is a 9th-level warlock of the Fiend. His spellcasting ability is Charisma (spell save {@dc 15}, {@hit 7} to hit with spell attacks). He regains his expended spell slots when he finishes a short or long rest. He knows the following warlock spells:"
+					],
+					"will": [
+						"{@spell detect magic}"
+					],
+					"spells": {
+						"0": {
+							"spells": [
+								"{@spell eldritch blast}"
+							]
+						},
+						"5": {
+							"lower": 1,
+							"slots": 2,
+							"spells": [
+								"{@spell banishment}",
+								"{@spell command}",
+								"{@spell fear}",
+								"{@spell fire shield}",
+								"{@spell hellish rebuke}",
+								"{@spell hold person}",
+								"{@spell suggestion}"
+							]
+						}
+					}
 				}
 			],
 			"action": [
 				{
 					"name": "Multiattack",
 					"entries": [
-						"Corvane makes three attacks with his warhammer."
+						"Corvane makes three attacks with his warhammer. He can replace one of them with a Shield Bash."
 					]
 				},
 				{
 					"name": "Crested Warhammer",
 					"entries": [
-						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}13 ({@damage 2d8 + 4}) bludgeoning damage, and the target must succeed on a {@dc 16} Strength saving throw or be pushed 5 feet and have disadvantage on its next attack roll."
+						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}13 ({@damage 2d8 + 4}) bludgeoning damage, and if the target is Large or smaller, Corvane can push it up to 10 feet straight away from himself."
 					]
 				},
 				{
 					"name": "Shield Bash",
 					"entries": [
-						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}8 ({@damage 1d6 + 4}) bludgeoning damage, and the target must succeed on a {@dc 16} Strength saving throw or be knocked {@condition prone}."
+						"One creature within 5 feet of Corvane must succeed on a {@dc 16} Strength saving throw or take 9 ({@damage 2d4 + 4}) bludgeoning damage and, if it is Medium or smaller, be knocked {@condition prone}. Without his shield he shoves instead: the target must succeed on a {@dc 16} Strength or Dexterity saving throw (its choice) or be pushed 5 feet or knocked {@condition prone}, taking no damage."
 					]
 				},
 				{
-					"name": "A Word to the Wise (Recharge 5-6)",
+					"name": "Eldritch Blast",
 					"entries": [
-						"Corvane speaks, low and level, to one creature he can see within 60 feet that can understand him. The target must succeed on a {@dc 15} Wisdom saving throw or be {@condition frightened} of him for 1 minute, repeating the save at the end of each of its turns. A creature that has seen Corvane kill someone makes this save with disadvantage."
-					]
-				}
-			],
-			"bonus": [
-				{
-					"name": "Send Them",
-					"entries": [
-						"One ally within 60 feet that can see or hear Corvane uses its reaction to move up to its speed and make one weapon attack."
+						"Corvane fires two beams. For each one: {@atk rs} {@hit 7} to hit, range 120 ft., one target. {@h}8 ({@damage 1d10 + 3}) force damage."
 					]
 				}
 			],
 			"reaction": [
 				{
-					"name": "Old Reflex",
+					"name": "Hellish Rebuke",
 					"entries": [
-						"When Corvane is hit by a melee attack, he can make one attack with his warhammer against the attacker."
+						"When a creature Corvane can see within 60 feet damages him, he can expend a spell slot to cast {@spell hellish rebuke}. The creature must make a {@dc 15} Dexterity saving throw, taking 33 ({@damage 6d10}) fire damage on a failed save, or half as much on a successful one."
 					]
 				},
 				{
 					"name": "Nothing Touches the Boy",
 					"entries": [
-						"When an ally within 10 feet of Corvane would take damage, Corvane can take that damage instead."
+						"When an ally within 5 feet of Corvane takes damage, Corvane can take that damage instead. The damage he takes this way can't be reduced or prevented."
+					]
+				}
+			],
+			"legendary": [
+				{
+					"name": "Hammer",
+					"entries": [
+						"Corvane makes one Crested Warhammer attack."
+					]
+				},
+				{
+					"name": "Shove",
+					"entries": [
+						"Corvane uses Shield Bash."
+					]
+				},
+				{
+					"name": "Send Them",
+					"entries": [
+						"Corvane targets one ally he can see within 30 feet. If the target can see and hear him, it can make one weapon attack as a reaction and has advantage on the attack roll."
+					]
+				},
+				{
+					"name": "Move",
+					"entries": [
+						"Corvane moves up to his speed without provoking opportunity attacks."
+					]
+				},
+				{
+					"name": "A Word to the Wise (Costs 2 Actions)",
+					"entries": [
+						"Corvane targets one creature he can see within 30 feet. If it can see and hear him, it must succeed on a {@dc 15} Wisdom saving throw or be {@condition frightened} until the end of Corvane's next turn."
 					]
 				}
 			],
@@ -1467,7 +1542,7 @@
 				{
 					"name": "Runecraft Brawler",
 					"entries": [
-						"Cassian's unarmed strikes are magical and deal fire damage as shown below. He adds his Charisma modifier to their damage rolls."
+						"Cassian's unarmed strikes are magical and deal fire damage as shown below."
 					]
 				},
 				{
@@ -1598,7 +1673,7 @@
 				{
 					"name": "Duelist's Discipline",
 					"entries": [
-						"Eclair adds 3 to her AC against the first attack made against her each round (included above) while she is wielding a finesse weapon and no shield."
+						"Eclair adds 3 to her AC against the first attack made against her each round while she is wielding a finesse weapon and no shield."
 					]
 				},
 				{
@@ -1741,13 +1816,13 @@
 				{
 					"name": "Duelling Blade",
 					"entries": [
-						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}7 ({@damage 1d8 + 3}) piercing damage."
+						"{@atk mw} {@hit 6} to hit, reach 5 ft., one target. {@h}7 ({@damage 1d8 + 3}) piercing damage."
 					]
 				},
 				{
 					"name": "Moravel: Garrison Volley (Recharge 5-6)",
 					"entries": [
-						"Five darts of force, each hitting a creature of the champion's choice within 120 feet for 3 ({@damage 1d4 + 1}) force damage."
+						"Five darts of force, each hitting a creature of the champion's choice within 120 feet for 3 ({@damage 1d4 + 1}) force damage. This is {@spell magic missile} cast at 3rd level."
 					]
 				},
 				{
@@ -1833,7 +1908,7 @@
 			"skill": {
 				"nature": "+2",
 				"perception": "+4",
-				"stealth": "+6",
+				"stealth": "+7",
 				"survival": "+4"
 			},
 			"languages": [
@@ -1864,7 +1939,7 @@
 				{
 					"name": "Hand Axe",
 					"entries": [
-						"{@atk mw,rw} {@hit 5} to hit, reach 5 ft. or range 20/60 ft., one target. {@h}6 ({@damage 1d6 + 3}) slashing damage."
+						"{@atk mw,rw} {@hit 3} to hit, reach 5 ft. or range 20/60 ft., one target. {@h}4 ({@damage 1d6 + 1}) slashing damage."
 					]
 				}
 			],
@@ -1978,7 +2053,7 @@
 				{
 					"name": "Cleansing Spear",
 					"entries": [
-						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}6 ({@damage 1d6 + 3}) piercing damage, plus 5 ({@damage 2d4}) radiant damage if the target is an aberration or a Spellplague-warped creature."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage, plus 5 ({@damage 2d4}) radiant damage if the target is an aberration or a Spellplague-warped creature."
 					]
 				}
 			],
@@ -2017,11 +2092,11 @@
 				"N"
 			],
 			"ac": [
+				12,
 				{
-					"ac": 12,
-					"from": [
-						"mage armor"
-					]
+					"ac": 15,
+					"condition": "with {@spell mage armor}",
+					"braces": true
 				}
 			],
 			"hp": {
@@ -2126,11 +2201,11 @@
 				"N"
 			],
 			"ac": [
+				12,
 				{
-					"ac": 13,
-					"from": [
-						"mage armor"
-					]
+					"ac": 15,
+					"condition": "with {@spell mage armor}",
+					"braces": true
 				}
 			],
 			"hp": {
@@ -2147,7 +2222,7 @@
 			"wis": 13,
 			"cha": 12,
 			"passive": 11,
-			"cr": "4",
+			"cr": "5",
 			"group": [
 				"Oss'kai"
 			],
@@ -2227,7 +2302,7 @@
 				{
 					"name": "Quarterstaff",
 					"entries": [
-						"{@atk mw} {@hit 2} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
+						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
 					]
 				}
 			],
@@ -2256,11 +2331,11 @@
 				"N"
 			],
 			"ac": [
+				13,
 				{
-					"ac": 15,
-					"from": [
-						"mage armor"
-					]
+					"ac": 16,
+					"condition": "with {@spell mage armor}",
+					"braces": true
 				}
 			],
 			"hp": {
@@ -2277,7 +2352,7 @@
 			"wis": 15,
 			"cha": 13,
 			"passive": 12,
-			"cr": "8",
+			"cr": "9",
 			"group": [
 				"Oss'kai"
 			],
@@ -2382,7 +2457,7 @@
 				{
 					"name": "Rune Staff",
 					"entries": [
-						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 10 ({@damage 3d6}) force damage."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 10 ({@damage 3d6}) force damage."
 					]
 				}
 			],
@@ -2427,8 +2502,8 @@
 				}
 			],
 			"hp": {
-				"average": 189,
-				"formula": "26d8 + 72"
+				"average": 195,
+				"formula": "26d8 + 78"
 			},
 			"speed": {
 				"walk": 30
@@ -2499,7 +2574,7 @@
 					"type": "spellcasting",
 					"ability": "int",
 					"headerEntries": [
-						"The mage-adept is a 17th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 18}, {@hit 10} to hit with spell attacks). It has the following spells prepared:"
+						"The mage-adept is a 20th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 18}, {@hit 10} to hit with spell attacks). It has the following spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -2585,7 +2660,7 @@
 				{
 					"name": "Adept's Staff",
 					"entries": [
-						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) force damage."
+						"{@atk mw} {@hit 6} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) force damage."
 					]
 				},
 				{
@@ -2754,13 +2829,13 @@
 				"walk": 30
 			},
 			"str": 11,
-			"dex": 13,
+			"dex": 14,
 			"con": 11,
 			"int": 13,
 			"wis": 17,
 			"cha": 13,
 			"passive": 16,
-			"cr": "4",
+			"cr": "5",
 			"group": [
 				"Oss'kai"
 			],
@@ -2771,7 +2846,7 @@
 			"skill": {
 				"insight": "+6",
 				"medicine": "+9",
-				"nature": "+3"
+				"nature": "+4"
 			},
 			"languages": [
 				"Common",
@@ -2840,7 +2915,7 @@
 				{
 					"name": "Quarterstaff",
 					"entries": [
-						"{@atk mw} {@hit 2} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
+						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
 					]
 				}
 			],
@@ -2893,13 +2968,13 @@
 				"walk": 30
 			},
 			"str": 11,
-			"dex": 14,
+			"dex": 16,
 			"con": 13,
 			"int": 14,
 			"wis": 19,
 			"cha": 15,
 			"passive": 18,
-			"cr": "8",
+			"cr": "9",
 			"group": [
 				"Oss'kai"
 			],
@@ -3001,7 +3076,7 @@
 				{
 					"name": "Rune Staff",
 					"entries": [
-						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 7 ({@damage 2d6}) radiant damage."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 7 ({@damage 2d6}) radiant damage."
 					]
 				},
 				{
@@ -3053,8 +3128,8 @@
 				}
 			],
 			"hp": {
-				"average": 189,
-				"formula": "26d8 + 72"
+				"average": 195,
+				"formula": "26d8 + 78"
 			},
 			"speed": {
 				"walk": 30
@@ -3071,15 +3146,15 @@
 				"Oss'kai"
 			],
 			"save": {
-				"con": "+9",
-				"wis": "+11",
-				"cha": "+9"
+				"con": "+8",
+				"wis": "+10",
+				"cha": "+8"
 			},
 			"skill": {
-				"insight": "+11",
-				"medicine": "+16",
-				"nature": "+9",
-				"persuasion": "+9"
+				"insight": "+10",
+				"medicine": "+15",
+				"nature": "+8",
+				"persuasion": "+8"
 			},
 			"languages": [
 				"Common",
@@ -3119,7 +3194,7 @@
 					"type": "spellcasting",
 					"ability": "wis",
 					"headerEntries": [
-						"The healer-adept is a 17th-level spellcaster. Its spellcasting ability is Wisdom (spell save {@dc 19}, {@hit 11} to hit with spell attacks). It has the following spells prepared:"
+						"The healer-adept is a 20th-level spellcaster. Its spellcasting ability is Wisdom (spell save {@dc 18}, {@hit 10} to hit with spell attacks). It has the following spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -3204,7 +3279,7 @@
 				{
 					"name": "Adept's Staff",
 					"entries": [
-						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) radiant damage."
+						"{@atk mw} {@hit 6} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) radiant damage."
 					]
 				},
 				{
@@ -3535,7 +3610,7 @@
 				{
 					"name": "Bite",
 					"entries": [
-						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage. If the target is a creature, it must succeed on a {@dc 11} Strength saving throw or be knocked {@condition prone}."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage. If the target is a creature, it must succeed on a {@dc 12} Strength saving throw or be knocked {@condition prone}."
 					]
 				}
 			],
@@ -3610,7 +3685,7 @@
 				{
 					"name": "Club",
 					"entries": [
-						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
+						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d4 + 1}) bludgeoning damage."
 					]
 				},
 				{
@@ -3735,8 +3810,7 @@
 				{
 					"ac": 15,
 					"from": [
-						"studded leather",
-						"shield"
+						"scale mail"
 					]
 				}
 			],
@@ -3852,7 +3926,7 @@
 				"walk": 30
 			},
 			"str": 16,
-			"dex": 14,
+			"dex": 16,
 			"con": 15,
 			"int": 12,
 			"wis": 12,
@@ -3864,7 +3938,7 @@
 			],
 			"save": {
 				"str": "+5",
-				"dex": "+4",
+				"dex": "+5",
 				"wis": "+3"
 			},
 			"skill": {
@@ -4169,7 +4243,7 @@
 			],
 			"ac": [
 				{
-					"ac": 14,
+					"ac": 15,
 					"from": [
 						"studded leather"
 					]
@@ -4267,21 +4341,21 @@
 			],
 			"ac": [
 				{
-					"ac": 15,
+					"ac": 16,
 					"from": [
 						"studded leather"
 					]
 				}
 			],
 			"hp": {
-				"average": 76,
+				"average": 78,
 				"formula": "12d8 + 24"
 			},
 			"speed": {
 				"walk": 30
 			},
 			"str": 12,
-			"dex": 17,
+			"dex": 18,
 			"con": 14,
 			"int": 16,
 			"wis": 14,
@@ -4297,7 +4371,7 @@
 				"wis": "+4"
 			},
 			"skill": {
-				"deception": "+8",
+				"deception": "+7",
 				"insight": "+4",
 				"perception": "+4",
 				"stealth": "+6"
@@ -4463,7 +4537,7 @@
 					"type": "spellcasting",
 					"ability": "cha",
 					"headerEntries": [
-						"Ilna is a 7th-level spellcaster. Its spellcasting ability is Charisma (spell save {@dc 15}, {@hit 7} to hit with spell attacks). It has the following spells prepared:"
+						"Ilna is a 10th-level spellcaster. Her spellcasting ability is Charisma (spell save {@dc 15}, {@hit 7} to hit with spell attacks). She knows the following bard spells:"
 					],
 					"spells": {
 						"0": {
@@ -4486,6 +4560,7 @@
 							"slots": 3,
 							"spells": [
 								"{@spell detect thoughts}",
+								"{@spell enthrall}",
 								"{@spell invisibility}",
 								"{@spell suggestion}"
 							]
@@ -4499,9 +4574,17 @@
 							]
 						},
 						"4": {
-							"slots": 1,
+							"slots": 3,
 							"spells": [
-								"{@spell dimension door}"
+								"{@spell dimension door}",
+								"{@spell greater invisibility}"
+							]
+						},
+						"5": {
+							"slots": 2,
+							"spells": [
+								"{@spell mislead}",
+								"{@spell modify memory}"
 							]
 						}
 					}
@@ -4517,7 +4600,7 @@
 				{
 					"name": "Dagger",
 					"entries": [
-						"{@atk mw,rw} {@hit 6} to hit, reach 5 ft. or range 20/60 ft., one target. {@h}6 ({@damage 1d4 + 4}) piercing damage."
+						"{@atk mw,rw} {@hit 6} to hit, reach 5 ft. or range 20/60 ft., one target. {@h}5 ({@damage 1d4 + 3}) piercing damage."
 					]
 				},
 				{
@@ -4537,9 +4620,9 @@
 			],
 			"reaction": [
 				{
-					"name": "Cutting Word",
+					"name": "Cutting Words (4/Short Rest)",
 					"entries": [
-						"When a creature Ilna can see within 60 feet makes an attack roll, ability check, or damage roll, Ilna subtracts 6 ({@dice 1d10 + 1}) from the roll."
+						"When a creature Ilna can see within 60 feet makes an attack roll, ability check, or damage roll, Ilna subtracts 5 ({@dice 1d10}) from the roll. She regains all four uses when she finishes a short or long rest."
 					]
 				}
 			],
