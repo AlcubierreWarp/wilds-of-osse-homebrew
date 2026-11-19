@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ossë S13 DM Screen</title>
+<style>
+:root{--bg:#14110f;--tile:#211b18;--panel:#1a1613;--line:#3b312a;--ink:#f3ebdc;--soft:#a99c8a;--gold:#e2be6a;--wine:#8f2735;
+--steady:#3f7d4b;--bleed:#c98a2b;--dead:#0c0a09;--ward:#7fc4d8;
+--bel:#6fbf9a;--gab:#ee8a8a;--gus:#e2be6a;--tim:#c3a2f2}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--ink);font:17px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+#app{height:100%;display:flex;flex-direction:column}
+button{font:inherit;color:var(--ink);background:#33291f;border:1px solid var(--line);border-radius:7px;cursor:pointer;padding:7px 13px;font-weight:700;font-size:16px}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.38;cursor:default}
+button:focus-visible,[data-a]:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+button.pri{background:var(--wine);border-color:#c2485a}
+button.go{background:#2f5d3a;border-color:#4d8f5c}
+button.quiet{background:none;color:var(--soft);font-weight:600;font-size:14px}
+button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
+.bar{display:flex;gap:8px;align-items:center;padding:6px 8px;border-bottom:1px solid var(--line);flex:none}
+.bar .tabb{font:700 18px/1 Georgia,serif;padding:10px 16px}
+.bar .sp{flex:1}
+.bar .mv{color:var(--soft);font-size:14px}
+.grid{flex:1;min-height:0;display:grid;gap:6px;padding:6px;grid-template-columns:1fr 1fr;grid-template-rows:320px repeat(5,minmax(0,1fr))}
+.grid.one{grid-template-columns:1fr;grid-template-rows:1fr}
+.pn{container-type:inline-size;background:var(--panel);border:1px solid var(--line);border-radius:8px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.pn.spot{border:2px solid var(--gold)}
+.ph{display:flex;align-items:center;gap:8px;padding:7px 12px 0;flex:none}
+.lab{font:700 13px/1 Georgia,serif;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.ph .sp{flex:1}
+.pb{flex:1;min-height:0;overflow-y:auto;padding:8px 12px 10px}
+.pc{display:inline-block;font-weight:800;font-size:13px;letter-spacing:.04em;padding:1px 8px;border-radius:4px;border:2px solid var(--c);color:var(--c);text-transform:uppercase;white-space:nowrap;line-height:1.35}
+.pc.lead{background:var(--c);color:#14110f}
+.pc.bel{--c:var(--bel)}.pc.gab{--c:var(--gab)}.pc.gus{--c:var(--gus)}.pc.tim{--c:var(--tim)}
+.flag{color:#ffb070;font-weight:700}
+
+/* spotlight */
+.sph0{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 12px 0;flex:none}
+.sph0 .mvh{flex:1 1 240px;min-width:0}
+.sph0 .nav{margin:0}
+.sph0 .nav button{flex:none;padding:10px 16px}
+.spg{flex:1;min-height:0;display:grid;grid-template-columns:1.5fr 1.2fr .9fr;gap:12px;padding:8px 12px 10px}
+@container (max-width:720px){.pn .spg{display:block;overflow-y:auto}.pn .spg>div{overflow:visible;min-height:auto;margin-bottom:12px}}
+.spg>div{min-height:0;overflow-y:auto}
+.mvn{font:700 12px/1 system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.mvt{font:700 30px/1.05 Georgia,serif;color:var(--gold);margin:3px 0 2px}
+.mvk{font-size:14px;color:var(--soft);margin-bottom:7px}
+.wl{display:grid;grid-template-columns:auto 1fr;gap:6px 8px;font-size:14.5px;line-height:1.28;align-items:start}
+.tick{display:flex;gap:8px;align-items:flex-start;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:15.5px;line-height:1.28;border:1px solid transparent}
+.tick:hover{border-color:var(--line)}
+.tick i{flex:none;width:20px;height:20px;border:2px solid var(--soft);border-radius:4px;margin-top:1px;display:grid;place-items:center;font-style:normal;font-size:14px;font-weight:900;color:#14110f}
+.tick.done{color:var(--soft);text-decoration:line-through}
+.tick.done i{background:var(--steady);border-color:var(--steady)}
+.pen{border-left:4px solid var(--gold);padding:5px 9px;background:var(--tile);border-radius:0 6px 6px 0;font:italic 15.5px/1.3 Georgia,serif;margin-bottom:6px}
+.pen b{display:block;font:700 11px/1.2 system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-style:normal;margin-bottom:2px}
+.nav{display:flex;gap:6px;margin:6px 0}
+.nav button{flex:1}
+.tally{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.tally .pc{cursor:pointer;font-size:13px;padding:4px 8px}
+.tally small{color:var(--soft);font-size:11px;letter-spacing:.1em;text-transform:uppercase;width:100%}
+
+/* roll call */
+.rcw{display:flex;flex-wrap:wrap;gap:6px}
+.rc{flex:1 1 140px;border-radius:7px;padding:6px 9px;cursor:pointer;user-select:none;border:2px solid transparent;min-width:0}
+.rc b{display:block;font:700 17px/1.1 Georgia,serif}
+.rc>span{font-size:12.5px;opacity:.9;display:block;line-height:1.25;margin-top:2px}
+.rc em{font:800 11.5px/1 system-ui;letter-spacing:.1em;text-transform:uppercase;font-style:normal;display:block;margin-top:4px}
+.rc.standing{background:var(--steady)}
+.rc.down{background:var(--bleed);color:#1b1206}
+.rc.dead{background:var(--dead);color:#8d8273;border-color:#3a322c}
+.rc.dead b{text-decoration:line-through}
+.pip{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #1b1206;vertical-align:-3px;margin-left:6px;cursor:pointer}
+.pip.f{background:#1b1206}
+.mini .rc{flex-basis:112px;padding:5px 8px}.mini .rc b{font-size:15px}.mini .rc>span{display:none}
+@media (max-height:280px){.one .rc{flex-basis:112px;padding:5px 8px}.one .rc b{font-size:15px}.one .rc>span{display:none}}
+
+/* hand */
+.dc{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.dc b{font:700 62px/.95 Georgia,serif;color:var(--gold)}
+.dc span{font-size:15px;color:var(--soft);line-height:1.25}
+.hpn{font:700 34px/1 Georgia,serif;margin:8px 0 4px}
+.hpn small{font:600 14px system-ui;color:var(--soft);margin-left:6px}
+.hpbar{height:16px;background:#3a2d27;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+.hpbar i{display:block;height:100%;background:var(--wine)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.dmg{display:flex;gap:6px;margin:8px 0 0}
+.dmg input{width:86px;font:700 20px/1 Georgia,serif;color:var(--ink);background:#120f0d;border:1px solid var(--line);border-radius:7px;padding:6px 10px;text-align:center}
+.dmg input::placeholder{color:var(--soft);font:600 14px system-ui}
+.dmg input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.notes{list-style:none;font-size:14.5px;line-height:1.3;display:flex;flex-direction:column;gap:4px}
+.notes li{padding-left:9px;border-left:3px solid var(--line)}
+.deadbox{background:var(--dead);border:1px solid #3a322c;border-radius:7px;padding:8px 10px;font:700 18px Georgia,serif;color:var(--gold);margin:6px 0}
+
+/* initiative */
+.ini{display:flex;flex-direction:column;gap:4px}
+.ir{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;padding:6px 9px;border-radius:7px;background:var(--tile);border:2px solid transparent;font-size:16px}
+.ir b{font:700 20px/1 Georgia,serif;color:var(--gold);text-align:center}
+.ir small{color:var(--soft);font-size:12.5px}
+.ir.cur{border-color:var(--gold);background:#3a2c14}
+.ir.off{opacity:.38}
+
+/* evidence */
+.ev{display:grid;grid-template-columns:26px 1fr;gap:4px 9px;padding:7px 8px;border-radius:7px;border:1px solid var(--line);margin-bottom:6px;cursor:pointer;background:var(--tile)}
+.ev i{width:22px;height:22px;border:2px solid var(--soft);border-radius:4px;display:grid;place-items:center;font-style:normal;font-weight:900;color:#14110f;font-size:15px;margin-top:2px}
+.ev.done{opacity:.55}
+.ev.done i{background:var(--steady);border-color:var(--steady)}
+.evh{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.evh b{font:700 18px/1.1 Georgia,serif}
+.evh u{text-decoration:none;font:700 12px system-ui;letter-spacing:.06em;background:#3a2d27;border:1px solid var(--line);border-radius:99px;padding:1px 9px;color:var(--gold)}
+.evt{font-size:15px;line-height:1.32}
+.mini .ev{padding:5px 8px;margin-bottom:4px}.mini .evt{display:none}.mini .evh b{font-size:16px}
+
+/* voices */
+.vgrid{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.vtile{background:var(--tile);border:1px solid var(--line);border-radius:7px;padding:7px 9px;cursor:pointer}
+.vtile:hover{border-color:var(--gold)}
+.vn{font:700 18px/1.05 Georgia,serif;color:var(--gold)}
+.vc{font-size:12px;color:var(--soft);line-height:1.25;margin-top:2px}
+.vname{font:700 24px/1 Georgia,serif;color:var(--gold)}
+.how{font-size:13.5px;color:var(--soft);font-style:italic;margin:2px 0 6px}
+.vbeat{font:700 11.5px/1 system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:9px 0 3px}
+.line{font:italic 600 19px/1.25 Georgia,serif;margin-bottom:5px}
+.sph{font:400 26px/1.36 Georgia,serif}
+.sph p{margin-bottom:14px}
+.sph .dir{font:italic 16px/1.3 system-ui;color:var(--soft)}
+.sph .cond{color:var(--gold)}
+
+/* sealed */
+.sealbtn{flex:1;margin:10px;border:2px dashed var(--line);background:#120f0d;color:var(--soft);font:700 20px Georgia,serif;border-radius:8px}
+.sec{list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.3}
+.sec li{padding-left:9px;border-left:3px solid var(--wine)}
+table.ck{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.28}
+table.ck th{text-align:left;font:700 11.5px system-ui;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);padding:3px 8px 3px 0;border-bottom:1px solid var(--line)}
+table.ck td{padding:5px 8px 5px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.ck td:first-child{font-weight:700;white-space:nowrap}
+
+/* stat blocks */
+.schips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.schips button{padding:5px 11px;font-size:14px;border-radius:99px}
+.sbk{background:#fdf1dc;color:#1b1410;border-radius:4px;border-top:4px solid #e69a28;border-bottom:4px solid #e69a28;padding:10px 12px;font:15.5px/1.38 "Segoe UI",system-ui,sans-serif;box-shadow:0 0 6px #0008}
+.sbk p{margin:3px 0}
+.sbk p b{color:#1b1410}
+.sbname{font:700 28px/1.05 Georgia,"Times New Roman",serif;color:#7a200d;font-variant:small-caps;letter-spacing:.02em}
+.sbsub{font-style:italic;font-size:.92em;margin-bottom:2px}
+.taper{height:5px;margin:6px 0;background:#922610;clip-path:polygon(0 0,0 100%,100% 50%)}
+.sbk p>b:first-child{color:#7a200d}
+.abil{width:100%;border-collapse:collapse;text-align:center;color:#7a200d}
+.abil th{font-size:.82em;letter-spacing:.04em;padding:0}.abil td{padding:0;font-size:.95em}
+.sbk h3{font:400 21px/1.1 Georgia,serif;font-variant:small-caps;color:#7a200d;border-bottom:1px solid #7a200d;margin:10px 0 4px;letter-spacing:.03em}
+.tonight{background:#f6dfae;border-left:4px solid #922610;border-radius:0 4px 4px 0;padding:5px 9px;margin:6px 0}
+.tonight h4{font:700 .78em system-ui;letter-spacing:.14em;text-transform:uppercase;color:#922610;margin-bottom:1px}
+.tonight p b i{font-style:normal}
+.skl{columns:2;column-gap:14px}
+.skl div{display:flex;justify-content:space-between;break-inside:avoid;border-bottom:1px dotted #c9b48a;padding:1px 0}
+.skl div b{color:#1b1410;font-weight:600}
+.skl div.pr span,.skl div.pr b{font-weight:700;color:#7a200d}
+.key{font-size:.8em;color:#7a200d99;margin-top:3px}
+.tb{width:100%;border-collapse:collapse;font-size:.93em}
+.tb th{text-align:left;font-size:.78em;letter-spacing:.06em;text-transform:uppercase;color:#7a200d;border-bottom:1px solid #c9b48a;padding:1px 4px 1px 0}
+.tb td{padding:2px 4px 2px 0;border-bottom:1px dotted #d9c69c;vertical-align:top}
+.tb td b{color:#1b1410}
+@media (prefers-reduced-motion: reduce){button:active{transform:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+const SB=[{"name":"The Hand","sub":"Medium humanoid, neutral evil · sworn servant of the royal family","ac":"17 (rune-threaded studded leather)","hp":"91","speed":"35 ft., climb 20 ft.","abil":[14,19,14,14,14,10],"props":[["Saving Throws","Dex +7, Int +5, Wis +5"],["Skills","Acrobatics +7, Athletics +5, Perception +5, Stealth +10"],["Damage Resistances","poison"],["Senses","passive Perception 15"],["Languages","Common, Thieves' cant"],["Challenge","6"]],"tonight":[["Defense DC 19","The target's player rolls d20 + (AC − 10). Two Kissed Blades, 14 each."],["No exit","He carries no tablet. He fights to the death and does not leave the room alive."],["The ward clock","Stopped while a PC holds the room. One ward of six still burns."],["Corvane, round 2","39 from the Marquis every round. He does not stop."],["Oathbound","A hidden mark under the skin: a sworn servant of the royal family. Found on the body with Arcana DC 14 or detect magic."]],"sections":[{"h":"","items":[["The Last Ward","While it stands he cannot come within 10 feet of the bed or target Cassian. It holds as long as a PC keeps him busy."],["Patient Killer","Its mark is Lord Cassian. It fights anyone who gets between them."],["Widow's Kiss","A creature dropped to 0 hit points by this poison is Kissed: unconscious, and it automatically fails one death save at the start of each turn. Healing wakes it, but it takes 7 poison damage at the start of each turn until cured (lesser restoration, protection from poison, or antitoxin with a DC 15 Medicine check)."]]},{"h":"Actions","items":[["Multiattack","Two Kissed Blade attacks."],["Kissed Blade","Melee, reach 5 ft. Defense DC 19. Hit: 14 (7 piercing + 7 poison)."]]},{"h":"Bonus Actions","items":[["Cunning Action","Dash, Disengage or Hide."]]},{"h":"Reactions","items":[["Uncanny Dodge","Halves the damage of one attack that hits it, if it can see the attacker."]]}]},{"name":"Marquis Corvane Aerrowyn","sub":"Medium humanoid (human), neutral evil","ac":"18 (half plate, shield). Your call what he wears at his own gala","hp":"138","speed":"30 ft.","abil":[18,13,18,16,15,17],"props":[["Saving Throws","Str +8, Con +8, Wis +6"],["Skills","Athletics +8, Deception +7, Insight +6, Intimidation +10, Perception +6, Persuasion +7"],["Senses","passive Perception 16"],["Challenge","7"]],"tonight":[["Round 2","He comes through the bedroom door and acts right after Belaskro, every round. Static damage, no DM rolls."],["His turn","The Hand takes 39 (three warhammer blows). He does not stop when the Hand is down."],["Nothing Left to Lose","His heir is in danger and in his sight: he attacks with advantage and resists all damage."],["After","The body stays in his house. He carries the blue robe downstairs."]],"sections":[{"h":"","items":[["Frontier Veteran","Advantage on initiative and on saves against being frightened. Cannot be surprised while conscious."],["Nothing Left to Lose but One Thing","While his heir is incapacitated or in danger and within his sight, he attacks with advantage and has resistance to all damage."]]},{"h":"Actions","items":[["Multiattack","Three warhammer attacks."],["Crested Warhammer","Melee +8, reach 5 ft. Hit: 13 (2d8 + 4) bludgeoning, and DC 16 Strength save or pushed 5 feet with disadvantage on its next attack."],["A Word to the Wise (Recharge 5–6)","One creature within 60 feet: DC 15 Wisdom save or frightened of him for 1 minute."]]},{"h":"Reactions","items":[["Old Reflex","When hit by a melee attack, he makes one warhammer attack against the attacker."],["Nothing Touches the Boy","When an ally within 10 feet would take damage, he takes it instead."]]},{"h":"Legendary Actions (3 per round, after another creature's turn)","items":[["Hammer","The Hand takes 13 and is shoved 5 feet from the bed. Belaskro's next defense roll has advantage."],["Shield Bash","The Hand is knocked prone. Attacks on him have advantage until his turn."],["Over the Child (Costs 2)","He moves to the bed and stands over Cassian. Cassian cannot be targeted until his next turn."],["SEND THEM (Costs 3)","Every PC who can hear him may use their reaction to move half speed and make one weapon attack."]]}]},{"name":"Lord Cassian Aerrowyn","sub":"Medium humanoid (human), chaotic neutral · injured, in bed","ac":"15 (no leathers, in bed)","hp":"30 (of 97)","speed":"0 ft. tonight","abil":[16,18,14,12,12,17],"props":[["Saving Throws","Dex +7, Cha +6"],["Skills","Acrobatics +7, Athletics +6, Intimidation +6, Performance +6"],["Senses","passive Perception 11"],["Challenge","5"]],"tonight":[["In the bed","He does not leave it, whatever anyone shouts. Do not explain."],["Last ward","One of six still burns. The clock is stopped while a PC holds the room."],["Beside a PC","PC attacks against the Hand have advantage, and he deals the Hand 14 fire each round. No roll."],["Defense +5, Con +2","If something does attack him."]],"sections":[{"h":"","items":[["Will Not Back Down","At half hit points or fewer he ignores the frightened condition."]]},{"h":"Reactions","items":[["Is That All You've Got","When he takes damage from an attack he can see, he reduces it by 5."]]}]},{"name":"Belaskro Tich","sub":"Human Ranger 4 · Folk Hero · played by Justin","ac":"15","hp":"32 (Hit Dice 4d10)","speed":"30 ft.","abil":[12,18,12,10,14,12],"props":[["Initiative","+4"],["Proficiency Bonus","+2"],["Saving Throws","Str +3*, Dex +6*, Con +1, Int +0, Wis +2, Cha +1 (* proficient)"],["Senses","passive Perception 14, Insight 12, Investigation 12"],["Proficiencies","Armor: Light Armor, Medium Armor, Shields; Weapons: Martial Weapons, Simple Weapons; Tools: Monster Harvesting Tools, Vehicles (Land)"],["Languages","Common, Common Sign Language, Dwarvish, Orc"],["Spellcasting","Wis · save DC 12 · attack +4"]],"tonight":[["Defense +5","Rolls d20 + 5 against DC 19 (the Hand)."],["Hunter's Mark","Already up on the Hand."],["Rune tablets","Two blank Vantry tablets left."],["Whip","Reach 10 ft."],["Wake","Cure Wounds is on his list. He cannot cure the poison."]],"sections":[{"h":"Skills","skills":[["Acrobatics","+4",""],["Animal Handling","+4","P"],["Arcana","+0",""],["Athletics","+3","P"],["Deception","+1",""],["History","+0",""],["Insight","+2",""],["Intimidation","+1",""],["Investigation","+2","P"],["Medicine","+2",""],["Nature","+0",""],["Perception","+4","P"],["Performance","+1",""],["Persuasion","+3","P"],["Religion","+0",""],["Sleight of Hand","+4",""],["Stealth","+4",""],["Survival","+6","E"]]},{"h":"Attacks","table":{"head":["Attack","Hit","Damage","Notes"],"rows":[["Crossbow, Hand","+8","1d6+4","Piercing Martial, Ammunition, Range, Light, Loading, Vex, Range (30/120)"],["Whip","+6","1d4+4","Slashing Martial, Finesse, Reach, Slow"],["Unarmed Strike","+3","2","Bludgeoning"]]}},{"h":"Spells · 1st level · 3 slots","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Speak with Animals (ritual)","Action","Self","10 minutes"],["Cure Wounds","Action","Touch","Instantaneous"],["Fog Cloud","Action","120 ft./20 ft. Sphere","Conc. 1 hour"],["Longstrider","Action","Touch","1 hour"],["Detect Magic (ritual)","Action","Self/30 ft. Sphere","Conc. 10 minutes"],["★ Hunter's Mark","Bonus","90 ft.","Conc. 1 hour"]]}},{"h":"","items":[["Spell list","★ marks always-prepared spells. The sheet lists every spell available to the class and does not show which of the others are prepared today."]]},{"h":"Ranger Features","items":[["Favored Enemy","You always have Hunter’s Mark prepared and can cast it without expending a spell slot 2 times per Long Rest. [Hunter’s Mark: 2 / Long Rest • 1 Bonus Action]"],["Deft Explorer","You gain Expertise with one of your skill proficiencies. You know two languages of your choice."],["Fighting Style","[Fighting Style feat]"],["Hunter’s Lore","When a creature is marked by your Hunter’s Mark, you know whether the creature has any Immunities, Resistances, Vulnerabilities, and if the creature has any, you know what they are. [1 Bonus Action]"],["Hunter’s Prey","You gain one option of your choice. Whenever you finish a Short or Long Rest, you can replace the option with the other one. [Colossus Slayer] Once per turn, when you hit a creature that’s missing any of its HP with a weapon, the weapon deals an extra 1d8 damage. [1 Action]"]]},{"h":"Human Species Traits","items":[["Resourceful","You gain Heroic Inspiration whenever you finish a Long Rest."],["Skillful","You gain proficiency in one skill of your choice."],["Versatile","You gain an Origin feat of your choice."]]},{"h":"Feats","items":[["Savage Attacker","Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target."],["Archery","You gain a +2 bonus to attack rolls with Ranged weapons."],["Weapon Mastery","[Hand Crossbow (Vex)] Vex. If you hit a creature with a Hand Crossbow and deal damage to it, you have Advantage on your next attack roll against that creature before the end of your next turn. [Whip (Slow)] Slow. If you hit a creature with a Whip and deal damage to the creature, you can reduce its Speed by 10 ft. until the start of your next turn. If the creature is hit more than once with this property, the Speed reduction doesn’t exceed 10 ft. [Vex (Hand Crossbow): 1 Action] [Slow (Whip):]"]]},{"h":"Equipment","items":[["Carried","Leather, Crossbow, Hand, Whip, Crossbow Bolts ×20, Clothes, Common, Pot, Iron, Shovel, Monster Harvesting Tools ×0, Sun and Moon Signet Ring, Blank Rune Tablets ×3, Sabotaged Shield Runes ×2, Unbowed Instruction Letter"]]}]},{"name":"Gabriele d'Avidicci","sub":"Human Cleric 4 · Soldier · played by Peter","ac":"15","hp":"27 (Hit Dice 4d8)","speed":"30 ft.","abil":[11,8,13,14,16,14],"props":[["Initiative","−1"],["Proficiency Bonus","+2"],["Saving Throws","Str +0, Dex -1, Con +1, Int +2, Wis +5*, Cha +4* (* proficient)"],["Senses","passive Perception 13, Insight 13, Investigation 12"],["Proficiencies","Armor: Light Armor, Medium Armor, Shields; Weapons: Simple Weapons, Sword; Tools: Playing Card Set"],["Languages","Common, Common Sign Language, Draconic"],["Spellcasting","Wis · save DC 13 · attack +5"]],"tonight":[["Defense +5","Rolls d20 + 5 against DC 19 (the Hand)."],["Cure","Lesser Restoration (bonus action, always prepared) cures Noémie."],["Wake","Cure Wounds (always prepared), Healing Word at 60 ft if prepared, one Potion of Healing."],["Preserve Life","Channel Divinity: wakes every Kissed champion within 30 feet."],["St. Peter","His Spiritual Weapon was last by the Vayne table."]],"sections":[{"h":"Skills","skills":[["Acrobatics","−1",""],["Animal Handling","+3",""],["Arcana","+7","P"],["Athletics","+2","P"],["Deception","+2",""],["History","+4","P"],["Insight","+3",""],["Intimidation","+4","P"],["Investigation","+2",""],["Medicine","+3",""],["Nature","+2",""],["Perception","+3",""],["Performance","+2",""],["Persuasion","+4","P"],["Religion","+5",""],["Sleight of Hand","−1",""],["Stealth","−1",""],["Survival","+3",""]]},{"h":"Attacks","table":{"head":["Attack","Hit","Damage","Notes"],"rows":[["Mace","+2","1d6","Bludgeoning Simple, Sap"],["Rapier","+0","1d8","Piercing Martial, Finesse, Vex"],["Unarmed Strike","+2","1","Bludgeoning"]]}},{"h":"Spells · Cantrips","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Thaumaturgy","Action","30 ft.","1 minute"],["Toll the Dead","Action","60 ft.","Instantaneous"],["Guidance","Action","Touch","Conc. 1 minute"]]}},{"h":"Spells · 1st level · 4 slots","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Guiding Bolt","Action","120 ft.","1 round"],["★ Cure Wounds","Action","Touch","Instantaneous"],["★ Bless","Action","30 ft.","Conc. 1 minute"],["Bane","Action","30 ft.","Conc. 1 minute"],["Protection from Evil and Good","Action","Touch","Conc. 10 minutes"],["Purify Food and Drink (ritual)","Action + 10m","10 ft./5 ft. Sphere","Instantaneous"],["Command","Action","60 ft.","Instantaneous"],["Sanctuary","Bonus","30 ft.","1 minute"],["Shield of Faith","Bonus","60 ft.","Conc. 10 minutes"],["Create or Destroy Water","Action","30 ft./30 ft. Cube","Instantaneous"],["Detect Evil and Good","Action","Self/30 ft. Sphere","Conc. 10 minutes"],["Detect Poison and Disease (ritual)","Action + 10m","Self/30 ft. Sphere","Conc. 10 minutes"],["Detect Magic (ritual)","Action + 10m","Self/30 ft. Sphere","Conc. 10 minutes"],["Healing Word","Bonus","60 ft.","Instantaneous"],["Inflict Wounds","Action","Touch","Instantaneous"]]}},{"h":"Spells · 2nd level · 3 slots","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Spiritual Weapon","Bonus","60 ft.","Conc. 1 minute"],["★ Aid","Action","30 ft.","8 hours"],["★ Lesser Restoration","Bonus","Touch","Instantaneous"],["Augury (ritual)","1 min (ritual)","Self","Instantaneous"],["Find Traps","Action","120 ft.","Instantaneous"],["Prayer of Healing","10m","30 ft.","Instantaneous"],["Protection from Poison","Action","Touch","1 hour"],["Blindness/Deafness","Action","120 ft.","1 minute"],["Gentle Repose (ritual)","Action + 10m","Touch","10 days"],["Calm Emotions","Action","60 ft./20 ft. Sphere","Conc. 1 minute"],["Locate Object","Action","Self","Conc. 10 minutes"],["Silence (ritual)","Action + 10m","120 ft./20 ft. Sphere","Conc. 10 minutes"],["Continual Flame","Action","Touch","Until dispelled"],["Hold Person","Action","60 ft.","Conc. 1 minute"],["Enhance Ability","Action","Touch","Conc. 1 hour"],["Warding Bond","Action","Touch","1 hour"],["Zone of Truth","Action","60 ft./15 ft. Sphere","10 minutes"]]}},{"h":"","items":[["Spell list","★ marks always-prepared spells. The sheet lists every spell available to the class and does not show which of the others are prepared today."]]},{"h":"Cleric Features","items":[["Divine Order","[Thaumaturge] You know one extra cantrip from the Cleric spell list. You also have a +3 bonus to your Arcana and Religion checks."],["Channel Divinity","You can channel energy directly from the Outer Planes to fuel magical effects. When you use this class’s Channel Divinity, you can choose which effect to create. You can use this class’s Channel Divinity 2 times per Long Rest, but can regain one expended use after finishing a Short Rest. If your Channel Divinity requires a saving throw, the DC equals your Cleric spell save DC (DC 13). [2 / Long Rest • 1 Action] [Channel Divinity: Divine Spark: 1 Action] [Channel Divinity: Turn Undead: 1 Action]"],["Disciple of Life","When a spell you cast with a spell slot restores HP to a creature, that creature regains an additional 2 + the spell slot’s level."],["Life Domain Spells","When you reach a Cleric level specified in the Life Domain Spells table, you always have the listed spells prepared."],["Preserve Life","As a Magic Action, you can expend a use of your Channel Divinity to restore 20 HP to Bloodied creatures within 30 ft. of yourself (which can include you), and divide the HP among them. This feature can only restore a creature up to half its maximum HP. [Channel Divinity: Preserve Life: 1 Action]"]]},{"h":"Human Species Traits","items":[["Resourceful","You gain Heroic Inspiration whenever you finish a Long Rest."],["Skillful","You gain proficiency in one skill of your choice."],["Versatile","You gain an Origin feat of your choice."]]},{"h":"Feats","items":[["Magic Initiate (Cleric)","Two Cantrips. You learn two cantrips of your choice from the Cleric spell list. Int., Wis., or Cha. is your spellcasting ability for this feat's spells. Level 1 Spell. Choose a level 1 spell from the Cleric spell list. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time. [Wisdom]"],["Savage Attacker","Once per turn when you hit a target with a weapon, you can roll the weapon’s damage dice twice and use either roll against the target."],["Soldier Ability Score Improvements","[Increase three scores (+1 / +1 / +1) •]"]]},{"h":"Equipment","items":[["Carried","Shield, Chain Shirt, Father Baricello's Rosary, Mace, Rapier, Backpack, Father Barichello's Bible, Potion of Healing, Rations ×7, Robe, Blanket, Tinderbox, Lamp, Holy Water"]]}]},{"name":"Gus (AM-FIU-27)","sub":"Warforged Artificer 4 · Faction Agent · played by Shane","ac":"18","hp":"23 (Hit Dice 4d8)","speed":"30 ft.","abil":[10,14,10,16,12,13],"props":[["Initiative","+2"],["Proficiency Bonus","+2"],["Saving Throws","Str +0, Dex +2, Con +2*, Int +5*, Wis +1, Cha +1 (* proficient)"],["Senses","passive Perception 13, Insight 13, Investigation 15"],["Damage Resistances","poison; advantage on saves against being poisoned"],["Proficiencies","Armor: Light Armor, Medium Armor, Shields; Weapons: Firearms, Martial Weapons, Simple Weapons; Tools: Alchemist's Supplies, Forgery Kit, Smith's Tools, Thieves' Tools, Tinker's Tools"],["Languages","Common, Dwarvish, Elvish, Sylvan"],["Spellcasting","Int · save DC 13 · attack +5"]],"tonight":[["Defense +8","Rolls d20 + 8 against DC 19 (the Hand)."],["Shield","Always prepared: as a reaction, +5 to a failed defense roll."],["Poison resistance","The Hand's hit deals him 10 instead of 14."],["Detect magic","Finds the oathmark on the body without a roll."],["Steel defender","On the ballroom floor by the Vayne table."],["EP-07","Handed over tonight: Handler signal lost."]],"sections":[{"h":"Skills","skills":[["Acrobatics","+2",""],["Animal Handling","+1",""],["Arcana","+5","P"],["Athletics","+0",""],["Deception","+1",""],["History","+3",""],["Insight","+3","P"],["Intimidation","+1",""],["Investigation","+5","P"],["Medicine","+1",""],["Nature","+3",""],["Perception","+3","P"],["Performance","+1",""],["Persuasion","+1",""],["Religion","+3",""],["Sleight of Hand","+2",""],["Stealth","+2",""],["Survival","+1",""]]},{"h":"Attacks","table":{"head":["Attack","Hit","Damage","Notes"],"rows":[["Crossbow, Light","+4","1d8+2","Piercing Simple, Ammunition, Loading, Range, Two-Handed, Slow, Range (80/320)"],["Dagger","+4","1d4+2","Piercing Simple, Finesse, Light, Thrown, Nick, Range (20/60)"],["Spear","+2","1d6","Piercing Simple, Thrown, Versatile, Sap, Range (20/60)"],["Shocking Grasp","+5","1d8","Lightning V/S"],["Unarmed Strike","+2","1","Bludgeoning"]]}},{"h":"Spells · Cantrips","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Acid Splash","Action","60 ft.","Instantaneous"],["Shocking Grasp","Action","Touch","Instantaneous"]]}},{"h":"Spells · 1st level · 3 slots","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Tasha's Caustic Brew","Action","Self/30 ft. Line","Conc. 1 minute"],["Sanctuary","Bonus","30 ft.","1 minute"],["Detect Magic (ritual)","Action","Self/30 ft. Sphere","Conc. 10 minutes"],["Snare","1m","Touch","8 hours"],["Grease","Action","60 ft./10 ft. Square","1 minute"],["★ Shield","Reaction","Self","1 round"],["★ Heroism","Action","Touch","Conc. 1 minute"],["Alarm (ritual)","1 min (ritual)","30 ft.","8 hours"],["Cure Wounds","Action","Touch","Instantaneous"],["Disguise Self","Action","Self","1 hour"],["Expeditious Retreat","Bonus","Self","Conc. 10 minutes"],["Faerie Fire","Action","60 ft./20 ft. Cube","Conc. 1 minute"],["False Life","Action","Self","1 hour"],["Feather Fall","Reaction","60 ft.","1 minute"],["Identify (ritual)","1 min (ritual)","Touch","Instantaneous"],["Jump","Action","Touch","1 minute"],["Longstrider","Action","Touch","1 hour"],["Purify Food and Drink (ritual)","Action + 10m","10 ft./5 ft. Sphere","Instantaneous"],["Absorb Elements","Reaction","Self","1 round"],["Catapult","Action","60 ft.","Instantaneous"]]}},{"h":"","items":[["Spell list","★ marks always-prepared spells. The sheet lists every spell available to the class and does not show which of the others are prepared today."]]},{"h":"Artificer Features","items":[["Magical Tinkering","Imbue a Tiny nonmagical object with a magical property of your choice: 5ft. radius light, up to 6 second long recorded message, emits odor or nonverbal sound, static visual effect including up to 25 words of text. You can affect a maximum of 3 objects at a time. [3 / Other • 1 Action]"],["Spellcasting","You can cast prepared artificer spells using INT as your spellcasting modifier (Spell DC 13, Spell Attack +5) and prepared artificer spells as rituals if they have the ritual tag. You must have a spellcasting focus, specifically thieves’ tools or some kind of artisan’s tool, in hand when you cast any spell with this feature."],["Infuse Item","Whenever you finish a long rest, you can touch up to 2 nonmagical objects, imbuing each of them with one of your artificer infusions, turning it into a magic item. You can attune yourself to the item the instant you infuse it, or you can forgo attunement so that someone else can attune to the item. Your infusion remains in an item indefinitely, but when you die, the infusion vanishes after 3 days. The infusion also vanishes if you give up your knowledge of the infusion or you exceed your maximum number of infusions. [2 / Other • 1 Action]"],["Artificer Infusions","You have invented numerous magical infusions that rapidly create magic items. Each infusion tells you the type of item that can receive it and if the resulting magic item requires attunement. Some infusions specify a minimum artificer level, and unless an infusion’s description says otherwise, you can’t learn it more than once."],["Artificer Specialist","The type of specialist are: [Battle Smith]"],["The Right Tool for the Job","With thieves’ tools or artisan’s tools in hand, you can magically create one set of artisan’s tools in an unoccupied space within 5 feet of you. This creation requires 1 hour of uninterrupted work, which can coincide with a short or long rest. Though the product of magic, the tools are nonmagical, and they vanish when you use this feature again. [1 Hour]"],["Tool Proficiency","You gain proficiency with smith’s tools. If you already have this proficiency, you gain proficiency with one other type of artisan’s tools of your choice."],["Battle Smith Spells","You always have certain spells prepared after you reach particular levels in this class, as shown in the Battle Smith Spells table."],["Battle Ready","You gain proficiency with martial weapons and when you attack with a magic weapon, you can use your Intelligence modifier, instead of Strength or Dexterity modifier, for the attack and damage rolls."],["Steel Defender","You have created a Steel Defender, that obeys your commands. In combat, the steel defender shares your initiative count, but it takes its turn immediately after yours. It can move and use its reaction on its own, but the only action it takes on its turn is the Dodge action. If you expend your bonus action, you can command it to take an action from its stat block, or some other action. [25 / Other • 1 Action]"]]},{"h":"Warforged Species Traits","items":[["Constructed Resilience","You have advantage on saving throws against being poisoned, and you have resistance to poison damage. You don’t need to eat, drink, or breathe. You are immune to disease. You don’t need to sleep, and magic can’t put you to sleep."],["Sentry’s Rest","When you take a long rest, you must spend at least six hours in an inactive, motionless state, rather than sleeping. In this state, you appear inert, but it doesn’t render you unconscious, and you can see and hear as normal."],["Integrated Protection","You gain a +1 bonus to Armor Class. To don or doff armor other than a shield takes 1 hour, and you must be proficient with the armor. While you live, your incorporated armor can’t be removed from your body against your will. ADDITIONAL FEATURES & TRAITS ADDITIONAL EQUIPMENT"]]},{"h":"Feats","items":[["War Caster","You have advantage on CON saving throws that you make to maintain your concentration on a spell when you take damage. You can perform the somatic components of spells even when you have weapons or a shield in one or both hands. You can use your reaction to make an opportunity attack to cast a spell that has a casting time of 1 action and targets only that creature. [1 Reaction]"]]},{"h":"Equipment","items":[["Carried","Scale Mail, Dagger, Spear, Crossbow, Light, Crossbow Bolts ×20, Backpack, Clothes, Common, Thieves' Tools, Crowbar, Hammer, Piton ×10, Rations (1 day) ×10, Rope, Hempen (50 feet), Tinderbox, Torch ×10, Waterskin"]]}]},{"name":"Princess Timbit","sub":"Custom Lineage (catfolk) Druid 4 · Noble · played by Ally","ac":"11","hp":"23 (Hit Dice 4d8)","speed":"30 ft.","abil":[8,13,10,14,12,17],"props":[["Initiative","+1"],["Proficiency Bonus","+2"],["Saving Throws","Str -1, Dex +1, Con +0, Int +4*, Wis +3*, Cha +3 (* proficient)"],["Senses","Darkvision 60 ft., passive Perception 13, Insight 11, Investigation 12"],["Proficiencies","Armor: Light Armor, Shields; Weapons: Simple Weapons; Tools: Herbalism Kit, Playing Card Set"],["Languages","Common, Druidic, Undercommon"],["Spellcasting","Wis · save DC 11 · attack +3"]],"tonight":[["Defense +1","Rolls d20 + 1 against DC 19 (the Hand)."],["Cure","Lesser Restoration cured Éclair last session. Check her remaining slots with Ally."],["Hold the count","Spare the Dying, 15 ft: Noémie loses no pip this round."],["Wake","Cure Wounds (always prepared). Healing Word if prepared."],["The debt","The Queen owes her, in front of witnesses."]],"sections":[{"h":"Skills","skills":[["Acrobatics","+1",""],["Animal Handling","+1",""],["Arcana","+5","P"],["Athletics","−1",""],["Deception","+3",""],["History","+4","P"],["Insight","+1",""],["Intimidation","+3",""],["Investigation","+2",""],["Medicine","+1",""],["Nature","+3",""],["Perception","+3","P"],["Performance","+3",""],["Persuasion","+5","P"],["Religion","+2",""],["Sleight of Hand","+1",""],["Stealth","+1",""],["Survival","+1",""]]},{"h":"Attacks","table":{"head":["Attack","Hit","Damage","Notes"],"rows":[["Shillelagh","+3","1d8+1","Bludgeoning D: 1m, V/S/M"],["Starry Wisp","+3","1d8","Radiant V/S"],["Eldritch Blast","+5","1d10","Force V/S"],["Poison Spray","+3","1d12","Poison V/S"],["Unarmed Strike","+1","0","Bludgeoning"]]}},{"h":"Spells · Cantrips","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Shillelagh","Bonus","Self","1 minute"],["Spare the Dying","Action","15 ft.","Instantaneous"],["Starry Wisp","Action","120 ft.","Instantaneous"],["Resistance","Action","Touch","Conc. 1 minute"],["Control Flames","Action","60 ft./5 ft. Cube","Instantaneous"]]}},{"h":"Spells · 1st level · 4 slots","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Faerie Fire","Action","60 ft./20 ft. Cube","Conc. 1 minute"],["Protection from Evil and Good","Action","Touch","Conc. 10 minutes"],["Beast Bond","Action","Touch","Conc. 10 minutes"],["★ Cure Wounds","Action","Touch","Instantaneous"],["★ Burning Hands","Action","Self/15 ft. Cone","Instantaneous"],["Absorb Elements","Reaction","Self","1 round"],["Earth Tremor","Action","10 ft.","Instantaneous"],["Ice Knife","Action","120 ft./5 ft. Sphere","Instantaneous"],["Animal Friendship","Action","30 ft.","24 hours"],["Fog Cloud","Action","120 ft./20 ft. Sphere","Conc. 1 hour"],["Purify Food and Drink (ritual)","Action + 10m","10 ft./5 ft. Sphere","Instantaneous"],["Goodberry","Action","Self","24 hours"],["Charm Person","Action","30 ft.","1 hour"],["Jump","Bonus","Touch","1 minute"],["Longstrider","Action","Touch","1 hour"],["★ Speak with Animals (ritual)","Action","Self","10 minutes"],["Create or Destroy Water","Action","30 ft./30 ft. Cube","Instantaneous"],["Detect Poison and Disease (ritual)","Action + 10m","Self/30 ft. Sphere","Conc. 10 minutes"],["Detect Magic (ritual)","Action + 10m","Self/30 ft. Sphere","Conc. 10 minutes"],["Healing Word","Bonus","60 ft.","Instantaneous"],["Thunderwave","Action","Self/15 ft. Cube","Instantaneous"],["Entangle","Action","90 ft./20 ft. Square","Conc. 1 minute"]]}},{"h":"Spells · 2nd level · 3 slots","table":{"head":["Spell","Time","Range","Duration"],"rows":[["Find Traps","Action","120 ft.","Instantaneous"],["Summon Beast","Action","90 ft.","Conc. 1 hour"],["Augury (ritual)","1m","Self","Instantaneous"],["Enlarge/Reduce","Action","30 ft.","Conc. 1 minute"],["★ Flaming Sphere","Action","60 ft./5 ft. Sphere","Conc. 1 minute"],["★ Scorching Ray","Action","240 ft.","Instantaneous"],["Dust Devil","Action","60 ft./5 ft. Cube","Conc. 1 minute"],["Earthbind","Action","300 ft.","Conc. 1 minute"],["Skywrite (ritual)","Action + 10m","Sight","Conc. 1 hour"],["Warding Wind","Action","Self/10 ft. Sphere","Conc. 10 minutes"],["Aid","Action","30 ft.","8 hours"],["Pass without Trace","Action","Self/30 ft. Emanation","Conc. 1 hour"],["Animal Messenger (ritual)","Action + 10m","30 ft.","24 hours"],["Flame Blade","Bonus","Self","Conc. 10 minutes"],["Barkskin","Bonus","Touch","1 hour"],["Beast Sense (ritual)","Action + 10m","Touch","Conc. 1 hour"],["Protection from Poison","Action","Touch","1 hour"],["Locate Animals or Plants (ritual)","Action + 10m","Self","Instantaneous"],["Locate Object","Action","Self","Conc. 10 minutes"],["Lesser Restoration","Bonus","Touch","Instantaneous"],["Continual Flame","Action","Touch","Until dispelled"],["Spike Growth","Action","150 ft./20 ft. Sphere","Conc. 10 minutes"],["Darkvision","Action","Touch","8 hours"],["Moonbeam","Action","120 ft./5 ft. Cylinder","Conc. 1 minute"],["Gust of Wind","Action","Self","Conc. 1 minute"],["Heat Metal","Action","60 ft.","Conc. 1 minute"],["Hold Person","Action","60 ft.","Conc. 1 minute"],["Enhance Ability","Action","Touch","Conc. 1 hour"]]}},{"h":"","items":[["Spell list","★ marks always-prepared spells. The sheet lists every spell available to the class and does not show which of the others are prepared today."]]},{"h":"Wildfire Spirit","items":[["Summon","Action, one use of Wild Shape. AC 13, speed 30 ft., fly 30 ft. (hover). Acts after her turn; bonus action to command it."],["Flame Seed","Ranged +3, 60 ft. Hit: 1d6 + 2 fire."],["Fiery Teleportation","The spirit and each willing creature within 5 feet teleport up to 15 feet. Creatures within 5 feet of the space it left: DC 11 Dexterity save or 1d6 + 2 fire."]]},{"h":"Druid Features","items":[["Druidic","You know Druidic and always have Speak with Animals prepared. You can use Druidic to leave hidden message. You and others who know Druidic automatically spot such a message. Others spot the message’s presence with a successful DC 15 Intelligence (Investigation) check but can’t decipher it without magic. [Leave Druidic Message: Special]"],["Primal Order","You have dedicated yourself to one of the sacred roles. [Magician] You know one extra cantrip from the Druid spell list. You also gain a +1 bonus to Intelligence (Arcana or Nature) checks."],["Wild Shape","As a Bonus Action, you shape-shift into a Beast form that you have learned for this feature. You stay in that form for 2 hours or until you use Wild Shape again, have the Incapacitated condition, or die. You can also leave the form early as a Bonus Action. You can use Wild Shape 2 times per Long Rest, and regain one expended use after finishing a Short Rest. You are able to learn a number of Beast forms as outlined below, and whenever you finish a Long Rest, you can replace one of your known forms with another eligible form. • Level 2: You know 4 four Beast Forms with a max CR of 1/4 that lack a Fly Speed. • Level 4: You know 6 four Beast Forms with a max CR of 1/2 that lack a Fly Speed. • Level 8 You know 8 four Beast Forms with a max CR of 1 and can adopt a form that has a Fly Speed. [2 / Long Rest • 1 Bonus Action]"],["Wild Companion","As a Magic action, you can expend a spell slot or a use of Wild Shape to cast Find Familiar without Material components. When you cast the spell in this way, the familiar is Fey and disappears when you finish a Long Rest."],["Circle Spells","You have formed a bond with a wildfire spirit, a primal being of creation and destruction. Your link with this spirit grants you access to some spells when you reach certain levels in this class, as shown on the Circle of Wildfire Spells table."],["Summon Wildfire Spirit","As an action, you can expend one use of your Wild Shape feature to summon your wildfire spirit, rather than assuming a beast form. Each creature within 10 ft. of the spirit (other than you) when it appears must succeed on a Dex saving throw (DC 11) or take 2d6 fire damage. The spirit manifests for 1 hour, until it is reduced to 0 hit points, until you summon the spirit again, or until you die. [1 Action] [Summon Wildfire Spirit: Command: 25 / Other • 1] Bonus Action"]]},{"h":"Custom Lineage Species Traits","items":[["Variable Trait","[Darkvision] Darkvision with a range of 60 ft."]]},{"h":"Feats","items":[["Magic Initiate (Druid)","Two Cantrips. You learn two cantrips of your choice from the Druid spell list. Int., Wis., or Cha. is your spellcasting ability for this feat's spells. Level 1 Spell. Choose a level 1 spell from the Druid spell list. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have. Spell Change. Whenever you gain a new level, you can replace one of the spells you chose for this feat ADDITIONAL FEATURES & TRAITS ADDITIONAL EQUIPMENT with a different spell of the same level from the chosen spell list. Repeatable. You can take this feat more than once, but you must choose a different spell list each time. [Charisma]"],["Spell Sniper","When you cast a spell that requires you to make an attack roll, the spell’s range is doubled. Your ranged spell attacks ignore half cover and three-quarters cover. You learn one cantrip that requires an attack roll from a chosen spell list. Your spellcasting ability for this cantrip depends on the spell list you chose from. [Charisma - Bard, Sorcerer, Warlock] Your spellcasting ability for this cantrip is Charisma."]]},{"h":"Equipment","items":[["Carried","Signet Ring"]]}]}];
+const SBSHORT=["The Hand","Corvane","Cassian","Belaskro","Gabriele","Gus","Timbit"];
+const PCN={bel:"Belaskro",gab:"Gabriele",gus:"Gus",tim:"Timbit"};
+const PCO=["bel","gab","gus","tim"];
+const MVTAB=[1,2,2,3,3];
+const TABN=["1 · Last Bell","2 · Aftermath","3 · Hard Out"];
+
+const MOVES=[
+{t:"The last bell",k:"Combat · 20 to 30 min",
+ who:{bel:[1,"Between the Hand and the bed. Cross-cut: one round upstairs, one beat on the floor, and back."],
+      gus:[0,"EP-07. Say the line, pass the page across, say nothing else."],
+      gab:[0,"Triage. Noémie has one pip left. Lesser Restoration cures; Medicine DC 10 or Spare the Dying holds the count. Wrent's body is ten paces the other way."],
+      tim:[0,"The debt. A queen who owes her, a cousin out cold, guards moving Sabine out. What she asks for now gets a yes."]},
+ beats:[[1,"Belaskro rolls defense: d20 + (AC − 10) against DC 19. Two Kissed Blades, 14 each."],
+        [1,"Gus: \"Handler signal lost.\" Hand EP-07 to Shane."],
+        [1,"Round 2: Corvane comes through the door. 39 to the Hand, and he does not stop."],
+        [0,"The Hand is down and the hammer goes up. Does Belaskro speak? Corvane finishes it either way."],
+        [0,"Cassian never leaves the bed. Do not explain it. The body stays in the house."]],
+ pen:["Justin: \"When you look back at Cassian in that bed, who in your family do you see?\"",
+      "Shane: \"Nobody has given Gus an order. What is the first thing he does?\""]},
+{t:"Count the dead",k:"Roleplay · 30 min",
+ who:{gab:[1,"Last rites for three, one of them the man he chose not to save. Jared Dreveth crawls out from under the table owing him a life."],
+      gus:[0,"Wrent's body. EP-07 step 3 is Wrent's letter. Let Shane read it in his own time."],
+      tim:[0,"Éclair wakes furious at being saved. Uncle Honey Cruller wants a name."],
+      bel:[0,"Comes downstairs with Corvane. First time the uncle treats him as blood."]},
+ beats:[[1,"Say every name. Garrick Moravel. Aurelian Aldric. Lieutenant Malachai Wrent. Hold the silence."],
+        [0,"Jared Dreveth, alive under the table, owes Gabriele his life."],
+        [0,"Rowan Halvenne is alive and shaking. Tasmin saw all of it from her chair."]],
+ pen:["Round the table once: \"One thing about this room your character will never forget.\"",
+      "Peter: \"Three bodies. Whose side does Gabriele kneel at first?\""]},
+{t:"Who opened the doors",k:"Investigation · 30 to 40 min",
+ who:{gus:[1,"His standing order from EP-07: find who opened the security. That is Grey."],
+      tim:[1,"She knows courts. The Queen, the loyal page, Tasmin, and the name of the oathmark."],
+      gab:[0,"The frame. Seranthis was left untouched so Seranthis would wear it. Jared is frightened."],
+      bel:[0,"The blanks and the robe. The batch stamp matches his two. Corvane wants Grey tracked."]},
+ beats:[[1,"The missing guards: Dunmore, the forged seal, Grey gone since the toast."],
+        [1,"The oathmark on the dead man: sworn servant of the royal family."],
+        [0,"Finding Grey is one mission with two owners: Gus by EP-07, Belaskro for the family."],
+        [0,"Later stake: Belaskro thinks he holds Gus's leash. Gus no longer takes orders."]],
+ pen:["Ally: \"Timbit knows courts. What is the Queen doing with her hands that gives her away?\"",
+      "Shane: \"Gus has one standing order and a room full of nobles. Who does he question first, and how badly does it go?\""]},
+{t:"Get out of my house",k:"Speeches · 10 to 15 min",
+ who:{bel:[1,"Named as the nephew in front of every house. He was in that room: the Hand never touched Cassian."],
+      tim:[0,"The debt. Sabine repeats it by name on her way out."],
+      gab:[0,"Listens, with Jared Dreveth at his elbow."],
+      gus:[0,"Listens. Watches who looks at the stairs."]},
+ beats:[[1,"Sabine, leaving under guard: \"I gave that toast. I will not pretend otherwise.\""],
+        [1,"Corvane stops her at the door with the blue robe. If shown the oathmark, he names it and the room goes silent."],
+        [1,"Corvane's speech: alive because of my nephew, will never walk again, I will stand for him."],
+        [1,"Hard out: \"Now get out of my house.\""]],
+ pen:["Justin: \"Your uncle just told every house that tonight crippled his son. You were in that room. What does Belaskro do with his face?\""]},
+{t:"Before dawn",k:"Montage · 15 min",
+ who:{bel:[1,"Corvane, quietly, as family: \"You track things. Track Grey, before someone says I did this to my own son.\""],
+      tim:[1,"Uncle Honey Cruller wants a name before the embassy decides whether she stays."],
+      gab:[1,"Jared Dreveth's invitation: come as a guest of House Dreveth, ahead of the others. Moravel soldiers are already outside the Seranthis embassy."],
+      gus:[1,"A stranger falls into step. \"Fine weather for the season.\" Cut to black before Shane answers."]},
+ beats:[[0,"Each player answers. You reply with one image and one hook."],
+        [1,"Gus closer: \"Fine weather for the season.\" Cut to black."]],
+ pen:["Each player: \"Where is your character when the sun comes up?\""]}
+];
+
+const ROLL=[
+["wrent","Lt. Malachai Wrent","Killed standing over Garrick. Raised a hand to Gus.","dead"],
+["garrick","Garrick Moravel","House Moravel. Round two. Nobody reached him.","dead"],
+["aurelian","Aurelian Aldric","House Aldric. The Queen's nephew.","dead"],
+["noemie","Noémie Vayne","House Vayne. Kissed, one pip left. Never flared.","down"],
+["eclair","Baroness Éclair","House Puss. Cured by Timbit, out cold.","down"],
+["cassian","Lord Cassian","In the bed behind Belaskro.","standing"],
+["hand","The Hand","Blue robe. Cassian's bedroom.","standing"],
+["rowan","Rowan Halvenne","Shoved his Knife prone and lived.","standing"],
+["tasmin","Tasmin Dreveth","In her chair. Saw everything.","standing"],
+["jared","Jared Dreveth","Lord of House Dreveth. Under a table.","standing"],
+["honey","Honey Cruller","Ambassador. Timbit's uncle.","standing"],
+["sabine","Queen Sabine","On the dais. Owes Timbit.","standing"],
+["corvane","Marquis Corvane","On the stair, going up.","standing"]
+];
+
+const EVID=[
+["guards",1,"The missing guards","No roll","Captain Dunmore, pale: \"Your seal, my lord. Guards to the gates, so the Dreveth party wouldn't feel watched. Under-Steward Grey handed it to me himself.\" Corvane: \"I gave no such order.\" Nobody has seen Grey since the toast. The order carries Corvane's own seal, so until Grey is found the trail points back at the Marquis.",["gus","bel"]],
+["knives",0,"What the Knives left","Investigation 14","None were taken, so this is all there is. Snapped exit tablets: rough Vantry blanks with a batch stamp, the same stock as Belaskro's two. Cloaks and instrument cases on the gallery, and in one case the hiring chit for the extra players, signed by Under-Steward Grey. The man upstairs carried no tablet.",["gus","bel"]],
+["oath",1,"The oathmark","Arcana 14 or detect magic","A hidden mark under the dead man's skin. Timbit, or History 12, names it: an oathbond. Royal houses change with the tournament, so everyone who lives and serves in the palace is sworn to the royal family. Leave that service without leave and you die. He was alive, bound and serving tonight.",["gus","tim"]],
+["robe",0,"The blue robe","No roll","The Hand wore a royal page's robe. Corvane takes it as proof. A calmer head says a robe can be stolen. The mark cannot.",["bel"]],
+["page",0,"The loyal page","Persuasion 12","Raised the dais shield on the Queen's own instruction from that morning: \"At the first sign of trouble.\" He wears the same oathmark and will show it: the price of a life in the palace at the King's side. Told the dead man had one, he goes white.",["tim"]],
+["queen",0,"The Queen","Insight 14","She is shaken for real, and it is the ballroom that shook her. Her first look still went to the stairs.",["tim"]],
+["tasmin",0,"Tasmin, the witness","Persuasion 12","They dropped from the musicians' gallery. Nobody on staff knew every player. No blade ever came near her table. The shout from upstairs came before the first knife.",["tim"]],
+["chair",0,"The empty chair","No roll","Seranthis was left untouched so Seranthis would wear it. Jared Dreveth knows it and is frightened.",["gab"]]
+];
+
+const INIT=[
+["tim","Princess Timbit","20","Ballroom floor"],
+["bel","Belaskro","9","Upstairs. Defense vs DC 19"],
+["cas","Cassian","with Bel","14 fire to the Hand, no roll"],
+["cor","Corvane","round 2","39 to the Hand, no roll"],
+["gus","Gus","8","Ballroom floor"],
+["hand","The Hand","5","Two Kissed Blades, 14 each"],
+["gab","Gabriele","1","Ballroom floor"]
+];
+
+const VOICES=[
+{n:"Corvane",how:"Gravelly, deep, deliberate. Quiet to roaring in three seconds.",beats:[
+ ["The bedroom",["Get away from my son.","You came into my house.","Stand aside, nephew. This one is mine.","I know that robe."]],
+ ["The count",["Someone cover that child.","Say their names. All of them."]],
+ ["The missing guards",["I gave no such order.","Find Grey. Bring him to me breathing."]],
+ ["To the Queen",["A royal page, Majesty. In my son's bedroom.","Your toast. Your livery. Explain it to the room."]],
+ ["To Belaskro, before dawn",["You stood between my boy and a knife. That makes you mine.","You track things. Track Grey, before someone says I did this to my own son."]],
+ ["Anger",["Quiet. ... QUIET.","Power is safety, and my duty is to keep my family safe."]]]},
+{n:"Cassian",how:"Arrogant, unaffected, performing even now. Nineteen.",beats:[
+ ["The bedroom",["Is that all you've got?","Cousin. You're late, and you are dressed like a tapestry.","I am not getting out of this bed. Stop asking."]],
+ ["Fighting beside Belaskro",["Left side, he favours the left.","Burn, you patient bastard."]],
+ ["When Corvane arrives",["Father. ... Father, that's enough.","Tell them I laughed."]]]},
+{n:"The Hand",how:"Flat, professional, unhurried. Never raises his voice.",beats:[
+ ["Opening",["You're not on the contract.","Leave, and I'll forget you.","One name. Yours isn't it."]],
+ ["Combat",["You are making this expensive.","He stays in the bed. Interesting."]],
+ ["When Corvane enters",["Marquis. This was meant to be quiet."]],
+ ["Dying",["I did as I was sworn."]]]},
+{n:"Queen Sabine",how:"Public voice: graceful, warm, entirely composed. More gracious under stress.",beats:[
+ ["The debt",["Whoever you are, the crown is in your debt.","Princess Timbit. I do not owe many debts, and I forget none of them."]],
+ ["Pressed (Insight 14)",["Is the boy alive?","I asked for a toast. I did not ask for this."]],
+ ["Corvane and the robe",["A robe, Marquis. Robes are stolen every day.","Grief makes poor evidence. I will forgive it tonight."]],
+ ["Leaving",["I gave that toast. I will not pretend otherwise, and I will not let anyone pretend it was mine."]]]},
+{n:"The loyal page",how:"Young, shaken, proud of his post.",beats:[
+ ["The shield",["Her Majesty's instruction this morning. At the first sign of trouble, raise it.","I did what I was told. It kept her alive."]],
+ ["The oathmark",["We all carry it. It is the price of the palace.","You serve at the King's side, or you do not serve anyone again."]],
+ ["Told the dead man had one",["That is not possible. He would have needed leave.","I know every page. I do not know him."]]]},
+{n:"Captain Dunmore",how:"House guard captain. Pale, soldierly, already blaming himself.",beats:[
+ ["The order",["Your seal, my lord. Guards to the gates, so the Dreveth party wouldn't feel watched.","Under-Steward Grey handed it to me himself."]],
+ ["Grey",["Nobody has seen Grey since the toast.","His room is cleared out. He packed before dinner."]],
+ ["After",["You'll have my resignation, my lord. Once I've found him."]]]},
+{n:"Honey Cruller",how:"Timbit's uncle. Theatrical, proud, impeccable manners.",beats:[
+ ["Signature",["My daughter competes. My niece investigates."]],
+ ["The count",["My whiskers have not stopped itching since the soup.","You are alive, Éclair. Be furious tomorrow."]],
+ ["Before dawn",["I want a name, Timbit. Before the embassy decides whether any of us stay."]]]},
+{n:"Éclair",how:"Clipped, competitive, hates being fussed over.",beats:[
+ ["Waking",["Who touched me? ... You. Of course it was you.","I had him. I had the angle."]],
+ ["General",["I am not in danger, I am in the tournament.","Nobody is to say I fainted."]]]},
+{n:"Tasmin",how:"Bandaged, in a wheeled chair. Quiet and exact.",beats:[
+ ["The witness",["They came off the gallery all at once, like it was rehearsed.","Nobody knew every player. I heard the steward say so.","No blade came near our table. I noticed. I wish I hadn't.","The shout from upstairs came first. Before any of them moved."]]]},
+{n:"Jared Dreveth",how:"Lord of House Dreveth. Measured. Likes an argument about faith and power.",beats:[
+ ["Under the table",["I have been saved with less dignity, Father, but not often."]],
+ ["The frame",["They left us untouched so that we would wear it.","By morning there will be soldiers at our gate."]],
+ ["The invitation",["My house respects men of the cloth. Come as our guest. Go ahead of your friends."]]]},
+{n:"Rowan",how:"Vain golden boy, badly shaken.",beats:[
+ ["After",["I shoved him. I just shoved him. Why did that work?","Garrick was right there.","Don't tell Odile I was sick."]]]},
+{n:"Steven",how:"Marshal Intelligence. Deadpan. A different face from last time.",beats:[
+ ["Contact",["Fine weather for the season.","(The reply) Every season has weather.","Anything else means a hostile. Or a farmer."]],
+ ["If asked his name",["Steven. Tonight."]]]}
+];
+
+const SECRETS=[
+"Two attacks, two paymasters. The Unbowed sent the Knives for the champions. The Queen had word that something would hit the gala, kept it to herself, and sent the Hand for Cassian under its cover.",
+"What ties him to her: the oathmark. Every palace servant is oathbound to the royal family, and breaking that service without leave is death. The Hand was alive, bound and serving. Add a genuine palace robe and her morning order that had the dais shield ready and penned Corvane away from the stairs.",
+"The mark says royal family. It does not say which member. Queen, King or Prince is still open for the party.",
+"She never expected champions to die. Aurelian was her nephew. That is why she is shaken for real.",
+"Cassian has been paralyzed since Silverglass. Corvane hid it behind the wards. Tonight lets him announce it and hang it on the Crown.",
+"What caused Silverglass is open: a horrible accident, or a bad rune slipped into his bag, possibly by the Crown.",
+"Open: the warning she sat on came up through Marshal Intelligence, which would lay Wrent's death at the palace door for Gus.",
+"The batch stamp leads to Pell Marrow's skimmed blanks, and so to the Pyreborn and Corvane's own supply line.",
+"Grey was bought through a family relation. Who paid is deliberately open.",
+"Noémie's lineage. She never flared, so House Vayne's secret is still safe.",
+"Wrent was Gus's handler. Shane knows from EP-07. Whether the party hears is Shane's call."
+];
+const CLOCKS=[
+["Queen Sabine","By morning the palace names the Unbowed, sooner than anyone should know, calls the blue robe stolen, and demands the body.","The palace steward who keeps the oath rolls turns up dead."],
+["Corvane","Stands in for Cassian and says the Crown crippled him. Pyreborn go loud.","Whispers start that he staged it, with his own seal on the order."],
+["Moravel, Aldric","Want a name for their dead.","Moravel soldiers at the Seranthis embassy gate."],
+["Meow embassy","Éclair lived, so Honey wants a name.","Timbit is ordered home."],
+["The Unbowed","Read the night as a win.","Ballad brawls turn deadly in the poor quarter."],
+["The Marshals","Rhys has a dead lieutenant and an off-books team with no handler.","Dray turns up with orders to bring the party in."],
+["Gabriele","Travels ahead as a guest of House Dreveth.","Letters back from the road."]
+];
+
+const KEY="osse-s13-v1";
+function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false};}
+let S=fresh();
+try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll){S=Object.assign(fresh(),j);S.sealOpen=false;S.armReset=false;S.armHp=false;}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false};S=Object.assign(fresh(),j,mine);render();}}catch(_){}});
+let single=null;
+function readHash(){const h=(location.hash||"").slice(1);single=null;const m=/^tab([123])$/.exec(h);if(m){S.tab=+m[1];}const p=/^panel=(\w+)$/.exec(h);if(p&&P[p[1]])single=p[1];}
+
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const md=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+const chip=(k,lead,txt)=>`<span class="pc ${k}${lead?" lead":""}">${txt||PCN[k]}</span>`;
+const head=(t,extra)=>`<div class="ph"><span class="lab">${t}</span><span class="sp"></span>${extra||""}</div>`;
+
+const P={};
+P.spot=()=>{const m=MOVES[S.mv],nx=MOVES[S.mv+1];
+ const order=PCO.slice().sort((a,b)=>m.who[b][0]-m.who[a][0]);
+ return `<div class="sph0"><div class="mvh"><div class="mvn">Movement ${S.mv+1} of 5 · ${esc(m.k)}</div><div class="mvt">${esc(m.t)}</div></div>
+  <div class="nav"><button data-a="mv" data-v="-1"${S.mv===0?" disabled":""} aria-label="Previous movement">◀</button><button class="pri" data-a="mv" data-v="1"${nx?"":" disabled"}>${nx?"Next: "+esc(nx.t)+" ▶":"Last movement"}</button></div></div>
+ <div class="spg">
+ <div><div class="wl">${order.map(k=>`${chip(k,m.who[k][0],PCN[k]+(m.who[k][0]?" ★":""))}<span>${esc(m.who[k][1])}</span>`).join("")}</div></div>
+ <div><div class="lab" style="margin-bottom:4px">Beats</div>${m.beats.map((b,i)=>{const k=S.mv+"-"+i,d=S.beats[k];return `<div class="tick${d?" done":""}" data-a="beat" data-v="${k}" role="button" tabindex="0"><i>${d?"✓":""}</i><span>${b[0]?'<span class="flag">⚑ </span>':""}${esc(b[1])}</span></div>`;}).join("")}</div>
+ <div>${m.pen.map(p=>`<div class="pen"><b>Hand the pen</b>${esc(p)}</div>`).join("")}
+  <div class="tally"><small>Had the floor (tap)</small>${PCO.map(k=>`<span class="pc ${k}" data-a="tally" data-v="${k}" role="button" tabindex="0">${PCN[k].slice(0,3)} ${S.tally[k]}</span>`).join("")}<button class="quiet" data-a="tally0">clear</button></div></div>
+ </div>`;};
+
+P.roll=()=>`${head("Roll call",'<span class="mv">tap to change</span>')}<div class="pb"><div class="rcw">${ROLL.map(r=>{const st=S.roll[r[0]];const lab=st==="standing"?"Standing":st==="down"?"Down":"Dead";
+ const pip=(r[0]==="noemie"&&st==="down")?`<span class="pip${S.pip?" f":""}" data-a="pip" title="pip" role="button" tabindex="0"></span>`:"";
+ return `<div class="rc ${st}" data-a="rc" data-v="${r[0]}" role="button" tabindex="0" title="${esc(r[2])}"><b>${esc(r[1])}</b><span>${esc(r[2])}</span><em>${lab}${r[0]==="noemie"&&st==="down"?(S.pip?" · 1 pip":" · no pips, dying"):""}${pip}</em></div>`;}).join("")}</div></div>`;
+
+P.hand=()=>{const dead=S.hp<=0;return `${head("The Hand",`<span class="mv">Round ${S.round}</span>`)}<div class="pb">
+ <div class="dc"><b>DC 19</b><span>Defense. The player rolls<br>d20 + (AC − 10). Two blades, 14 each.</span></div>
+ <div class="hpn">${S.hp}<small>of 91 HP · AC 17</small></div><div class="hpbar"><i style="width:${Math.max(0,S.hp)/91*100}%"></i></div>
+ ${dead?'<div class="deadbox">Dead. The body stays in the house. The mark is under the skin.</div>':""}
+ <div class="dmg"><input id="dmg" type="text" inputmode="numeric" autocomplete="off" placeholder="damage" aria-label="Damage to the Hand"><button class="on" data-a="dmg">Hit</button></div>
+ <div class="btns"><button data-a="hp" data-v="-1">−1</button><button data-a="hp" data-v="-5">−5</button><button data-a="hp" data-v="-10">−10</button><button data-a="hp" data-v="5">+5</button><button class="go" data-a="hp" data-v="-14">Cassian 14</button><button class="pri" data-a="hp" data-v="-39">Corvane 39</button><button class="quiet" data-a="hpset">${S.armHp?"Tap again to reset HP":"reset HP"}</button></div>
+ <div class="btns"><button data-a="rnd" data-v="-1">Round −</button><button data-a="rnd" data-v="1">Round +</button></div>
+ <ul class="notes"><li>The ward clock is stopped while a PC holds the room. One ward still burns.</li><li>Round 2: Corvane arrives and finishes him. No exit, no capture.</li><li>Cassian fights from the bed and never leaves it.</li><li>Gus takes 10 from a blade (poison resistance).</li><li>The body stays in the house.</li></ul></div>`;};
+
+function iniActive(i){const id=INIT[i][0];if(id==="cor"&&S.round<2)return false;if(id==="hand"&&S.hp<=0)return false;return true;}
+P.init=()=>`${head("Initiative",`<span class="mv">Round ${S.round}</span>`)}<div class="pb"><div class="ini">${INIT.map((r,i)=>`<div class="ir${i===S.turn?" cur":""}${iniActive(i)?"":" off"}"><b>${r[2].length<3?r[2]:"·"}</b><span>${PCN[r[0]]?chip(r[0],1,r[1]):`<strong>${esc(r[1])}</strong>`} <small>${r[2].length<3?"":esc(r[2])+" · "}${esc(r[3])}</small></span><span></span></div>`).join("")}</div>
+ <div class="btns"><button data-a="turn" data-v="-1">◀ Back</button><button class="pri" data-a="turn" data-v="1" style="flex:1">Next turn ▶</button></div></div>`;
+
+P.evidence=()=>`${head("Evidence",`<span class="mv">${EVID.filter(e=>S.ev[e[0]]).length} of ${EVID.length} found</span>`)}<div class="pb">${EVID.map(e=>{const d=S.ev[e[0]];return `<div class="ev${d?" done":""}" data-a="ev" data-v="${e[0]}" role="button" tabindex="0"><i>${d?"✓":""}</i><div><div class="evh"><b>${e[1]?'<span class="flag">⚑ </span>':""}${esc(e[2])}</b><u>${esc(e[3])}</u>${e[5].map(k=>chip(k,0)).join(" ")}</div><div class="evt">${esc(e[4])}</div></div></div>`;}).join("")}</div>`;
+
+P.voices=()=>{if(S.voice===null)return `${head("Voices")}<div class="pb"><div class="vgrid">${VOICES.map((v,i)=>`<div class="vtile" data-a="vc" data-v="${i}" role="button" tabindex="0"><div class="vn">${esc(v.n)}</div><div class="vc">${esc(v.how)}</div></div>`).join("")}</div></div>`;
+ const v=VOICES[S.voice];return `${head("Voices",'<button data-a="vb">◀ All voices</button>')}<div class="pb"><div class="vname">${esc(v.n)}</div><div class="how">${esc(v.how)}</div>${v.beats.map(b=>`<div class="vbeat">${esc(b[0])}</div>${b[1].map(l=>`<div class="line">${esc(l)}</div>`).join("")}`).join("")}</div>`;};
+
+P.speech=()=>{const names=["Garrick Moravel","Aurelian Aldric"];if(S.roll.noemie==="dead")names.push("Noémie Vayne");
+ const dead=names.length>2?names.slice(0,-1).join(", ")+" and "+names[names.length-1]:names.join(" and ");
+ const cas=S.roll.cassian==="dead";
+ const sab=`<p class="dir">Shaken under the grace. Leaving under guard.</p><p>I gave that toast. I will not pretend otherwise, and I will not let anyone pretend it was mine.</p><p>Whoever did this tonight has made the Crown a victim alongside every family in this room. The Marshals will have everything I can give them.</p><p class="dir">On her way out, by name:</p><p>Princess Timbit. The Crown remembers its debt.</p>`;
+ const cor=`<p class="dir">Quiet, then loud, then quiet. The blue robe is in his fist.</p><p>Quiet. <span class="dir">(beat)</span> QUIET.</p>
+ <p>Five children stood up in my house tonight to be cheered. <span class="cond">${esc(dead)}</span> will be carried out of it.</p>
+ <p>${cas?'<span class="cond">My son is upstairs, dead in his own bed.</span>':'My son is upstairs, alive because of <span class="cond">my nephew</span>. He will never walk again.'} Twice now someone has reached into my family to take him. Tonight they reached into all of yours.</p>
+ <p>You all heard whose toast they were waiting for. You have seen whose robe was in my son's bedroom. I will not tell you what that means. You have eyes.</p>
+ <p>Two months, we were told. Two months to heal. Look at this floor and tell me who was meant to heal.</p>
+ <p>The founders wrote that the crown belongs to whoever is strong enough to stand up and take it. Every generation. Any citizen. Someone would rather there was nobody left standing.</p>
+ <p>When the tournament comes, House Aerrowyn will be on the sand. ${cas?"I will stand for my son.":"My son cannot stand, so I will stand for him."} And any house that still has the stomach for it can stand beside me.</p>
+ <p class="dir">(beat, quieter)</p><p>Now get out of my house.</p>`;
+ return `${head("Speeches",`<button class="${S.speech==="sabine"?"on":""}" data-a="sp" data-v="sabine">Sabine, leaving</button><button class="${S.speech==="corvane"?"on":""}" data-a="sp" data-v="corvane">Corvane</button>`)}<div class="pb"><div class="sph">${S.speech==="sabine"?sab:cor}</div></div>`;};
+
+P.stats=()=>{const c=SB[S.stat],mod=n=>{const m=Math.floor((n-10)/2);return (m>=0?"+":"−")+Math.abs(m);};
+ const ent=x=>`<p><b><i>${md(x[0])}.</i></b> ${md(x[1])}</p>`;
+ return `${head("Stat blocks")}<div class="pb"><div class="schips">${SB.map((x,i)=>`<button class="${i===S.stat?"on":""}" data-a="st" data-v="${i}">${SBSHORT[i]||esc(x.name)}</button>`).join("")}</div>
+ <div class="sbk"><div class="sbname">${esc(c.name)}</div><div class="sbsub">${esc(c.sub)}</div><div class="taper"></div>
+ <p><b>Armor Class</b> ${esc(c.ac)}</p><p><b>Hit Points</b> ${esc(c.hp)}</p><p><b>Speed</b> ${esc(c.speed)}</p><div class="taper"></div>
+ ${c.abil?`<table class="abil"><tr>${["STR","DEX","CON","INT","WIS","CHA"].map(x=>`<th>${x}</th>`).join("")}</tr><tr>${c.abil.map(n=>`<td>${n} (${mod(n)})</td>`).join("")}</tr></table><div class="taper"></div>`:""}
+ ${c.props.map(p=>`<p><b>${esc(p[0])}</b> ${esc(p[1])}</p>`).join("")}${c.props.length?'<div class="taper"></div>':""}
+ <div class="tonight"><h4>Tonight</h4>${c.tonight.map(ent).join("")}</div>
+ ${c.sections.map(x=>(x.h?`<h3>${esc(x.h)}</h3>`:"")+(x.items?x.items.map(ent).join(""):"")
+  +(x.skills?`<div class="skl">${x.skills.map(k=>`<div class="${k[2]?"pr":""}"><span>${k[2]==="E"?"◆":k[2]==="P"?"●":"○"} ${esc(k[0])}</span><b>${esc(k[1])}</b></div>`).join("")}</div><p class="key">● proficient · ◆ expertise</p>`:"")
+  +(x.table?`<table class="tb"><tr>${x.table.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${x.table.rows.map(r=>`<tr>${r.map((v,i)=>`<td>${i===0?"<b>"+md(v)+"</b>":md(v)}</td>`).join("")}</tr>`).join("")}</table>`:"")).join("")}</div></div>`;};
+
+P.sealed=()=>{if(!S.sealOpen)return `<button class="sealbtn" data-a="seal" data-v="1">Sealed. Tap to open.</button>`;
+ const view=S.sealView||(S.tab===3?"clocks":"secrets");
+ return `${head("Sealed",`<button class="${view==="secrets"?"on":""}" data-a="sview" data-v="secrets">Do not reveal</button><button class="${view==="clocks"?"on":""}" data-a="sview" data-v="clocks">Clocks</button><button class="pri" data-a="seal" data-v="0">Close</button>`)}<div class="pb">${view==="secrets"?`<ul class="sec">${SECRETS.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:`<table class="ck"><tr><th>Who</th><th>Next move</th><th>If the party stalls</th></tr>${CLOCKS.map(c=>`<tr><td>${esc(c[0])}</td><td>${esc(c[1])}</td><td>${esc(c[2])}</td></tr>`).join("")}</table>`}</div>`;};
+
+const ROWS={1:"fit-content(45%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) repeat(5,minmax(0,1fr))"};
+const LAYOUT={
+1:[["spot","1 / -1","1"],["stats","1","2 / 6"],["hand","2","2 / 4"],["init","2","4 / 6"],["voices","1","6"],["roll","2","6","mini"]],
+2:[["spot","1 / -1","1"],["roll","1 / -1","2"],["evidence","1 / -1","3 / 5"],["voices","1","5 / 7"],["sealed","2","5 / 7"]],
+3:[["spot","1 / -1","1"],["speech","1 / -1","2 / 5"],["roll","1","5","mini"],["evidence","2","5","mini"],["sealed","1 / -1","6"]]
+};
+
+function render(){const app=document.getElementById("app");const keep={};
+ app.querySelectorAll("[data-k]").forEach(el=>{const s=el.querySelector(".pb")||el;keep[el.dataset.k]=s.scrollTop;});
+ if(single){app.innerHTML=`<div class="grid one"><section class="pn${single==="spot"?" spot":""}" data-k="one-${single}">${P[single]()}</section></div>`;}
+ else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
+ <div class="grid" style="grid-template-rows:${ROWS[S.tab]}">${LAYOUT[S.tab].map(l=>`<section class="pn${l[0]==="spot"?" spot":""}${l[3]?" "+l[3]:""}" data-k="${S.tab}-${l[0]}" style="grid-column:${l[1]};grid-row:${l[2]}">${P[l[0]]()}</section>`).join("")}</div>`;}
+ app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el;s.scrollTop=v;}});}
+
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const A={
+ tab:v=>{S.tab=+v;S.sealOpen=false;S.sealView=null;},
+ mv:v=>{S.mv=clamp(S.mv+ +v,0,4);S.tab=MVTAB[S.mv];S.sealOpen=false;S.sealView=null;},
+ beat:v=>{S.beats[v]=!S.beats[v];},
+ tally:v=>{S.tally[v]++;},
+ tally0:()=>{PCO.forEach(k=>S.tally[k]=0);},
+ rc:v=>{const o=["standing","down","dead"];S.roll[v]=o[(o.indexOf(S.roll[v])+1)%3];},
+ pip:()=>{S.pip=S.pip?0:1;},
+ hp:v=>{S.hp=clamp(S.hp+ +v,0,91);if(S.hp<=0)S.roll.hand="dead";},
+ hpset:()=>{if(S.armHp){S.hp=91;S.roll.hand="standing";}else{S.armHp=true;return "keephp";}},
+ dmg:()=>{const el=document.getElementById("dmg"),n=parseInt(el&&el.value,10);if(n>0)A.hp(-n);},
+ rnd:v=>{S.round=clamp(S.round+ +v,1,20);},
+ turn:v=>{const n=INIT.length;let i=S.turn,g=0;do{i+= +v;if(i>=n){i=0;S.round=clamp(S.round+1,1,20);}if(i<0){i=n-1;S.round=clamp(S.round-1,1,20);}g++;}while(!iniActive(i)&&g<2*n);S.turn=i;},
+ ev:v=>{S.ev[v]=!S.ev[v];},
+ vc:v=>{S.voice=+v;},
+ vb:()=>{S.voice=null;},
+ sp:v=>{S.speech=v;},
+ st:v=>{S.stat=+v;},
+ seal:v=>{S.sealOpen=v==="1";if(!S.sealOpen)S.sealView=null;},
+ sview:v=>{S.sealView=v;},
+ reset:()=>{if(S.armReset){S=fresh();}else{S.armReset=true;return "keep";}}
+};
+function act(el){const a=el.dataset.a;if(!A[a])return;const r=A[a](el.dataset.v);if(r!=="keep")S.armReset=false;if(r!=="keephp")S.armHp=false;save();render();if(a==="dmg"){const i=document.getElementById("dmg");if(i)i.focus();}}
+document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(el&&!el.disabled){e.preventDefault();act(el);}});
+document.addEventListener("keydown",e=>{const t=e.target;
+ if(t&&t.tagName==="INPUT"){if(e.key==="Enter"){e.preventDefault();act({dataset:{a:"dmg"}});}return;}
+ if((e.key==="Enter"||e.key===" ")&&t&&t.dataset&&t.dataset.a&&t.tagName!=="BUTTON"){e.preventDefault();act(t);return;}
+ if(e.ctrlKey||e.metaKey||e.altKey)return;
+ if(e.key==="1"||e.key==="2"||e.key==="3"){A.tab(e.key);save();render();}});
+window.addEventListener("hashchange",()=>{readHash();render();});
+readHash();render();
+</script>
+</body>
+</html>
