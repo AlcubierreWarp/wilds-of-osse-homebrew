@@ -34,7 +34,7 @@ Whole screen, three tabs laid out for a vertical monitor. Add the tab to the end
 
 The Next button in Spotlight moves to the right tab by itself. Keys 1, 2 and 3 also switch tabs.
 
-iPad in landscape, tap only: add `#ipad`. Spotlight stays on the left, and the right side shows one view at a time (Fight, Stat blocks, Voices, Roll call, Evidence, Speeches, Sealed) with a number pad for damage. An iPad opening the base address in landscape gets this view by itself. State is kept per device, so the iPad and the Mac do not share it.
+iPad in landscape, tap only: add `#ipad`. Spotlight stays on the left, and the right side shows one view at a time (Fight, Stakes, Stats, Voices, Roll call, Evidence, Speeches, Sealed) with a number pad for damage. An iPad opening the base address in landscape gets this view by itself. State is kept per device, so the iPad and the Mac do not share it.
 
 Initiative: tap Edit to change a roll, remove someone, or add a name from the cast. Tap Done to sort.
 
@@ -53,3 +53,4 @@ Single panels, one per 5e.tools Embed. Use these on a landscape screen:
 | Speeches | `#panel=speech` |
 | Stat blocks | `#panel=stats` |
 | Sealed | `#panel=sealed` |
+| Stakes | `#panel=stakes` |

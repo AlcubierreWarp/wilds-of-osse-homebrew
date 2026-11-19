@@ -26,6 +26,8 @@ From the plan, pull:
 ## 2. Shape the screen around the story
 
 - One movement per scene. Each names its lead PC, a job for every other PC, the flagged beats, and the pen questions.
+- Each movement also carries the stakes (`st`): for each PC who faces a decision in that scene, the decision in one line, then the considerations the game master can offer from that character's history. Use only facts from the plan and the campaign record. Keep sealed secrets out of it. A PC with no decision is left out. This feeds the Stakes view.
+- Set `order` on a movement when the plan fixes the order the PCs are taken in.
 - Group movements into two to four tabs by phase. `MVTAB` maps each movement to its tab, so Next in Spotlight changes tab by itself.
 - Pick each tab's panels by what the scene is:
 
