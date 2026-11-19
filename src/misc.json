@@ -265,8 +265,8 @@
 				}
 			],
 			"hp": {
-				"average": 138,
-				"formula": "16d8 + 64"
+				"average": 144,
+				"formula": "17d8 + 68"
 			},
 			"speed": {
 				"walk": 30
@@ -278,7 +278,7 @@
 			"wis": 15,
 			"cha": 17,
 			"passive": 16,
-			"cr": "7",
+			"cr": "9",
 			"save": {
 				"str": "+8",
 				"con": "+8",
@@ -288,7 +288,7 @@
 				"athletics": "+8",
 				"deception": "+7",
 				"insight": "+6",
-				"intimidation": "+10",
+				"intimidation": "+11",
 				"perception": "+6",
 				"persuasion": "+7"
 			},
@@ -316,57 +316,120 @@
 					]
 				},
 				{
+					"name": "Pact Weapon",
+					"entries": [
+						"Corvane's crested warhammer is his pact weapon. It counts as magical, and he can call it to his empty hand as a bonus action."
+					]
+				},
+				{
 					"name": "Nothing Left to Lose but One Thing",
 					"entries": [
-						"While a creature Corvane regards as his heir is {@condition incapacitated} or in danger and within his sight, Corvane makes all attack rolls with advantage and has resistance to all damage."
+						"While a creature Corvane regards as his heir is {@condition incapacitated} or in danger and within his sight, Corvane is reckless: he has advantage on melee weapon attack rolls, and attack rolls against him have advantage until the start of his next turn."
 					]
+				}
+			],
+			"spellcasting": [
+				{
+					"name": "Pact Magic",
+					"type": "spellcasting",
+					"ability": "cha",
+					"headerEntries": [
+						"Corvane is a 9th-level warlock of the Fiend. His spellcasting ability is Charisma (spell save {@dc 15}, {@hit 7} to hit with spell attacks). He regains his expended spell slots when he finishes a short or long rest. He knows the following warlock spells:"
+					],
+					"will": [
+						"{@spell detect magic}"
+					],
+					"spells": {
+						"0": {
+							"spells": [
+								"{@spell eldritch blast}"
+							]
+						},
+						"5": {
+							"lower": 1,
+							"slots": 2,
+							"spells": [
+								"{@spell banishment}",
+								"{@spell command}",
+								"{@spell fear}",
+								"{@spell fire shield}",
+								"{@spell hellish rebuke}",
+								"{@spell hold person}",
+								"{@spell suggestion}"
+							]
+						}
+					}
 				}
 			],
 			"action": [
 				{
 					"name": "Multiattack",
 					"entries": [
-						"Corvane makes three attacks with his warhammer."
+						"Corvane makes three attacks with his warhammer. He can replace one of them with a Shield Bash."
 					]
 				},
 				{
 					"name": "Crested Warhammer",
 					"entries": [
-						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}13 ({@damage 2d8 + 4}) bludgeoning damage, and the target must succeed on a {@dc 16} Strength saving throw or be pushed 5 feet and have disadvantage on its next attack roll."
+						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}13 ({@damage 2d8 + 4}) bludgeoning damage, and if the target is Large or smaller, Corvane can push it up to 10 feet straight away from himself."
 					]
 				},
 				{
 					"name": "Shield Bash",
 					"entries": [
-						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}8 ({@damage 1d6 + 4}) bludgeoning damage, and the target must succeed on a {@dc 16} Strength saving throw or be knocked {@condition prone}."
+						"One creature within 5 feet of Corvane must succeed on a {@dc 16} Strength saving throw or take 9 ({@damage 2d4 + 4}) bludgeoning damage and, if it is Medium or smaller, be knocked {@condition prone}. Without his shield he shoves instead: the target must succeed on a {@dc 16} Strength or Dexterity saving throw (its choice) or be pushed 5 feet or knocked {@condition prone}, taking no damage."
 					]
 				},
 				{
-					"name": "A Word to the Wise (Recharge 5-6)",
+					"name": "Eldritch Blast",
 					"entries": [
-						"Corvane speaks, low and level, to one creature he can see within 60 feet that can understand him. The target must succeed on a {@dc 15} Wisdom saving throw or be {@condition frightened} of him for 1 minute, repeating the save at the end of each of its turns. A creature that has seen Corvane kill someone makes this save with disadvantage."
-					]
-				}
-			],
-			"bonus": [
-				{
-					"name": "Send Them",
-					"entries": [
-						"One ally within 60 feet that can see or hear Corvane uses its reaction to move up to its speed and make one weapon attack."
+						"Corvane fires two beams. For each one: {@atk rs} {@hit 7} to hit, range 120 ft., one target. {@h}8 ({@damage 1d10 + 3}) force damage."
 					]
 				}
 			],
 			"reaction": [
 				{
-					"name": "Old Reflex",
+					"name": "Hellish Rebuke",
 					"entries": [
-						"When Corvane is hit by a melee attack, he can make one attack with his warhammer against the attacker."
+						"When a creature Corvane can see within 60 feet damages him, he can expend a spell slot to cast {@spell hellish rebuke}. The creature must make a {@dc 15} Dexterity saving throw, taking 33 ({@damage 6d10}) fire damage on a failed save, or half as much on a successful one."
 					]
 				},
 				{
 					"name": "Nothing Touches the Boy",
 					"entries": [
-						"When an ally within 10 feet of Corvane would take damage, Corvane can take that damage instead."
+						"When an ally within 5 feet of Corvane takes damage, Corvane can take that damage instead. The damage he takes this way can't be reduced or prevented."
+					]
+				}
+			],
+			"legendary": [
+				{
+					"name": "Hammer",
+					"entries": [
+						"Corvane makes one Crested Warhammer attack."
+					]
+				},
+				{
+					"name": "Shove",
+					"entries": [
+						"Corvane uses Shield Bash."
+					]
+				},
+				{
+					"name": "Send Them",
+					"entries": [
+						"Corvane targets one ally he can see within 30 feet. If the target can see and hear him, it can make one weapon attack as a reaction and has advantage on the attack roll."
+					]
+				},
+				{
+					"name": "Move",
+					"entries": [
+						"Corvane moves up to his speed without provoking opportunity attacks."
+					]
+				},
+				{
+					"name": "A Word to the Wise (Costs 2 Actions)",
+					"entries": [
+						"Corvane targets one creature he can see within 30 feet. If it can see and hear him, it must succeed on a {@dc 15} Wisdom saving throw or be {@condition frightened} until the end of Corvane's next turn."
 					]
 				}
 			],
@@ -443,7 +506,7 @@
 				{
 					"name": "Runecraft Brawler",
 					"entries": [
-						"Cassian's unarmed strikes are magical and deal fire damage as shown below. He adds his Charisma modifier to their damage rolls."
+						"Cassian's unarmed strikes are magical and deal fire damage as shown below."
 					]
 				},
 				{
@@ -574,7 +637,7 @@
 				{
 					"name": "Duelist's Discipline",
 					"entries": [
-						"Eclair adds 3 to her AC against the first attack made against her each round (included above) while she is wielding a finesse weapon and no shield."
+						"Eclair adds 3 to her AC against the first attack made against her each round while she is wielding a finesse weapon and no shield."
 					]
 				},
 				{
@@ -717,13 +780,13 @@
 				{
 					"name": "Duelling Blade",
 					"entries": [
-						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}7 ({@damage 1d8 + 3}) piercing damage."
+						"{@atk mw} {@hit 6} to hit, reach 5 ft., one target. {@h}7 ({@damage 1d8 + 3}) piercing damage."
 					]
 				},
 				{
 					"name": "Moravel: Garrison Volley (Recharge 5-6)",
 					"entries": [
-						"Five darts of force, each hitting a creature of the champion's choice within 120 feet for 3 ({@damage 1d4 + 1}) force damage."
+						"Five darts of force, each hitting a creature of the champion's choice within 120 feet for 3 ({@damage 1d4 + 1}) force damage. This is {@spell magic missile} cast at 3rd level."
 					]
 				},
 				{

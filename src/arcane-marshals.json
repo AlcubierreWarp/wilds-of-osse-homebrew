@@ -18,7 +18,7 @@
 			],
 			"ac": [
 				{
-					"ac": 15,
+					"ac": 16,
 					"from": [
 						"chain shirt",
 						"shield"
@@ -119,7 +119,7 @@
 			],
 			"ac": [
 				{
-					"ac": 17,
+					"ac": 18,
 					"from": [
 						"chain mail",
 						"shield"
@@ -332,7 +332,7 @@
 					"type": "spellcasting",
 					"ability": "int",
 					"headerEntries": [
-						"The lieutenant is a 8th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 15}, {@hit 7} to hit with spell attacks). It has the following spells prepared:"
+						"The lieutenant is an 8th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 15}, {@hit 7} to hit with spell attacks). It has the following spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -357,7 +357,7 @@
 							"spells": [
 								"{@spell hold person}",
 								"{@spell see invisibility}",
-								"{@spell zone of truth}"
+								"{@spell detect thoughts}"
 							]
 						},
 						"3": {
@@ -388,13 +388,19 @@
 				{
 					"name": "Rune-Etched Baton",
 					"entries": [
-						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}6 ({@damage 1d6 + 2}) bludgeoning damage plus 7 ({@damage 2d6}) force damage."
+						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) bludgeoning damage plus 7 ({@damage 2d6}) force damage."
 					]
 				},
 				{
 					"name": "Writ of Restraint (Recharge 5-6)",
 					"entries": [
 						"The lieutenant names one creature it can see within 60 feet and speaks the terms of its warrant. The target must succeed on a {@dc 15} Wisdom saving throw or be {@condition restrained} by bands of light for 1 minute. The target repeats the save at the end of each of its turns, ending the effect on a success. While restrained this way the target's spellcasting requires a successful {@dc 15} Constitution check."
+					]
+				},
+				{
+					"name": "Truth Sigil (1/Day)",
+					"entries": [
+						"The lieutenant's sigil of office casts {@spell zone of truth} (save {@dc 15}), requiring no components."
 					]
 				}
 			],
@@ -534,7 +540,7 @@
 							"spells": [
 								"{@spell hold person}",
 								"{@spell see invisibility}",
-								"{@spell zone of truth}"
+								"{@spell detect thoughts}"
 							]
 						},
 						"3": {
@@ -592,6 +598,12 @@
 					"name": "Clear the Ring (1/Day)",
 					"entries": [
 						"Elowen strikes his baton on the ground. Every creature of his choice within 30 feet must make a {@dc 16} Strength saving throw. On a failure a creature takes 21 ({@damage 6d6}) force damage and is pushed 20 feet away and knocked {@condition prone}. On a success it takes half damage and is not moved. Ongoing spells of 3rd level or lower in the area end."
+					]
+				},
+				{
+					"name": "Truth Sigil (1/Day)",
+					"entries": [
+						"Elowen's sigil of office casts {@spell zone of truth} (save {@dc 16}), requiring no components."
 					]
 				}
 			],

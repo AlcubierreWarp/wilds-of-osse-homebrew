@@ -44,7 +44,7 @@
 			"skill": {
 				"nature": "+2",
 				"perception": "+4",
-				"stealth": "+6",
+				"stealth": "+7",
 				"survival": "+4"
 			},
 			"languages": [
@@ -75,7 +75,7 @@
 				{
 					"name": "Hand Axe",
 					"entries": [
-						"{@atk mw,rw} {@hit 5} to hit, reach 5 ft. or range 20/60 ft., one target. {@h}6 ({@damage 1d6 + 3}) slashing damage."
+						"{@atk mw,rw} {@hit 3} to hit, reach 5 ft. or range 20/60 ft., one target. {@h}4 ({@damage 1d6 + 1}) slashing damage."
 					]
 				}
 			],
@@ -189,7 +189,7 @@
 				{
 					"name": "Cleansing Spear",
 					"entries": [
-						"{@atk mw} {@hit 5} to hit, reach 5 ft., one target. {@h}6 ({@damage 1d6 + 3}) piercing damage, plus 5 ({@damage 2d4}) radiant damage if the target is an aberration or a Spellplague-warped creature."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}5 ({@damage 1d6 + 2}) piercing damage, plus 5 ({@damage 2d4}) radiant damage if the target is an aberration or a Spellplague-warped creature."
 					]
 				}
 			],
@@ -228,11 +228,11 @@
 				"N"
 			],
 			"ac": [
+				12,
 				{
-					"ac": 12,
-					"from": [
-						"mage armor"
-					]
+					"ac": 15,
+					"condition": "with {@spell mage armor}",
+					"braces": true
 				}
 			],
 			"hp": {
@@ -337,11 +337,11 @@
 				"N"
 			],
 			"ac": [
+				12,
 				{
-					"ac": 13,
-					"from": [
-						"mage armor"
-					]
+					"ac": 15,
+					"condition": "with {@spell mage armor}",
+					"braces": true
 				}
 			],
 			"hp": {
@@ -358,7 +358,7 @@
 			"wis": 13,
 			"cha": 12,
 			"passive": 11,
-			"cr": "4",
+			"cr": "5",
 			"group": [
 				"Oss'kai"
 			],
@@ -438,7 +438,7 @@
 				{
 					"name": "Quarterstaff",
 					"entries": [
-						"{@atk mw} {@hit 2} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
+						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
 					]
 				}
 			],
@@ -467,11 +467,11 @@
 				"N"
 			],
 			"ac": [
+				13,
 				{
-					"ac": 15,
-					"from": [
-						"mage armor"
-					]
+					"ac": 16,
+					"condition": "with {@spell mage armor}",
+					"braces": true
 				}
 			],
 			"hp": {
@@ -488,7 +488,7 @@
 			"wis": 15,
 			"cha": 13,
 			"passive": 12,
-			"cr": "8",
+			"cr": "9",
 			"group": [
 				"Oss'kai"
 			],
@@ -593,7 +593,7 @@
 				{
 					"name": "Rune Staff",
 					"entries": [
-						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 10 ({@damage 3d6}) force damage."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 10 ({@damage 3d6}) force damage."
 					]
 				}
 			],
@@ -638,8 +638,8 @@
 				}
 			],
 			"hp": {
-				"average": 189,
-				"formula": "26d8 + 72"
+				"average": 195,
+				"formula": "26d8 + 78"
 			},
 			"speed": {
 				"walk": 30
@@ -710,7 +710,7 @@
 					"type": "spellcasting",
 					"ability": "int",
 					"headerEntries": [
-						"The mage-adept is a 17th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 18}, {@hit 10} to hit with spell attacks). It has the following spells prepared:"
+						"The mage-adept is a 20th-level spellcaster. Its spellcasting ability is Intelligence (spell save {@dc 18}, {@hit 10} to hit with spell attacks). It has the following spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -796,7 +796,7 @@
 				{
 					"name": "Adept's Staff",
 					"entries": [
-						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) force damage."
+						"{@atk mw} {@hit 6} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) force damage."
 					]
 				},
 				{
@@ -965,13 +965,13 @@
 				"walk": 30
 			},
 			"str": 11,
-			"dex": 13,
+			"dex": 14,
 			"con": 11,
 			"int": 13,
 			"wis": 17,
 			"cha": 13,
 			"passive": 16,
-			"cr": "4",
+			"cr": "5",
 			"group": [
 				"Oss'kai"
 			],
@@ -982,7 +982,7 @@
 			"skill": {
 				"insight": "+6",
 				"medicine": "+9",
-				"nature": "+3"
+				"nature": "+4"
 			},
 			"languages": [
 				"Common",
@@ -1051,7 +1051,7 @@
 				{
 					"name": "Quarterstaff",
 					"entries": [
-						"{@atk mw} {@hit 2} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
+						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage."
 					]
 				}
 			],
@@ -1104,13 +1104,13 @@
 				"walk": 30
 			},
 			"str": 11,
-			"dex": 14,
+			"dex": 16,
 			"con": 13,
 			"int": 14,
 			"wis": 19,
 			"cha": 15,
 			"passive": 18,
-			"cr": "8",
+			"cr": "9",
 			"group": [
 				"Oss'kai"
 			],
@@ -1212,7 +1212,7 @@
 				{
 					"name": "Rune Staff",
 					"entries": [
-						"{@atk mw} {@hit 3} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 7 ({@damage 2d6}) radiant damage."
+						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}3 ({@damage 1d6}) bludgeoning damage plus 7 ({@damage 2d6}) radiant damage."
 					]
 				},
 				{
@@ -1264,8 +1264,8 @@
 				}
 			],
 			"hp": {
-				"average": 189,
-				"formula": "26d8 + 72"
+				"average": 195,
+				"formula": "26d8 + 78"
 			},
 			"speed": {
 				"walk": 30
@@ -1282,15 +1282,15 @@
 				"Oss'kai"
 			],
 			"save": {
-				"con": "+9",
-				"wis": "+11",
-				"cha": "+9"
+				"con": "+8",
+				"wis": "+10",
+				"cha": "+8"
 			},
 			"skill": {
-				"insight": "+11",
-				"medicine": "+16",
-				"nature": "+9",
-				"persuasion": "+9"
+				"insight": "+10",
+				"medicine": "+15",
+				"nature": "+8",
+				"persuasion": "+8"
 			},
 			"languages": [
 				"Common",
@@ -1330,7 +1330,7 @@
 					"type": "spellcasting",
 					"ability": "wis",
 					"headerEntries": [
-						"The healer-adept is a 17th-level spellcaster. Its spellcasting ability is Wisdom (spell save {@dc 19}, {@hit 11} to hit with spell attacks). It has the following spells prepared:"
+						"The healer-adept is a 20th-level spellcaster. Its spellcasting ability is Wisdom (spell save {@dc 18}, {@hit 10} to hit with spell attacks). It has the following spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -1415,7 +1415,7 @@
 				{
 					"name": "Adept's Staff",
 					"entries": [
-						"{@atk mw} {@hit 4} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) radiant damage."
+						"{@atk mw} {@hit 6} to hit, reach 5 ft., one target. {@h}4 ({@damage 1d6 + 1}) bludgeoning damage plus 18 ({@damage 4d8}) radiant damage."
 					]
 				},
 				{
