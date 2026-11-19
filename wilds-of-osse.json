@@ -10,11 +10,11 @@
 				],
 				"version": "2.1.0",
 				"dateAdded": 1789869156,
-				"dateLastModified": 1795052365
+				"dateLastModified": 1795057097
 			}
 		],
 		"dateAdded": 1789869156,
-		"dateLastModified": 1795052365
+		"dateLastModified": 1795057097
 	},
 	"monster": [
 		{
@@ -1301,8 +1301,8 @@
 				}
 			],
 			"hp": {
-				"average": 144,
-				"formula": "17d8 + 68"
+				"average": 126,
+				"formula": "12d8 + 72"
 			},
 			"speed": {
 				"walk": 30
@@ -1316,15 +1316,14 @@
 			"passive": 16,
 			"cr": "9",
 			"save": {
-				"str": "+8",
-				"con": "+8",
-				"wis": "+6"
+				"wis": "+6",
+				"cha": "+7"
 			},
 			"skill": {
 				"athletics": "+8",
 				"deception": "+7",
 				"insight": "+6",
-				"intimidation": "+11",
+				"intimidation": "+7",
 				"perception": "+6",
 				"persuasion": "+7"
 			},
@@ -1336,7 +1335,7 @@
 				{
 					"name": "Frontier Veteran",
 					"entries": [
-						"Corvane has advantage on Initiative rolls and on saving throws against being {@condition frightened}. He cannot be surprised while conscious."
+						"Corvane adds his proficiency bonus to his Initiative rolls (included), and can swap his Initiative with that of a willing ally (Alert feat)."
 					]
 				},
 				{
@@ -1346,21 +1345,45 @@
 					]
 				},
 				{
-					"name": "Brute",
-					"entries": [
-						"A melee weapon deals one extra die of its damage when Corvane hits with it (included below)."
-					]
-				},
-				{
 					"name": "Pact Weapon",
 					"entries": [
-						"Corvane's crested warhammer is his pact weapon. It counts as magical, and he can call it to his empty hand as a bonus action."
+						"Corvane's crested warhammer is his pact weapon. He can conjure it in his hand as a bonus action, and it is his spellcasting focus (Pact of the Blade)."
 					]
 				},
 				{
 					"name": "Nothing Left to Lose but One Thing",
 					"entries": [
-						"While a creature Corvane regards as his heir is {@condition incapacitated} or in danger and within his sight, Corvane is reckless: he has advantage on melee weapon attack rolls, and attack rolls against him have advantage until the start of his next turn."
+						"When a creature threatens someone Corvane regards as his heir, he casts {@spell hex} on that creature first and keeps it there until the creature is dead."
+					]
+				},
+				{
+					"name": "Dark One's Blessing",
+					"entries": [
+						"When Corvane reduces an enemy to 0 hit points, or someone else reduces an enemy within 10 feet of him to 0 hit points, he gains 15 temporary hit points."
+					]
+				},
+				{
+					"name": "Dark One's Own Luck (3/Day)",
+					"entries": [
+						"When Corvane makes an ability check or a saving throw, he can add {@dice 1d10} to the roll after seeing it but before its effects occur."
+					]
+				},
+				{
+					"name": "Fiendish Resilience",
+					"entries": [
+						"When Corvane finishes a short or long rest, he chooses one damage type other than force and has resistance to it until he chooses another."
+					]
+				},
+				{
+					"name": "Eldritch Mind",
+					"entries": [
+						"Corvane has advantage on Constitution saving throws made to maintain {@status concentration}."
+					]
+				},
+				{
+					"name": "Feats and Invocations",
+					"entries": [
+						"Feats: Alert, Tough, Lightly Armored, Moderately Armored, Weapon Master (warhammer, Push). Invocations: Pact of the Blade, Thirsting Blade, Devouring Blade, Eldritch Smite, Lifedrinker, Agonizing Blast, Eldritch Mind, Fiendish Vigor."
 					]
 				}
 			],
@@ -1370,10 +1393,7 @@
 					"type": "spellcasting",
 					"ability": "cha",
 					"headerEntries": [
-						"Corvane is a 9th-level warlock of the Fiend. His spellcasting ability is Charisma (spell save {@dc 15}, {@hit 7} to hit with spell attacks). He regains his expended spell slots when he finishes a short or long rest. He knows the following warlock spells:"
-					],
-					"will": [
-						"{@spell detect magic}"
+						"Corvane is a 12th-level warlock of the Fiend. His spellcasting ability is Charisma (spell save {@dc 15}, {@hit 7} to hit with spell attacks). He regains his expended spell slots when he finishes a short or long rest. He has the following warlock spells prepared:"
 					],
 					"spells": {
 						"0": {
@@ -1383,43 +1403,73 @@
 						},
 						"5": {
 							"lower": 1,
-							"slots": 2,
+							"slots": 3,
 							"spells": [
 								"{@spell banishment}",
+								"{@spell burning hands}",
 								"{@spell command}",
 								"{@spell fear}",
 								"{@spell fire shield}",
+								"{@spell fireball}",
+								"{@spell geas}",
 								"{@spell hellish rebuke}",
+								"{@spell hex}",
 								"{@spell hold person}",
-								"{@spell suggestion}"
+								"{@spell insect plague}",
+								"{@spell scorching ray}",
+								"{@spell stinking cloud}",
+								"{@spell suggestion}",
+								"{@spell wall of fire}"
 							]
 						}
-					}
+					},
+					"daily": {
+						"1": [
+							"{@spell mass suggestion} (Mystic Arcanum)"
+						]
+					},
+					"footerEntries": [
+						"He can also cast {@spell false life} on himself at will, gaining 12 temporary hit points (Fiendish Vigor)."
+					]
 				}
 			],
 			"action": [
 				{
 					"name": "Multiattack",
 					"entries": [
-						"Corvane makes three attacks with his warhammer. He can replace one of them with a Shield Bash."
+						"Corvane makes three attacks with his warhammer."
 					]
 				},
 				{
 					"name": "Crested Warhammer",
 					"entries": [
-						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}13 ({@damage 2d8 + 4}) bludgeoning damage, and if the target is Large or smaller, Corvane can push it up to 10 feet straight away from himself."
+						"{@atk mw} {@hit 8} to hit, reach 5 ft., one target. {@h}8 ({@damage 1d8 + 4}) bludgeoning damage, plus 3 ({@damage 1d6}) necrotic damage if the target is under his {@spell hex}. If the target is Large or smaller, Corvane can push it up to 10 feet straight away from himself."
 					]
 				},
 				{
-					"name": "Shield Bash",
+					"name": "Lifedrinker (1/Turn)",
 					"entries": [
-						"One creature within 5 feet of Corvane must succeed on a {@dc 16} Strength saving throw or take 9 ({@damage 2d4 + 4}) bludgeoning damage and, if it is Medium or smaller, be knocked {@condition prone}. Without his shield he shoves instead: the target must succeed on a {@dc 16} Strength or Dexterity saving throw (its choice) or be pushed 5 feet or knocked {@condition prone}, taking no damage."
+						"When Corvane hits with his warhammer, he can deal an extra 3 ({@damage 1d6}) necrotic, psychic, or radiant damage."
+					]
+				},
+				{
+					"name": "Eldritch Smite (1/Turn)",
+					"entries": [
+						"When Corvane hits with his warhammer, he can expend a spell slot to deal an extra 27 ({@damage 6d8}) force damage, and the target is knocked {@condition prone} if it is Huge or smaller."
 					]
 				},
 				{
 					"name": "Eldritch Blast",
 					"entries": [
-						"Corvane fires two beams. For each one: {@atk rs} {@hit 7} to hit, range 120 ft., one target. {@h}8 ({@damage 1d10 + 3}) force damage."
+						"Corvane fires three beams. For each one: {@atk rs} {@hit 7} to hit, range 120 ft., one target. {@h}8 ({@damage 1d10 + 3}) force damage."
+					]
+				}
+			],
+			"bonus": [
+				{
+					"name": "Hex",
+					"entries": [
+						"Corvane expends a spell slot to cast {@spell hex} on a creature he can see within 90 feet. Cast with a 5th-level slot, it lasts up to 24 hours while he concentrates. If the target drops to 0 hit points, he can move the curse to a new creature with a later bonus action."
 					]
 				}
 			],
@@ -1428,12 +1478,6 @@
 					"name": "Hellish Rebuke",
 					"entries": [
 						"When a creature Corvane can see within 60 feet damages him, he can expend a spell slot to cast {@spell hellish rebuke}. The creature must make a {@dc 15} Dexterity saving throw, taking 33 ({@damage 6d10}) fire damage on a failed save, or half as much on a successful one."
-					]
-				},
-				{
-					"name": "Nothing Touches the Boy",
-					"entries": [
-						"When an ally within 5 feet of Corvane takes damage, Corvane can take that damage instead. The damage he takes this way can't be reduced or prevented."
 					]
 				}
 			],
@@ -1447,7 +1491,7 @@
 				{
 					"name": "Shove",
 					"entries": [
-						"Corvane uses Shield Bash."
+						"Corvane shoves one creature within 5 feet. It must succeed on a {@dc 16} Strength or Dexterity saving throw (its choice) or be pushed 5 feet or knocked {@condition prone}."
 					]
 				},
 				{
@@ -1590,7 +1634,7 @@
 				{
 					"name": "Is That All You've Got",
 					"entries": [
-						"When Cassian takes damage from an attack he can see, he reduces the damage by 5 ({@dice 1d10}) and his next attack roll this round is made with advantage."
+						"When Cassian takes damage from an attack he can see, he reduces the damage by 9 ({@dice 1d10 + 4}) and his next attack roll this round is made with advantage."
 					]
 				}
 			],
