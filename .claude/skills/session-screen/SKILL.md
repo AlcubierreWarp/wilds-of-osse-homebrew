@@ -71,7 +71,8 @@ NPCs: every move must be a published mechanic, or a baseline rule with new flavo
 - In a PC's **Tonight** call-out, give the AC and the roll the main foe needs to hit it.
 - Casters follow their class: only spells on the class or subclass list, no more spells than that level knows, and the right slots. A warlock has few slots, all at the top level, back on a short rest. Scale effects to the slot level used.
 - Session rulings go in **Tonight**, written as rulings, with the baseline rule they bend.
-- Marquis Corvane is a warlock, Pact of the Blade, with a fire-leaning Fiend spell list. Keep him that way unless told otherwise.
+- A named NPC with a class is built like a character of that class: every trait is a class feature, subclass feature, invocation, spell or feat a character of that level could have. Do not borrow features from other classes or from unrelated monster blocks. Boss extras (legendary actions) are allowed, and are labelled as that.
+- Marquis Corvane is a 12th-level warlock, Fiend patron, Pact of the Blade (2024 rules). His three attacks come from Thirsting Blade and Devouring Blade, and his damage from Hex and Lifedrinker. Keep him that way unless told otherwise.
 
 ## 4. Design rules
 
