@@ -38,6 +38,7 @@ From the plan, pull:
 - Spotlight is the top row of every tab. Sealed is at the bottom and closed.
 - Retire panels the session does not need. Add a bespoke one when a scene has its own mechanic (S13: The Hand).
 - Every panel also works alone at `#panel=<name>`, and each tab at `#tabN`.
+- Keep the iPad view (`#ipad`, and automatic on a touch device in landscape): Spotlight on the left, one view at a time on the right, chosen per tab in `TV`. Combat pairs the foe tracker with Initiative. Built for 1024 by 740, tap only: targets 44px or larger, a number pad instead of a text field, nothing that needs hover.
 
 ## 3. Stat blocks
 
@@ -70,8 +71,9 @@ Run the `screen` preview server (`.claude/launch.json`) and check in the browser
 
 1. Each tab at 1080 by 1800: nothing cut off in Spotlight, every panel readable.
 2. Spotlight and one other panel alone at 520 by 420.
-3. Click through: Next across all movements, damage entry, roll call taps, evidence ticks, sealed open and close, every stat block and voice.
-4. No console errors, and no `{{` left showing.
+3. The iPad view at 1024 by 740: every tab and view, the number pad, no control under 44px.
+4. Click through: Next across all movements, damage entry, roll call taps, evidence ticks, sealed open and close, every stat block and voice.
+5. No console errors, and no `{{` left showing.
 
 ## 6. Publish
 

@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Ossë S13 DM Screen</title>
 <style>
 :root{--bg:#14110f;--tile:#211b18;--panel:#1a1613;--line:#3b312a;--ink:#f3ebdc;--soft:#a99c8a;--gold:#e2be6a;--wine:#8f2735;
@@ -10,7 +13,9 @@
 --bel:#6fbf9a;--gab:#ee8a8a;--gus:#e2be6a;--tim:#c3a2f2}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--ink);font:17px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
-#app{height:100%;display:flex;flex-direction:column}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{overscroll-behavior:none}
+#app{height:100%;height:100dvh;display:flex;flex-direction:column}
 button{font:inherit;color:var(--ink);background:#33291f;border:1px solid var(--line);border-radius:7px;cursor:pointer;padding:7px 13px;font-weight:700;font-size:16px}
 button:active{transform:scale(.97)}
 button:disabled{opacity:.38;cursor:default}
@@ -166,6 +171,36 @@ table.ck td:first-child{font-weight:700;white-space:nowrap}
 .tb th{text-align:left;font-size:.78em;letter-spacing:.06em;text-transform:uppercase;color:#7a200d;border-bottom:1px solid #c9b48a;padding:1px 4px 1px 0}
 .tb td{padding:2px 4px 2px 0;border-bottom:1px dotted #d9c69c;vertical-align:top}
 .tb td b{color:#1b1410}
+/* touch layout: iPad in landscape, one pane, tap only */
+.touch,.touch *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.touch .pb,.touch .spg{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.touch button{min-height:44px}
+.touch .bar{padding:5px 8px}
+.touch .bar .tabb{padding:8px 16px}
+.tgrid{flex:1;min-height:0;display:grid;gap:6px;padding:6px;grid-template-columns:minmax(0,39fr) minmax(0,61fr);grid-template-rows:minmax(0,1fr)}
+.tright{min-width:0;min-height:0;display:flex;flex-direction:column;gap:6px}
+.seg{display:flex;gap:6px;flex:none}
+.seg button{flex:1;min-height:48px;padding:6px 4px;font-size:16px}
+.tview{flex:1;min-height:0;display:grid;gap:6px;grid-template-columns:repeat(var(--n),minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
+.touch .tick{padding:10px 6px}
+.touch .tick i{width:24px;height:24px}
+.touch .tally .pc{padding:10px 12px;font-size:14px}
+.touch .rc{padding:10px}
+.touch .pip{width:32px;height:32px;vertical-align:-10px}
+.touch .ev{padding:10px}
+.touch .vtile{padding:12px 10px}
+.touch .schips button{padding:8px 14px;font-size:15px}
+.touch .dc b{font-size:44px}
+.touch .dc span{font-size:14px}
+.touch .hpn{font-size:30px;margin-top:4px}
+.touch .dice span{font-size:14px}
+.touch .ir{min-height:44px}
+.padv{display:flex;align-items:baseline;gap:8px;margin:8px 0 0;padding:4px 10px;background:#120f0d;border:1px solid var(--line);border-radius:7px}
+.padv b{font:700 26px/1.2 Georgia,serif;color:var(--gold);min-width:1.6em}
+.padv small{color:var(--soft);font-size:13px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 8px}
+.pad button{font-size:20px;min-height:48px;padding:4px}
+.pad .wide{grid-column:1 / -1;min-height:52px}
 @media (prefers-reduced-motion: reduce){button:active{transform:none}}
 </style>
 </head>
@@ -345,13 +380,18 @@ const CLOCKS=[
 ];
 
 const KEY="osse-s13-v1";
-function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false};}
+function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false,tv:{1:0,2:0,3:0}};}
 let S=fresh();
 try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll){S=Object.assign(fresh(),j);S.sealOpen=false;S.armReset=false;S.armHp=false;}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false};S=Object.assign(fresh(),j,mine);render();}}catch(_){}});
-let single=null;
-function readHash(){const h=(location.hash||"").slice(1);single=null;const m=/^tab([123])$/.exec(h);if(m){S.tab=+m[1];}const p=/^panel=(\w+)$/.exec(h);if(p&&P[p[1]])single=p[1];}
+window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false,tv:S.tv};S=Object.assign(fresh(),j,mine);render();}}catch(_){}});
+let single=null,touch=false,pad="";
+const autoTouch=()=>{try{return matchMedia("(pointer:coarse)").matches&&innerWidth>innerHeight&&innerHeight<=900;}catch(e){return false;}};
+const TV={
+1:[["Fight",["hand","init"]],["Stat blocks",["stats"]],["Voices",["voices"]],["Roll call",["roll"]]],
+2:[["Evidence",["evidence"]],["Roll call",["roll"]],["Voices",["voices"]],["Stat blocks",["stats"]],["Sealed",["sealed"]]],
+3:[["Speeches",["speech"]],["Roll call",["roll"]],["Evidence",["evidence"]],["Voices",["voices"]],["Sealed",["sealed"]]]};
+function readHash(){const h=(location.hash||"").slice(1);single=null;touch=h==="ipad"||(!h&&autoTouch());const m=/^tab([123])$/.exec(h);if(m){S.tab=+m[1];}const p=/^panel=(\w+)$/.exec(h);if(p&&P[p[1]])single=p[1];}
 
 const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const md=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\{\{(.+?)\}\}/g,'<small class="src">$1</small>');
@@ -379,8 +419,11 @@ P.hand=()=>{const dead=S.hp<=0;return `${head("The Hand",`<span class="mv">Round
  <div class="hpn">${S.hp}<small>of 91 HP · AC 17</small></div><div class="hpbar"><i style="width:${Math.max(0,S.hp)/91*100}%"></i></div>
  ${dead?'<div class="deadbox">Dead. The body stays in the house. The mark is under the skin.</div>':""}
  <div class="dice"><span><b>Corvane</b>3 × 2d8 + 4<small>+8, advantage</small></span><span><b>Cassian</b>1d6 + 4 + 2d6 fire<small>+7</small></span></div>
- <div class="dmg"><input id="dmg" type="text" inputmode="numeric" autocomplete="off" placeholder="rolled" aria-label="Damage to the Hand"><button class="on" data-a="dmg">Hit</button></div>
- <div class="btns"><button data-a="hp" data-v="-1">−1</button><button data-a="hp" data-v="-5">−5</button><button data-a="hp" data-v="-10">−10</button><button data-a="hp" data-v="5">+5</button><button class="quiet" data-a="hpset">${S.armHp?"Tap again to reset HP":"reset HP"}</button></div>
+ ${touch?`<div class="padv"><b>${pad||"0"}</b><small>rolled damage</small></div>
+ <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="pad" data-v="${n}">${n}</button>`).join("")}<button data-a="pad" data-v="b" aria-label="Delete">⌫</button><button data-a="pad" data-v="0">0</button><button class="go" data-a="padhit" data-v="heal">Heal</button><button class="on wide" data-a="padhit" data-v="hit">Hit the Hand</button></div>
+ <div class="btns"><button class="quiet" data-a="hpset">${S.armHp?"Tap again to reset HP":"reset HP"}</button></div>`
+ :`<div class="dmg"><input id="dmg" type="text" inputmode="numeric" autocomplete="off" placeholder="rolled" aria-label="Damage to the Hand"><button class="on" data-a="dmg">Hit</button></div>
+ <div class="btns"><button data-a="hp" data-v="-1">−1</button><button data-a="hp" data-v="-5">−5</button><button data-a="hp" data-v="-10">−10</button><button data-a="hp" data-v="5">+5</button><button class="quiet" data-a="hpset">${S.armHp?"Tap again to reset HP":"reset HP"}</button></div>`}
  <div class="btns"><button data-a="rnd" data-v="-1">Round −</button><button data-a="rnd" data-v="1">Round +</button></div>
  <ul class="notes"><li>The ward clock is stopped while a PC holds the room. One ward still burns.</li><li>Round 2: Corvane arrives and finishes him. No exit, no capture.</li><li>Cassian fights from the bed and never leaves it.</li><li>Gus takes 10 from a blade (poison resistance).</li><li>The body stays in the house.</li></ul></div>`;};
 
@@ -431,15 +474,24 @@ const LAYOUT={
 };
 
 function render(){const app=document.getElementById("app");const keep={};
- app.querySelectorAll("[data-k]").forEach(el=>{const s=el.querySelector(".pb")||el;keep[el.dataset.k]=s.scrollTop;});
- if(single){app.innerHTML=`<div class="grid one"><section class="pn${single==="spot"?" spot":""}" data-k="one-${single}">${P[single]()}</section></div>`;}
+ app.querySelectorAll("[data-k]").forEach(el=>{const s=el.querySelector(".pb")||el.querySelector(".spg")||el;keep[el.dataset.k]=s.scrollTop;});
+ app.className=touch&&!single?"touch":"";
+ if(touch&&!single){const views=TV[S.tab],vi=Math.min((S.tv&&S.tv[S.tab])||0,views.length-1),v=views[vi];
+  app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
+  <div class="tgrid"><section class="pn spot" data-k="t-spot">${P.spot()}</section>
+  <div class="tright"><div class="seg">${views.map((x,i)=>`<button class="${i===vi?"on":""}" data-a="tv" data-v="${i}">${x[0]}</button>`).join("")}</div>
+  <div class="tview" style="--n:${v[1].length}">${v[1].map(k=>`<section class="pn" data-k="t-${S.tab}-${k}">${P[k]()}</section>`).join("")}</div></div></div>`;}
+ else if(single){app.innerHTML=`<div class="grid one"><section class="pn${single==="spot"?" spot":""}" data-k="one-${single}">${P[single]()}</section></div>`;}
  else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
  <div class="grid" style="grid-template-rows:${ROWS[S.tab]}">${LAYOUT[S.tab].map(l=>`<section class="pn${l[0]==="spot"?" spot":""}${l[3]?" "+l[3]:""}" data-k="${S.tab}-${l[0]}" style="grid-column:${l[1]};grid-row:${l[2]}">${P[l[0]]()}</section>`).join("")}</div>`;}
- app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el;s.scrollTop=v;}});}
+ app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el.querySelector(".spg")||el;s.scrollTop=v;}});}
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const A={
  tab:v=>{S.tab=+v;S.sealOpen=false;S.sealView=null;},
+ tv:v=>{if(!S.tv)S.tv={1:0,2:0,3:0};S.tv[S.tab]=+v;S.sealOpen=false;S.sealView=null;},
+ pad:v=>{pad=v==="b"?pad.slice(0,-1):(pad+v).replace(/^0+/,"").slice(0,3);},
+ padhit:v=>{const n=parseInt(pad,10);if(n>0)A.hp(v==="heal"?n:-n);pad="";},
  mv:v=>{S.mv=clamp(S.mv+ +v,0,4);S.tab=MVTAB[S.mv];S.sealOpen=false;S.sealView=null;},
  beat:v=>{S.beats[v]=!S.beats[v];},
  tally:v=>{S.tally[v]++;},
@@ -468,6 +520,9 @@ document.addEventListener("keydown",e=>{const t=e.target;
  if(e.ctrlKey||e.metaKey||e.altKey)return;
  if(e.key==="1"||e.key==="2"||e.key==="3"){A.tab(e.key);save();render();}});
 window.addEventListener("hashchange",()=>{readHash();render();});
+window.addEventListener("resize",()=>{const t=touch;readHash();if(t!==touch)render();});
+let wl=null;async function wake(){try{if(touch&&"wakeLock" in navigator&&!wl){wl=await navigator.wakeLock.request("screen");wl.addEventListener("release",()=>{wl=null;});}}catch(e){}}
+document.addEventListener("click",wake);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")wake();});
 readHash();render();
 </script>
 </body>
