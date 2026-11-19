@@ -44,6 +44,20 @@ From the plan, pull:
 - Keep the Export button. Its text must list every beat, clue, roll call state and the fight as plain Markdown, flag what was not reached or not found, and end with the board state so it can be restored. Tom gives it to Claude for the post-session sync, with the summary and transcript.
 - Keep the iPad view (`#ipad`, and automatic on a touch device in landscape): Spotlight on the left, one view at a time on the right, chosen per tab in `TV`. Combat pairs the foe tracker with Initiative. Built for 1024 by 740, tap only: targets 44px or larger, a number pad instead of a text field, nothing that needs hover.
 
+## Hand the pen prompts
+
+Each movement has two to four prompts, stored as `[who, prompt, then]`. Write them this way:
+
+- Give half, ask for half. State the part you would have narrated, and leave one gap sized for a single answer. "What happens next?" is too wide.
+- Stay inside the character: their memory, feelings, body, senses, choices and past. Never ask a player to invent an NPC's secret, a clue, or the result of their own action. In an investigation, give the clue and ask what the character makes of it.
+- Paint the scene for the whole table: name the mood, then ask "what do you see that shows it?" Address these to "Anyone" so nobody is put on the spot.
+- Open with what, who, where, when or how. No yes or no questions unless both answers lead somewhere. No questions that need a proper noun.
+- Stage it: an easy, concrete question first, then a deeper one in `then`.
+- Do not ask what you cannot accept. Fix what the plan needs to stay true.
+- Aim at motive and relationships, and plan how the answer comes back later in the scene.
+
+Sources: Jason Cordova's Paint the Scene (The Gauntlet), the Gauntlet forum thread on leading questions, The Alexandrian on description-on-demand, and Sly Flourish on asking the wrong questions.
+
 ## 3. Stat blocks
 
 Player characters: carry the blocks forward from the last screen and update them from the current sheets. The **Tonight** call-out lists only what matters this session: defense bonus, the spells, items and features likely to come up, and anything the story hands them.

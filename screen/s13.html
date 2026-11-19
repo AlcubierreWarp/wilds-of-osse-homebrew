@@ -43,11 +43,19 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 
 /* spotlight */
 .sph0{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 12px 0;flex:none}
-.sph0 .mvh{flex:1 1 240px;min-width:0}
+.sph0 .mvh{flex:1 1 330px;min-width:0}
 .sph0 .nav{margin:0}
 .sph0 .nav button{flex:none;padding:10px 16px}
-.spg{flex:1;min-height:0;display:grid;grid-template-columns:1.5fr 1.2fr .9fr;gap:12px;padding:8px 12px 10px}
-@container (max-width:720px){.pn .spg{display:block;overflow-y:auto}.pn .spg>div{overflow:visible;min-height:auto;margin-bottom:12px}}
+.spg{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:10px 14px;padding:8px 12px 10px}
+.spg.pr{grid-template-columns:1.2fr 1fr}
+.spg.pr>.pens{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 8px;align-items:start}
+.spg.pr .penrule{grid-column:1 / -1;margin:0}
+.spg.pr .pen{margin:0}
+.tally.tb{margin-top:8px}
+.tally.th small{width:auto;margin-right:2px}
+@container (max-width:720px){.tally.th{display:none}}
+@container (min-width:721px){.tally.tb{display:none}}
+@container (max-width:720px){.pn .spg{display:block;overflow-y:auto}.pn .spg>div{overflow:visible;min-height:auto;margin-bottom:12px}.pn .spg>.pens{display:grid;grid-template-columns:1fr}}
 .spg>div{min-height:0;overflow-y:auto}
 .mvn{font:700 12px/1 system-ui;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
 .mvt{font:700 30px/1.05 Georgia,serif;color:var(--gold);margin:3px 0 2px}
@@ -59,6 +67,10 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 .tick.done{color:var(--soft);text-decoration:line-through}
 .tick.done i{background:var(--steady);border-color:var(--steady)}
 .pen{border-left:4px solid var(--gold);padding:5px 9px;background:var(--tile);border-radius:0 6px 6px 0;font:italic 15.5px/1.3 Georgia,serif;margin-bottom:6px}
+.pen small{display:block;font:15px/1.3 Georgia,serif;color:var(--soft);margin-top:4px}
+.pen small i{font:700 11px/1.2 system-ui;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-style:normal;margin-right:4px}
+.penrule{font-size:13px;line-height:1.3;color:var(--soft);margin-bottom:6px}
+.penrule .lab{margin-right:8px;display:inline-block;margin-bottom:2px}
 .pen b{display:block;font:700 11px/1.2 system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-style:normal;margin-bottom:2px}
 .nav{display:flex;gap:6px;margin:6px 0}
 .nav button{flex:1}
@@ -255,8 +267,7 @@ const MOVES=[
         [1,"Round 2: Corvane comes through the door. Three blows on the Hand, 2d8 + 4 each, and he does not stop."],
         [0,"The Hand is down and the hammer goes up. Does Belaskro speak? Corvane finishes it either way."],
         [0,"Cassian never leaves the bed. Do not explain it. The body stays in the house."]],
- pen:["Justin: \"When you look back at Cassian in that bed, who in your family do you see?\"",
-      "Shane: \"Nobody has given Gus an order. What is the first thing he does?\""]},
+ pen:[["Justin", "Between blows you look back at the bed. Cassian is nineteen and grinning at a man who came to kill him. What about him is so plainly family that it stops your breath?", "And what about him is nothing like you?"], ["Shane", "\"Handler signal lost.\" No instruction follows it. What does Gus's body do in that silence, before he decides anything?", "And what is the first thing he chooses for himself?"], ["Whoever hits the Hand", "Show us how you fight in a nobleman's bedroom. What gets broken?", ""]]},
 {t:"Count the dead",k:"Roleplay · 30 min",
  st:{"gab": ["Three bodies. Whose side does he kneel at first?", ["One of them is the man he chose not to save.", "Jared Dreveth is alive because of him and owes him a life.", "He is in a priest's full dress in front of every house."]], "gus": ["Wrent's letter. Does he read it here, and does he tell anyone?", ["EP-07 step 3 is Wrent's letter. Shane reads it in his own time.", "Wrent was the Marshal his whole purpose pointed at.", "What he does with it is Shane's call."]], "tim": ["Éclair wakes furious at being saved, and Honey wants a name.", ["Éclair is alive because of her, and hates it.", "She has no name to give yet.", "The Crown's debt is hers to spend or to hold."]], "bel": ["Corvane treats him as blood for the first time. Does he take it?", ["He comes downstairs at his uncle's side, in front of the houses.", "He is still a deputized constable."]]},
  who:{gab:[1,"Last rites for three, one of them the man he chose not to save. Jared Dreveth crawls out from under the table owing him a life."],
@@ -266,8 +277,7 @@ const MOVES=[
  beats:[[1,"Say every name. Garrick Moravel. Aurelian Aldric. Lieutenant Malachai Wrent. Hold the silence."],
         [0,"Jared Dreveth, alive under the table, owes Gabriele his life."],
         [0,"Rowan Halvenne is alive and shaking. Tasmin saw all of it from her chair."]],
- pen:["Round the table once: \"One thing about this room your character will never forget.\"",
-      "Peter: \"Three bodies. Whose side does Gabriele kneel at first?\""]},
+ pen:[["Anyone", "The bells have stopped and the room is counting its own. What small, ordinary thing in this ballroom is unbearable to look at now?", "What does your character do about it?"], ["Peter", "Three bodies need rites, and one is the man you did not go to. Whose side do you kneel at first?", "What do you say over Wrent that you would not want the others to hear?"], ["Ally", "Éclair wakes furious that it was you. This is an old argument between the two of you. What was it about the first time?", ""]]},
 {t:"Who opened the doors",k:"Investigation · 30 to 40 min",
  st:{"gus": ["One standing order and a room full of nobles. Who does he question first?", ["His order from EP-07: find who opened the security. That is Grey.", "Belaskro thinks he still holds Gus's leash. Gus no longer takes orders.", "Until Grey is found, the trail carries Corvane's own seal."]], "tim": ["The Queen's first look went to the stairs. Does she press a queen who owes her?", ["Pressing her puts the debt at risk.", "Honey asked her to spy on the Crown's side.", "She can name the oathmark, and knows what it means that the dead man carried one."]], "bel": ["Family or the law: who gets what he finds?", ["The batch stamp on the exit tablets matches the two blanks he carries.", "Corvane wants Grey tracked for the family, before the forged seal makes the night look staged.", "He is a deputized constable, and the order that moved the guards carried his uncle's seal."]], "gab": ["Seranthis was left untouched so it would wear the blame. Does he stand with Jared?", ["Jared knows it is a frame, and is frightened.", "In Session 11 the rosary ruled out the Dreveth government.", "Jared is his road toward Barichello."]]},
  who:{gus:[1,"His standing order from EP-07: find who opened the security. That is Grey."],
@@ -278,8 +288,7 @@ const MOVES=[
         [1,"The oathmark on the dead man: sworn servant of the royal family."],
         [0,"Finding Grey is one mission with two owners: Gus by EP-07, Belaskro for the family."],
         [0,"Later stake: Belaskro thinks he holds Gus's leash. Gus no longer takes orders."]],
- pen:["Ally: \"Timbit knows courts. What is the Queen doing with her hands that gives her away?\"",
-      "Shane: \"Gus has one standing order and a room full of nobles. Who does he question first, and how badly does it go?\""]},
+ pen:[["Ally", "You were raised in a court. The Queen's first look went to the stairs, and you caught it. Who taught you to watch where a ruler looks first, and what did the lesson cost you?", "What does it tell you to do now: press her, or keep it?"], ["Shane", "One standing order, and a room of nobles who have never been questioned by anyone like Gus. What does he do that no trained investigator would?", "Which of them does he pick first, and why that one?"], ["Peter", "Jared is frightened and trying not to show it. You have watched frightened men try that before. Where was it, and what did you do for them?", ""]]},
 {t:"Get out of my house",k:"Speeches · 10 to 15 min",
  st:{"bel": ["Family or Crown: his uncle tells every house that tonight crippled Cassian.", ["He was in that room. The Hand never touched Cassian.", "He is named as the nephew in front of every house. It is a gift and a trap.", "What does he do with his face?"]], "tim": ["The Queen repeats the debt by name on her way out.", ["Every house hears it. So does Corvane.", "A debt from the Crown, in a room that is turning against the Crown."]]},
  who:{bel:[1,"Named as the nephew in front of every house. He was in that room: the Hand never touched Cassian."],
@@ -290,7 +299,7 @@ const MOVES=[
         [1,"Corvane stops her at the door with the blue robe. If shown the oathmark, he names it and the room goes silent."],
         [1,"Corvane's speech: alive because of my nephew, will never walk again, I will stand for him."],
         [1,"Hard out: \"Now get out of my house.\""]],
- pen:["Justin: \"Your uncle just told every house that tonight crippled his son. You were in that room. What does Belaskro do with his face?\""]},
+ pen:[["Justin", "Your uncle has just told every house that tonight crippled his son. You were in that room, and you know what the Hand did not do. Every eye that leaves Corvane lands on you. What do they see?", "And what do you do with your hands?"], ["Anyone", "The houses file out past the bodies. What do you see one of them do that tells you this city has already picked sides?", ""]]},
 {t:"Before dawn",k:"Montage · 15 min",order:["bel","tim","gab","gus"],
  st:{"bel": ["Corvane offers him a room in the guest wing. Family or Crown?", ["Taking it puts him under his uncle's roof and in his uncle's camp.", "He is still a deputized constable.", "Corvane's ask stands: track Grey, before someone says he did this to his own son.", "He knows the Hand never touched Cassian."]], "tim": ["Her uncle takes her home this instant. Does she go quietly?", ["Security is discussed in the morning. Then, with clearer heads, they decide whether she is sent home to Meow.", "The Queen's debt is hers, and it is only worth something if she stays.", "Honey still wants a name."]], "gab": ["Jared asks him to Seranthis as a guest. Does he go, ahead of the others?", ["He is no longer under Arcane Marshal oversight. He is a free man.", "He saved Jared's life, and House Dreveth respects men of the cloth.", "They leave in the morning. The Crown will blame Seranthis and come after them.", "Moravel soldiers are already outside the Seranthis embassy.", "Jared is his road toward Barichello."]], "gus": ["No handler and no orders. What did he do tonight, and where did he spend the night?", ["Wherever he says, a Steven finds him: \"Fine weather for the season.\"", "The reply is \"Every season has weather.\" Anything else marks a hostile.", "Cut to black before Shane answers."]]},
  who:{bel:[1,"Corvane offers him a room in the guest wing, as family. His ask stands: track Grey."],
@@ -302,7 +311,7 @@ const MOVES=[
         [1,"Gabriele: Jared invites him to Seranthis as a guest. They leave in the morning, before the Crown blames them."],
         [0,"Gus: left alone. Ask what he did this evening and where he spent the night."],
         [1,"Wherever he says, a Steven walks up: \"Fine weather for the season.\" Cut to black."]],
- pen:["Shane: \"Nobody has given Gus an order. What did he do with the evening, alone, and where does he spend the night?\""]}
+ pen:[["Justin", "Corvane walks you to the guest wing himself. It is finer than anywhere you have slept. What is the one thing in that room you cannot stop looking at?", "Do you unpack?"], ["Ally", "Your uncle does not let go of your arm until the embassy door shuts. What do you look back at, one last time, before it does?", "What will you say in the morning to be allowed to stay?"], ["Peter", "Jared offers you Seranthis, and tonight you answer to no one. When did you last choose for yourself where to go?", "What do you pack first?"], ["Shane", "The manor doors close behind you and nobody tells you where to go. Where do your feet take you?", "What do you do there until the light changes? The Steven finds him in that exact place."]]}
 ];
 
 const ROLL=[
@@ -361,6 +370,7 @@ const VOICES=[
  ["Dying",["I did as I was sworn."]]]},
 {n:"Queen Sabine",how:"Public voice: graceful, warm, entirely composed. More gracious under stress.",beats:[
  ["The debt",["Whoever you are, the crown is in your debt.","Princess Timbit. I do not owe many debts, and I forget none of them."]],
+ ["If the boon is too large",["You ask a queen for a kingdom's worth, Princess. I said the Crown was in your debt. I did not say it was bankrupt.", "That is not mine to give tonight. Ask me for something I can put in your hand before I reach that door.", "A debt is paid in the coin the debtor holds. Name something smaller and it is yours now. The rest we will speak of at the palace.", "I will not refuse you in front of this room. I will ask you to ask again, more wisely."]],
  ["Pressed (Insight 14)",["Is the boy alive?","I asked for a toast. I did not ask for this."]],
  ["Corvane and the robe",["A robe, Marquis. Robes are stolen every day.","Grief makes poor evidence. I will forgive it tonight."]],
  ["Leaving",["I gave that toast. I will not pretend otherwise, and I will not let anyone pretend it was mine."]]]},
@@ -442,12 +452,13 @@ const P={};
 P.spot=()=>{const m=MOVES[S.mv],nx=MOVES[S.mv+1];
  const order=mvOrder(m);
  return `<div class="sph0"><div class="mvh"><div class="mvn">Movement ${S.mv+1} of 5 · ${esc(m.k)}</div><div class="mvt">${esc(m.t)}</div></div>
+  <div class="tally th"><small>Had the floor</small>${PCO.map(k=>`<span class="pc ${k}" data-a="tally" data-v="${k}" role="button" tabindex="0">${PCN[k].slice(0,3)} ${S.tally[k]}</span>`).join("")}<button class="quiet" data-a="tally0">clear</button></div>
   <div class="nav"><button data-a="mv" data-v="-1"${S.mv===0?" disabled":""} aria-label="Previous movement">◀</button><button class="pri" data-a="mv" data-v="1"${nx?"":" disabled"}>${nx?"Next: "+esc(nx.t)+" ▶":"Last movement"}</button></div></div>
- <div class="spg">
+ <div class="spg${m.pen.length>3?" pr":""}">
  <div><div class="wl">${order.map(k=>`${chip(k,m.who[k][0],PCN[k]+(m.who[k][0]?" ★":""))}<span>${esc(m.who[k][1])}</span>`).join("")}</div></div>
- <div><div class="lab" style="margin-bottom:4px">Beats</div>${m.beats.map((b,i)=>{const k=S.mv+"-"+i,d=S.beats[k];return `<div class="tick${d?" done":""}" data-a="beat" data-v="${k}" role="button" tabindex="0"><i>${d?"✓":""}</i><span>${b[0]?'<span class="flag">⚑ </span>':""}${esc(b[1])}</span></div>`;}).join("")}</div>
- <div>${m.pen.map(p=>`<div class="pen"><b>Hand the pen</b>${esc(p)}</div>`).join("")}
-  <div class="tally"><small>Had the floor (tap)</small>${PCO.map(k=>`<span class="pc ${k}" data-a="tally" data-v="${k}" role="button" tabindex="0">${PCN[k].slice(0,3)} ${S.tally[k]}</span>`).join("")}<button class="quiet" data-a="tally0">clear</button></div></div>
+ <div><div class="lab" style="margin-bottom:4px">Beats</div>${m.beats.map((b,i)=>{const k=S.mv+"-"+i,d=S.beats[k];return `<div class="tick${d?" done":""}" data-a="beat" data-v="${k}" role="button" tabindex="0"><i>${d?"✓":""}</i><span>${b[0]?'<span class="flag">⚑ </span>':""}${esc(b[1])}</span></div>`;}).join("")}
+  <div class="tally tb"><small>Had the floor</small>${PCO.map(k=>`<span class="pc ${k}" data-a="tally" data-v="${k}" role="button" tabindex="0">${PCN[k].slice(0,3)} ${S.tally[k]}</span>`).join("")}<button class="quiet" data-a="tally0">clear</button></div></div>
+ <div class="pens"><p class="penrule"><span class="lab">Hand the pen</span><span>Give half, ask for half. Take whatever comes back and build on it.</span></p>${m.pen.map(p=>`<div class="pen"><b>${esc(p[0])}</b>${esc(p[1])}${p[2]?`<small><i>Then</i> ${esc(p[2])}</small>`:""}</div>`).join("")}</div>
  </div>`;};
 
 P.roll=()=>`${head("Roll call",'<span class="mv">tap to change</span>')}<div class="pb"><div class="rcw">${ROLL.map(r=>{const st=S.roll[r[0]];const lab=st==="standing"?"Standing":st==="down"?"Down":"Dead";
@@ -537,7 +548,7 @@ const modalHTML=()=>`<div class="modal"><div class="mbox"><div class="ph"><span 
  <textarea id="xtext" spellcheck="false" aria-label="Board export">${esc(xdraft!==null?xdraft:report())}</textarea>
  <div class="btns"><button class="on" data-a="xcopy">Copy</button>${navigator.share?'<button data-a="xshare">Share</button>':""}<button data-a="xfile">Save as file</button><span class="xmsg" id="xmsg">${esc(xnote)}</span><span class="sp"></span><button class="quiet" data-a="xrestore">${armRestore?"Tap again to replace the board":"Restore from pasted export"}</button></div></div></div>`;
 
-const ROWS={1:"fit-content(45%) fit-content(40%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) fit-content(40%) minmax(0,3.7fr) minmax(0,1fr) minmax(0,.8fr)"};
+const ROWS={1:"fit-content(45%) fit-content(40%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) fit-content(40%) minmax(0,3.7fr) minmax(0,.95fr) minmax(0,.55fr)"};
 const LAYOUT={
 1:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["stats","1","3 / 7"],["hand","2","3 / 5"],["init","2","5 / 7"],["voices","1","7"],["roll","2","7","mini"]],
 2:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["roll","1 / -1","3"],["evidence","1 / -1","4 / 6"],["voices","1","6 / 8"],["sealed","2","6 / 8"]],
