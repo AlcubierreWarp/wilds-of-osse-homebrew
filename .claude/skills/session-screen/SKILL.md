@@ -48,7 +48,8 @@ NPCs: every move must be a published mechanic, or a baseline rule with new flavo
 - Start from the closest published block (gladiator, warlord, assassin, a class feature, a spell) and rename. Check the wording against 5e.tools data, not memory: `https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/bestiary/bestiary-<source>.json`.
 - End each entry with its source in double braces, for example `{{Command Ally, as the warlord.}}`. The page shows it as a small note.
 - Check the math: proficiency bonus fits the challenge rating; attack bonus is ability modifier plus proficiency; save DC is 8 plus modifier plus proficiency; hit points match the hit dice.
-- Table rules: players roll defense, d20 + (AC − 10) against DC 12 + the attacker's bonus. Damage is static (the average).
+- Table rules: players roll defense, d20 + (AC − 10) against DC 12 + the attacker's bonus. Foes deal static damage (the average) to PCs.
+- Tom rolls damage for named NPCs such as Corvane and Cassian. Show their damage as dice with the average in brackets, never as a fixed number or "no roll".
 - Casters use the per-day Spellcasting format, with every spell on their class or patron list.
 - Session rulings go in **Tonight**, written as rulings, with the baseline rule they bend.
 - Marquis Corvane is a warlock, Pact of the Blade, with a fire-leaning Fiend spell list. Keep him that way unless told otherwise.
