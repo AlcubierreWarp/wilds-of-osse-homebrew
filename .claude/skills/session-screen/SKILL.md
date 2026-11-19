@@ -33,14 +33,14 @@ From the plan, pull:
 
 | Scene type | Panels |
 |---|---|
-| Combat | Stat blocks, a tracker for the main foe (attack bonus, HP, typed damage, quick buttons), Initiative, Voices, Roll call |
+| Combat | Stat blocks, Health (bars, statuses and resistances for everyone in the fight), Initiative (rolls, damage and healing, bench, add someone), Voices, Roll call |
 | Roleplay, investigation | Roll call, Evidence (full width), Voices, Sealed |
 | Speeches, endings | Speech view in large type with fill-ins from Roll call, Roll call, Evidence, Sealed |
 
 - Spotlight is the top row of every tab. Stakes is a strip right under it, showing each decision, with the considerations opening on a tap. Sealed is at the bottom and closed.
 - Retire panels the session does not need. Add a bespoke one when a scene has its own mechanic (S13: The Hand).
 - Every panel also works alone at `#panel=<name>`, and each tab at `#tabN`.
-- Initiative is editable at the table: adjust a roll, remove a name, add one from the cast or by typing. Keep that.
+- Health and Initiative share one list of combatants (`CMB0`: side, initiative, hit points, AC, attack line, resistances, statuses, in the fight or on the bench). Initiative edits rolls and hit points and moves people to and from the bench; Health shows the result. Keep both, and keep + Add.
 - Keep the Export button. Its text must list every beat, clue, roll call state and the fight as plain Markdown, flag what was not reached or not found, and end with the board state so it can be restored. Tom gives it to Claude for the post-session sync, with the summary and transcript.
 - Keep the iPad view (`#ipad`, and automatic on a touch device in landscape): Spotlight on the left, one view at a time on the right, chosen per tab in `TV`. Combat pairs the foe tracker with Initiative. Built for 1024 by 740, tap only: targets 44px or larger, a number pad instead of a text field, nothing that needs hover.
 

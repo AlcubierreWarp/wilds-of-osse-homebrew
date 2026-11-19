@@ -43,7 +43,7 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 
 /* spotlight */
 .sph0{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 12px 0;flex:none}
-.sph0 .mvh{flex:1 1 330px;min-width:0}
+.sph0 .mvh{flex:1 1 250px;min-width:0}
 .sph0 .nav{margin:0}
 .sph0 .nav button{flex:none;padding:10px 16px}
 .spg{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:10px 14px;padding:8px 12px 10px}
@@ -93,40 +93,66 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 .mini .rc{flex-basis:112px;padding:5px 8px}.mini .rc b{font-size:15px}.mini .rc>span{display:none}
 @media (max-height:280px){.one .rc{flex-basis:112px;padding:5px 8px}.one .rc b{font-size:15px}.one .rc>span{display:none}}
 
-/* hand */
-.dc{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.dc b{font:700 62px/.95 Georgia,serif;color:var(--gold)}
-.dc span{font-size:15px;color:var(--soft);line-height:1.25}
-.hpn{font:700 34px/1 Georgia,serif;margin:8px 0 4px}
-.hpn small{font:600 14px system-ui;color:var(--soft);margin-left:6px}
-.hpbar{height:16px;background:#3a2d27;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
-.hpbar i{display:block;height:100%;background:var(--wine)}
-.btns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-.dice{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
-.dice span{background:var(--tile);border:1px solid var(--line);border-radius:7px;padding:5px 10px;font-size:15px}
-.dice b{color:var(--gold);font-family:Georgia,serif;margin-right:6px}
-.dice small{color:var(--soft);font-size:12.5px;margin-left:6px}
-.dmg{display:flex;gap:6px;margin:8px 0 0}
-.dmg input{width:86px;font:700 20px/1 Georgia,serif;color:var(--ink);background:#120f0d;border:1px solid var(--line);border-radius:7px;padding:6px 10px;text-align:center}
-.dmg input::placeholder{color:var(--soft);font:600 14px system-ui}
-.dmg input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
-.notes{list-style:none;font-size:14.5px;line-height:1.3;display:flex;flex-direction:column;gap:4px}
+/* combat */
+.sd{display:inline-block;font:800 11px/1 system-ui;letter-spacing:.08em;text-transform:uppercase;padding:5px 0;width:56px;text-align:center;border-radius:4px;color:#fff;flex:none}
+.sd.enemy{background:#a8323f}.sd.ally{background:#2f7044}.sd.party{background:#2d5fa3}
+.ic{width:18px;height:18px;flex:none;vertical-align:-3px}
+input.inn,input.dmgf{-moz-appearance:textfield;appearance:textfield;outline:none}
+input.inn::-webkit-outer-spin-button,input.inn::-webkit-inner-spin-button,input.dmgf::-webkit-outer-spin-button,input.dmgf::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input.inn:focus-visible,input.dmgf:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.notes{list-style:none;font-size:14.5px;line-height:1.3;display:flex;flex-direction:column;gap:4px;margin-top:6px}
 .notes li{padding-left:9px;border-left:3px solid var(--line)}
-.deadbox{background:var(--dead);border:1px solid #3a322c;border-radius:7px;padding:8px 10px;font:700 18px Georgia,serif;color:var(--gold);margin:6px 0}
+
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 
 /* initiative */
-.ini{display:flex;flex-direction:column;gap:4px}
-.ir{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;padding:6px 9px;border-radius:7px;background:var(--tile);border:2px solid transparent;font-size:16px}
-.ir b{font:700 20px/1 Georgia,serif;color:var(--gold);text-align:center}
-.ir small{color:var(--soft);font-size:12.5px}
+.ph button{padding:5px 12px;font-size:15px}
+.ini{display:flex;flex-direction:column;gap:5px}
+.ir{display:grid;grid-template-columns:52px 56px minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 8px;border-radius:7px;background:var(--tile);border:2px solid transparent}
 .ir.cur{border-color:var(--gold);background:#3a2c14}
-.ir.off{opacity:.38}
-.ir{cursor:pointer}
-.ir.ed{grid-template-columns:44px 1fr;cursor:default}
-.ied{grid-column:1 / -1;display:flex;gap:6px;flex-wrap:wrap}
-.ied button{flex:1;padding:6px 4px;min-width:44px}
-.iadd{margin-top:10px}
-.iadd .dmg input{flex:1;width:auto;font:600 16px/1.2 system-ui,sans-serif;text-align:left}
+.ir.dn .im{opacity:.55}
+.inn{width:52px;height:42px;background:#120f0d;border:1px solid var(--line);border-radius:6px;color:var(--gold);font:700 25px/1 Georgia,serif;text-align:center}
+.im{min-width:0}
+.im b{font:700 18px/1.1 Georgia,serif}
+.im .hpt{font:700 16px/1 system-ui;margin-left:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.im small{display:block;color:var(--soft);font-size:12.5px;line-height:1.25;margin-top:3px}
+.dm{display:flex;gap:4px;align-items:center}
+.dmgf{width:58px;height:42px;background:#120f0d;border:1px solid var(--line);border-radius:6px;color:var(--ink);font:700 21px/1 system-ui;text-align:center}
+.dm button{width:42px;height:42px;padding:0;font-size:26px;line-height:1;color:#fff}
+.dm .mi{background:#a8323f;border-color:#d8596b}
+.dm .pl{background:#2f7044;border-color:#52a26a}
+.dm .out{width:24px;background:none;border:none;color:var(--soft);font-size:20px}
+.bench{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.bench small{color:var(--soft);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-right:2px}
+.bn{font-size:13.5px;padding:4px 10px 4px 5px;border-radius:99px;display:inline-flex;gap:6px;align-items:center;font-weight:600}
+.bn .sd{width:auto;padding:3px 6px;font-size:10px}
+.bn em{font-style:normal;color:var(--soft);font-weight:500}
+.empty{color:var(--soft);font-size:15px;padding:6px 2px}
+
+/* health */
+.hl{display:flex;flex-direction:column;gap:8px}
+.hc .top{display:flex;align-items:center;gap:8px}
+.hc .top b{font:700 20px/1.1 Georgia,serif;flex:1;min-width:0}
+.hc .num{font:700 19px/1 system-ui;font-variant-numeric:tabular-nums}
+.hc .hrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin-top:3px}
+.hb{height:18px;background:#3a2d27;border-radius:6px;overflow:hidden;border:1px solid var(--line);position:relative}
+.hb i{display:block;height:100%}
+.hb.ok i{background:#4c9a5c}.hb.half i{background:#d49a35}.hb.low i{background:#d8485c}
+.hb.zero{background:repeating-linear-gradient(45deg,#2a211c,#2a211c 6px,#120f0d 6px,#120f0d 12px)}
+.hb span{position:absolute;inset:0;display:grid;place-items:center;font:800 12.5px/1 system-ui;letter-spacing:.16em;color:#ffb9b9}
+.stf{min-width:96px;max-width:200px;min-height:30px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:center;padding:2px 8px;border:1px dashed var(--soft);border-radius:6px;background:none;color:var(--soft);font-size:13px;font-weight:600}
+.stf.has{border-style:solid;border-color:var(--gold);color:var(--gold)}
+.stf.open{background:#3a2c14}
+.stf .ic{width:21px;height:21px}
+.res{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
+.rs{display:inline-flex;align-items:center;gap:3px;font:800 12px/1 system-ui;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:2px 6px 2px 4px;background:var(--tile)}
+.rs .ic{width:15px;height:15px;color:var(--soft)}
+.pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:7px;padding:6px;border:1px solid var(--gold);border-radius:7px;background:#120f0d}
+.pick button{display:flex;align-items:center;gap:6px;padding:5px 7px;font-size:13px;font-weight:600;text-align:left;min-width:0}
+.pick .pk{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;color:var(--gold);font:700 12px/1 system-ui;letter-spacing:.1em;text-transform:uppercase}
+.foot{display:flex;gap:6px;align-items:center;margin-top:8px;padding-top:5px;border-top:1px solid var(--line)}
+.foot .sp{flex:1}
+
 .sm{padding:5px 12px;font-size:14px}
 .hint{color:var(--soft);font-size:14px;line-height:1.3;margin-top:6px}
 .btns .sp{flex:1}
@@ -230,17 +256,33 @@ table.ck td:first-child{font-weight:700;white-space:nowrap}
 .touch .ev{padding:10px}
 .touch .vtile{padding:12px 10px}
 .touch .schips button{padding:8px 14px;font-size:15px}
-.touch .dc b{font-size:44px}
-.touch .dc span{font-size:14px}
-.touch .hpn{font-size:30px;margin-top:4px}
-.touch .dice span{font-size:14px}
-.touch .ir{min-height:44px}
-.padv{display:flex;align-items:baseline;gap:8px;margin:8px 0 0;padding:4px 10px;background:#120f0d;border:1px solid var(--line);border-radius:7px}
-.padv b{font:700 26px/1.2 Georgia,serif;color:var(--gold);min-width:1.6em}
-.padv small{color:var(--soft);font-size:13px}
-.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 8px}
-.pad button{font-size:20px;min-height:48px;padding:4px}
-.pad .wide{grid-column:1 / -1;min-height:52px}
+.tview.stack{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,.9fr) minmax(0,1.1fr)}
+button.inn,button.dmgf{padding:0;cursor:pointer}
+.touch .inn,.touch .dmgf{height:44px}
+.touch .dmgf{width:52px;color:var(--soft)}
+.inn.sel,.dmgf.sel{outline:2px solid var(--gold);outline-offset:1px}
+.touch .dm .out{width:40px;font-size:24px}
+.touch .stf{min-height:44px}
+.touch .ph button{min-width:44px}
+.touch .bn{min-height:40px;padding:6px 12px 6px 7px}
+.pad{margin:0 0 8px;padding:8px;border:2px solid var(--gold);border-radius:8px;background:#120f0d}
+.pad .pt{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.pad .pt b{font:700 28px/1 Georgia,serif;color:var(--gold);min-width:2em}
+.pad .pt span{color:var(--soft);font-size:14px}
+.pad .pk{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.pad .pk button{min-height:46px;font-size:20px;padding:0}
+.pad .pk .quiet{font-size:13px}
+.pad .pa{display:flex;gap:6px;margin-top:6px}
+.pad .pa button{flex:1;color:#fff}
+.pad .mi{background:#a8323f;border-color:#d8596b}
+.pad .pl{background:#2f7044;border-color:#52a26a}
+.bn.add{padding:4px 12px;border-style:dashed}
+.bx{padding:2px 6px;min-height:0}
+.addf{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:8px}
+.addf input{height:40px;background:#120f0d;border:1px solid var(--line);border-radius:6px;color:var(--ink);font:600 15px system-ui,sans-serif;padding:0 8px}
+.addf input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.addf #aname{flex:1 1 140px;min-width:0}
+.addf #ahp{width:70px;text-align:center}
 @media (prefers-reduced-motion: reduce){button:active{transform:none}}
 </style>
 </head>
@@ -341,15 +383,14 @@ const EVID=[
 ["chair",0,"The empty chair","No roll","Seranthis was left untouched so Seranthis would wear it. Jared Dreveth knows it and is frightened.",["gab"]]
 ];
 
-const INIT=[
-["tim","Princess Timbit","20","Ballroom floor"],
-["bel","Belaskro","9","Upstairs. AC 15"],
-["cas","Cassian","with Bel","One fist at the Hand: 1d6 + 4 + 2d6 fire"],
-["cor","Corvane","round 2","Three blows: 1d8 + 4 + 1d6 Hex each"],
-["gus","Gus","8","Ballroom floor"],
-["hand","The Hand","5","Two Kissed Blades, +7 to hit, 14 each"],
-["gab","Gabriele","1","Ballroom floor"]
-];
+const CMB0=[{"id":"tim","name":"Timbit","side":"party","init":20,"inCombat":false,"hp":23,"maxHp":23,"ac":11,"atk":"Eldritch Blast +5 · spells +3, DC 11","res":[],"cond":[]},{"id":"bel","name":"Belaskro","side":"party","init":9,"inCombat":true,"hp":32,"maxHp":32,"ac":15,"atk":"Crossbow +8 · Whip +6","res":[],"cond":["Concentration"]},{"id":"cas","name":"Cassian","side":"ally","init":9,"inCombat":true,"hp":30,"maxHp":97,"ac":15,"atk":"+7 · 1d6 + 4 + 2d6 fire, you roll","res":[],"cond":[],"roll":"cassian"},{"id":"gus","name":"Gus","side":"party","init":8,"inCombat":false,"hp":23,"maxHp":23,"ac":18,"atk":"Shocking Grasp +5 · Crossbow +4","res":[["poison","R"]],"cond":[]},{"id":"cor","name":"Corvane","side":"ally","init":5,"inCombat":false,"hp":126,"maxHp":126,"ac":15,"atk":"+8 · 3 × (1d8 + 4 + 1d6 Hex), +1d6 once","res":[],"cond":[],"note":"round 2"},{"id":"gab","name":"Gabriele","side":"party","init":1,"inCombat":false,"hp":27,"maxHp":27,"ac":15,"atk":"Mace +2 · spells +5, DC 13","res":[],"cond":[]},{"id":"hand","name":"The Hand","side":"enemy","init":1,"inCombat":true,"hp":91,"maxHp":91,"ac":17,"atk":"+7 to hit · 14 (1d6 + 4 + 2d6 poison) ×2","res":[["poison","R"]],"cond":["Marked"],"roll":"hand"}];
+const ICONS={"eye-off":"<path d=\"M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49\"/> <path d=\"M14.084 14.158a3 3 0 0 1-4.242-4.242\"/> <path d=\"M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143\"/> <path d=\"m2 2 20 20\"/>","heart":"<path d=\"M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5\"/>","ear-off":"<path d=\"M6 18.5a3.5 3.5 0 1 0 7 0c0-1.57.92-2.52 2.04-3.46\"/> <path d=\"M6 8.5c0-.75.13-1.47.36-2.14\"/> <path d=\"M8.8 3.15A6.5 6.5 0 0 1 19 8.5c0 1.63-.44 2.81-1.09 3.76\"/> <path d=\"M12.5 6A2.5 2.5 0 0 1 15 8.5M10 13a2 2 0 0 0 1.82-1.18\"/> <line x1=\"2\" x2=\"22\" y1=\"2\" y2=\"22\"/>","ghost":"<path d=\"M15 10v1\"/> <path d=\"M7.528 20.472a1.6 1.6 0 012.277 0l1.057 1.056a1.6 1.6 0 002.276 0l1.057-1.056a1.6 1.6 0 012.277 0l1.114 1.114a1.4 1.4 0 002.414-1V10a8 8 0 00-16 0v10.586a1.4 1.4 0 002.414 1z\"/> <path d=\"M9 10v1\"/>","grab":"<path d=\"M18 11.5V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1.4\"/> <path d=\"M14 10V8a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2\"/> <path d=\"M10 9.9V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v5\"/> <path d=\"M6 14a2 2 0 0 0-2-2a2 2 0 0 0-2 2\"/> <path d=\"M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8 2 2 0 1 1 4 0\"/>","ban":"<circle cx=\"12\" cy=\"12\" r=\"10\"/> <path d=\"M4.929 4.929 19.07 19.071\"/>","circle-dashed":"<path d=\"M10.1 2.182a10 10 0 0 1 3.8 0\"/> <path d=\"M13.9 21.818a10 10 0 0 1-3.8 0\"/> <path d=\"M17.609 3.721a10 10 0 0 1 2.69 2.7\"/> <path d=\"M2.182 13.9a10 10 0 0 1 0-3.8\"/> <path d=\"M20.279 17.609a10 10 0 0 1-2.7 2.69\"/> <path d=\"M21.818 10.1a10 10 0 0 1 0 3.8\"/> <path d=\"M3.721 6.391a10 10 0 0 1 2.7-2.69\"/> <path d=\"M6.391 20.279a10 10 0 0 1-2.69-2.7\"/>","zap-off":"<path d=\"M10.768 5.111 13.44 2.44a1.5 1.5 0 012.474 1.561l-1.633 4.625\"/> <path d=\"m18.889 13.232.672-.672A1.5 1.5 0 0018.5 10h-2.844\"/> <path d=\"m2 2 20 20\"/> <path d=\"m7.94 7.94-3.5 3.499A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l5.5-5.5\"/>","mountain":"<path d=\"m8 3 4 8 5-5 5 15H2L8 3z\"/>","biohazard":"<circle cx=\"12\" cy=\"11.9\" r=\"2\"/> <path d=\"M6.7 3.4c-.9 2.5 0 5.2 2.2 6.7C6.5 9 3.7 9.6 2 11.6\"/> <path d=\"m8.9 10.1 1.4.8\"/> <path d=\"M17.3 3.4c.9 2.5 0 5.2-2.2 6.7 2.4-1.2 5.2-.6 6.9 1.5\"/> <path d=\"m15.1 10.1-1.4.8\"/> <path d=\"M16.7 20.8c-2.6-.4-4.6-2.6-4.7-5.3-.2 2.6-2.1 4.8-4.7 5.2\"/> <path d=\"M12 13.9v1.6\"/> <path d=\"M13.5 5.4c-1-.2-2-.2-3 0\"/> <path d=\"M17 16.4c.7-.7 1.2-1.6 1.5-2.5\"/> <path d=\"M5.5 13.9c.3.9.8 1.8 1.5 2.5\"/>","arrow-down-to-line":"<path d=\"M12 17V3\"/> <path d=\"m6 11 6 6 6-6\"/> <path d=\"M19 21H5\"/>","link":"<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>","sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\"/> <path d=\"M20 2v4\"/> <path d=\"M22 4h-4\"/> <circle cx=\"4\" cy=\"20\" r=\"2\"/>","moon":"<path d=\"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401\"/>","battery-low":"<path d=\"M22 14v-4\"/> <path d=\"M6 14v-4\"/> <rect x=\"2\" y=\"6\" width=\"16\" height=\"12\" rx=\"2\"/>","brain":"<path d=\"M12 18V5\"/> <path d=\"M15 13a4.17 4.17 0 01-3-4 4.17 4.17 0 01-3 4\"/> <path d=\"M17.707 6.294A3 3 0 1012 5a3 3 0 10-5.707 1.294\"/> <path d=\"M17.996 5.125a4 4 0 012.526 5.77\"/> <path d=\"M18 18a4 4 0 002-7.465\"/> <path d=\"M19.967 17.482a4 4 0 11-7.967.517 4 4 0 11-7.967-.517\"/> <path d=\"M6 18a4 4 0 01-2-7.465\"/> <path d=\"M6.004 5.125a4 4 0 00-2.526 5.77\"/>","skull":"<path d=\"m12.5 17-.5-1-.5 1h1z\"/> <path d=\"M15 22a1 1 0 0 0 1-1v-1a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20v1a1 1 0 0 0 1 1z\"/> <circle cx=\"15\" cy=\"12\" r=\"1\"/> <circle cx=\"9\" cy=\"12\" r=\"1\"/>","droplets":"<path d=\"M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z\"/> <path d=\"M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97\"/>","crosshair":"<circle cx=\"12\" cy=\"12\" r=\"10\"/> <line x1=\"22\" x2=\"18\" y1=\"12\" y2=\"12\"/> <line x1=\"6\" x2=\"2\" y1=\"12\" y2=\"12\"/> <line x1=\"12\" x2=\"12\" y1=\"6\" y2=\"2\"/> <line x1=\"12\" x2=\"12\" y1=\"22\" y2=\"18\"/>","shield":"<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/>","flask-conical":"<path d=\"M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2\"/> <path d=\"M6.453 15h11.094\"/> <path d=\"M8.5 2h7\"/>","flame":"<path d=\"M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4\"/>","snowflake":"<path d=\"m10 20-1.25-2.5L6 18\"/> <path d=\"M10 4 8.75 6.5 6 6\"/> <path d=\"m14 20 1.25-2.5L18 18\"/> <path d=\"m14 4 1.25 2.5L18 6\"/> <path d=\"m17 21-3-6h-4\"/> <path d=\"m17 3-3 6 1.5 3\"/> <path d=\"M2 12h6.5L10 9\"/> <path d=\"m20 10-1.5 2 1.5 2\"/> <path d=\"M22 12h-6.5L14 15\"/> <path d=\"m4 10 1.5 2L4 14\"/> <path d=\"m7 21 3-6-1.5-3\"/> <path d=\"m7 3 3 6h4\"/>","zap":"<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\"/>","sun":"<circle cx=\"12\" cy=\"12\" r=\"4\"/> <path d=\"M12 2v2\"/> <path d=\"M12 20v2\"/> <path d=\"m4.93 4.93 1.41 1.41\"/> <path d=\"m17.66 17.66 1.41 1.41\"/> <path d=\"M2 12h2\"/> <path d=\"M20 12h2\"/> <path d=\"m6.34 17.66-1.41 1.41\"/> <path d=\"m19.07 4.93-1.41 1.41\"/>"};
+const SIDE={enemy:"Enemy",ally:"Ally",party:"Party"};
+const CONDS=[["Blinded","eye-off"],["Charmed","heart"],["Deafened","ear-off"],["Frightened","ghost"],["Grappled","grab"],["Incapacitated","ban"],["Invisible","circle-dashed"],["Paralyzed","zap-off"],["Petrified","mountain"],["Poisoned","biohazard"],["Prone","arrow-down-to-line"],["Restrained","link"],["Stunned","sparkles"],["Unconscious","moon"],["Exhaustion","battery-low"],["Concentration","brain"],["Kissed","skull"],["Bleeding","droplets"],["Marked","crosshair"]];
+const CI={};CONDS.forEach(c=>CI[c[0]]=c[1]);
+const RESI=[["poison","flask-conical"],["fire","flame"],["cold","snowflake"],["lightning","zap"],["radiant","sun"],["necrotic","skull"],["psychic","brain"]];
+const RWORD={R:"Resistant to",I:"Immune to",V:"Vulnerable to"};
+const FIGHTNOTES=["The ward clock is stopped while a PC holds the room. One ward still burns.","Corvane arrives in round 2 and finishes him. No exit, no capture.","Cassian fights from the bed and never leaves it.","The body stays in the house."];
 
 const VOICES=[
 {n:"Corvane",how:"Gravelly, deep, deliberate. Quiet to roaring in three seconds.",beats:[
@@ -425,19 +466,17 @@ const CLOCKS=[
 ["Gabriele","Travels ahead as a guest of House Dreveth.","Letters back from the road."]
 ];
 
-const KEY="osse-s13-v1";
-function seedInit(){let last=0;return INIT.map(r=>{const num=/^\d+$/.test(r[2]);if(num)last=+r[2];return {id:r[0],name:r[1],v:last,lab:num?"":r[2],note:r[3]};});}
-function normalize(){if(!Array.isArray(S.init)||!S.init.every(e=>e&&e.id&&e.name))S.init=seedInit();S.init.forEach(e=>{if(typeof e.v!=="number")e.v=0;});if(!S.init.some(e=>e.id===S.turnId))S.turnId=S.init.length?S.init[0].id:null;if(!S.tv)S.tv={1:0,2:0,3:0};}
-function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,init:seedInit(),turnId:INIT[0][0],ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false,tv:{1:0,2:0,3:0},stOpen:{}};}
+const KEY="osse-s13-v2";
+function normalize(){if(!Array.isArray(S.cmb)||!S.cmb.every(c=>c&&c.id&&c.name))S.cmb=JSON.parse(JSON.stringify(CMB0));S.cmb.forEach(c=>{if(!Array.isArray(c.cond))c.cond=[];if(!Array.isArray(c.res))c.res=[];});if(!S.tv)S.tv={1:0,2:0,3:0};if(!S.stOpen)S.stOpen={};}
+function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,cmb:JSON.parse(JSON.stringify(CMB0)),round:1,turnId:null,picker:null,notesOpen:false,armFight:false,ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,tv:{1:0,2:0,3:0},stOpen:{}};}
 let S=fresh();
-try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll){S=Object.assign(fresh(),j);if(j.turnId===undefined&&INIT[j.turn])S.turnId=INIT[j.turn][0];normalize();S.sealOpen=false;S.armReset=false;S.armHp=false;}}catch(e){}
+try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll&&Array.isArray(j.cmb)){S=Object.assign(fresh(),j);normalize();S.sealOpen=false;S.armReset=false;S.armFight=false;S.picker=null;}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false,tv:S.tv,stOpen:S.stOpen};S=Object.assign(fresh(),j,mine);normalize();render();}}catch(_){}});
-let single=null,touch=false,pad="",iniEdit=false,armDel=null,modal=false,xdraft=null,xnote="",armRestore=false;
-const ALIAS={cassian:"cas",corvane:"cor"};
+window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll&&Array.isArray(j.cmb)){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,picker:S.picker,notesOpen:S.notesOpen,armReset:false,armFight:false,tv:S.tv,stOpen:S.stOpen};S=Object.assign(fresh(),j,mine);normalize();render();}}catch(_){}});
+let single=null,touch=false,pad="",padT=null,addOpen=false,wantFocus=null,modal=false,xdraft=null,xnote="",armRestore=false;
 const autoTouch=()=>{try{return matchMedia("(pointer:coarse)").matches&&innerWidth>innerHeight&&innerHeight<=900;}catch(e){return false;}};
 const TV={
-1:[["Fight",["hand","init"]],["Stakes",["stakes"]],["Stats",["stats"]],["Voices",["voices"]],["Roll call",["roll"]]],
+1:[["Fight",["health","init"],"stack"],["Stakes",["stakes"]],["Stats",["stats"]],["Voices",["voices"]],["Roll call",["roll"]]],
 2:[["Evidence",["evidence"]],["Stakes",["stakes"]],["Roll call",["roll"]],["Voices",["voices"]],["Stats",["stats"]],["Sealed",["sealed"]]],
 3:[["Speeches",["speech"]],["Stakes",["stakes"]],["Roll call",["roll"]],["Evidence",["evidence"]],["Voices",["voices"]],["Sealed",["sealed"]]]};
 function readHash(){const h=(location.hash||"").slice(1);single=null;touch=h==="ipad"||(!h&&autoTouch());const m=/^tab([123])$/.exec(h);if(m){S.tab=+m[1];}const p=/^panel=(\w+)$/.exec(h);if(p&&P[p[1]])single=p[1];}
@@ -465,31 +504,36 @@ P.roll=()=>`${head("Roll call",'<span class="mv">tap to change</span>')}<div cla
  const pip=(r[0]==="noemie"&&st==="down")?`<span class="pip${S.pip?" f":""}" data-a="pip" title="pip" role="button" tabindex="0"></span>`:"";
  return `<div class="rc ${st}" data-a="rc" data-v="${r[0]}" role="button" tabindex="0" title="${esc(r[2])}"><b>${esc(r[1])}</b><span>${esc(r[2])}</span><em>${lab}${r[0]==="noemie"&&st==="down"?(S.pip?" · 1 pip":" · no pips, dying"):""}${pip}</em></div>`;}).join("")}</div></div>`;
 
-P.hand=()=>{const dead=S.hp<=0;return `${head("The Hand",`<span class="mv">Round ${S.round}</span>`)}<div class="pb">
- <div class="dc"><b>+7</b><span>to hit. Two Kissed Blades a turn.<br>Hit: 14 (1d6 + 4 piercing plus 2d6 poison).</span></div>
- <div class="hpn">${S.hp}<small>of 91 HP · AC 17</small></div><div class="hpbar"><i style="width:${Math.max(0,S.hp)/91*100}%"></i></div>
- ${dead?'<div class="deadbox">Dead. The body stays in the house. The mark is under the skin.</div>':""}
- <div class="dice"><span><b>Corvane</b>3 × (1d8 + 4 + 1d6 Hex), +1d6 once<small>+8</small></span><span><b>Cassian</b>1d6 + 4 + 2d6 fire<small>+7</small></span></div>
- ${touch?`<div class="padv"><b>${pad||"0"}</b><small>rolled damage</small></div>
- <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="pad" data-v="${n}">${n}</button>`).join("")}<button data-a="pad" data-v="b" aria-label="Delete">⌫</button><button data-a="pad" data-v="0">0</button><button class="go" data-a="padhit" data-v="heal">Heal</button><button class="on wide" data-a="padhit" data-v="hit">Hit the Hand</button></div>
- <div class="btns"><button class="quiet" data-a="hpset">${S.armHp?"Tap again to reset HP":"reset HP"}</button></div>`
- :`<div class="dmg"><input id="dmg" type="text" inputmode="numeric" autocomplete="off" placeholder="rolled" aria-label="Damage to the Hand"><button class="on" data-a="dmg">Hit</button></div>
- <div class="btns"><button data-a="hp" data-v="-1">−1</button><button data-a="hp" data-v="-5">−5</button><button data-a="hp" data-v="-10">−10</button><button data-a="hp" data-v="5">+5</button><button class="quiet" data-a="hpset">${S.armHp?"Tap again to reset HP":"reset HP"}</button></div>`}
- <div class="btns"><button data-a="rnd" data-v="-1">Round −</button><button data-a="rnd" data-v="1">Round +</button></div>
- <ul class="notes"><li>The ward clock is stopped while a PC holds the room. One ward still burns.</li><li>Round 2: Corvane arrives and finishes him. No exit, no capture.</li><li>Cassian fights from the bed and never leaves it.</li><li>Gus takes 10 from a blade (poison resistance).</li><li>The body stays in the house.</li></ul></div>`;};
+const icon=n=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||ICONS.shield}</svg>`;
+const resIcon=x=>{x=x.toLowerCase();for(const r of RESI)if(x.includes(r[0]))return r[1];return "shield";};
+const cmb=id=>S.cmb.find(c=>c.id===id);
+const order=()=>S.cmb.filter(c=>c.inCombat).sort((a,b)=>b.init-a.init||S.cmb.indexOf(a)-S.cmb.indexOf(b));
+function curId(){const o=order();if(!o.length)return null;if(!o.some(c=>c.id===S.turnId))S.turnId=o[0].id;return S.turnId;}
+const side=c=>`<span class="sd ${c.side}">${SIDE[c.side]}</span>`;
 
-function iniActive(e){if(e.id==="cor"&&S.round<2)return false;if(e.id==="hand"&&S.hp<=0)return false;return true;}
-function sortInit(){S.init=S.init.map((e,i)=>[e,i]).sort((a,b)=>(b[0].v-a[0].v)||(a[1]-b[1])).map(x=>x[0]);}
-P.init=()=>{const L=S.init;
- const row=e=>{const cur=e.id===S.turnId,who=PCN[e.id]?chip(e.id,1,e.name):`<strong>${esc(e.name)}</strong>`;
-  if(iniEdit)return `<div class="ir ed${cur?" cur":""}"><b>${e.v}</b><span>${who}</span><div class="ied"><button data-a="iadj" data-v="${e.id}:-5">−5</button><button data-a="iadj" data-v="${e.id}:-1">−1</button><button data-a="iadj" data-v="${e.id}:1">+1</button><button data-a="iadj" data-v="${e.id}:5">+5</button><button class="quiet" data-a="idel" data-v="${e.id}" aria-label="Remove ${esc(e.name)}">${armDel===e.id?"Remove?":"✕"}</button></div></div>`;
-  return `<div class="ir${cur?" cur":""}${iniActive(e)?"":" off"}" data-a="iset" data-v="${e.id}" role="button" tabindex="0"><b>${e.lab?"·":e.v}</b><span>${who} <small>${e.lab?esc(e.lab)+(e.note?" · ":""):""}${esc(e.note||"")}</small></span><span></span></div>`;};
- const have=new Set(L.map(e=>e.id)),cast=ROLL.filter(r=>S.roll[r[0]]!=="dead"&&!have.has(r[0])&&!have.has(ALIAS[r[0]]||"-"));
- return `${head("Initiative",`<span class="mv">Round ${S.round}</span><button class="sm${iniEdit?" on":""}" data-a="iedit">${iniEdit?"Done":"Edit"}</button>`)}<div class="pb"><div class="ini">${L.map(row).join("")}</div>
- ${iniEdit?`<div class="iadd"><div class="lab" style="margin-bottom:6px">Add to the order</div><div class="schips">${cast.map(r=>`<button data-a="iadd" data-v="${r[0]}">${esc(r[1])}</button>`).join("")}<button data-a="iadd" data-v="">Someone else</button></div>
- <div class="dmg"><input id="iname" type="text" autocomplete="off" placeholder="or type a name" aria-label="Name to add"><button data-a="iaddname">Add</button></div>
- <p class="hint">A new name starts at 10. Set each roll with the buttons, then tap Done to sort the order.</p></div>`
- :`<div class="btns"><button data-a="turn" data-v="-1">◀ Back</button><button class="pri" data-a="turn" data-v="1" style="flex:1">Next turn ▶</button></div><p class="hint">Tap a name to jump to its turn.</p>`}</div>`;};
+P.health=()=>{const o=order();return `${head("Health",`<span class="mv">Round ${S.round}</span>`)}<div class="pb"><div class="hl">${o.length?o.map(c=>{const pct=c.maxHp?Math.max(0,c.hp)/c.maxHp*100:0;const cls=c.hp<=0?"zero":pct>50?"ok":pct>25?"half":"low";
+ return `<div class="hc"><div class="top">${side(c)}<b>${esc(c.name)}</b><span class="num">${c.hp} / ${c.maxHp}</span></div>
+ <div class="hrow"><div class="hb ${cls}" role="img" aria-label="${esc(c.name)}: ${c.hp} of ${c.maxHp} hit points"><i style="width:${pct}%"></i>${c.hp<=0?"<span>DOWN</span>":""}</div>
+ <button class="stf${c.cond.length?" has":""}${S.picker===c.id?" open":""}" data-a="pick" data-v="${c.id}" title="Statuses: tap to choose" aria-expanded="${S.picker===c.id}">${c.cond.length?c.cond.map(n=>`<span title="${esc(n)}">${icon(CI[n])}</span>`).join(""):"+ status"}</button></div>
+ ${c.res.length?`<div class="res">${c.res.map(r=>`<span class="rs" title="${RWORD[r[1]]} ${esc(r[0])}">${icon(resIcon(r[0]))}${r[1]}</span>`).join("")}</div>`:""}
+ ${S.picker===c.id?`<div class="pick"><div class="pk"><span>Statuses for ${esc(c.name)}</span><button class="quiet" data-a="pick" data-v="${c.id}">Done</button></div>${CONDS.map(k=>`<button class="${c.cond.includes(k[0])?"on":""}" data-a="cond" data-v="${c.id}:${k[0]}" aria-pressed="${c.cond.includes(k[0])}">${icon(k[1])}<span>${k[0]}</span></button>`).join("")}</div>`:""}</div>`;}).join(""):'<div class="empty">Nobody is in combat. Bring someone in from the bench on the Initiative panel.</div>'}</div>
+ <div class="foot"><button class="quiet" data-a="notes" aria-expanded="${!!S.notesOpen}">Fight notes ${S.notesOpen?"▾":"▸"}</button><span class="sp"></span><button class="quiet" data-a="fight0">${S.armFight?"Tap again to reset the fight":"Reset fight"}</button></div>
+ ${S.notesOpen?`<ul class="notes">${FIGHTNOTES.map(n=>`<li>${esc(n)}</li>`).join("")}</ul>`:""}</div>`;};
+P.hand=P.health;
+
+P.init=()=>{const o=order(),cur=curId(),bench=S.cmb.filter(c=>!c.inCombat);
+ const padBox=()=>{if(!touch||!padT)return "";const k=padT.split(":"),c=cmb(k[1]);if(!c)return "";const dm=k[0]==="dmg";
+  return `<div class="pad"><div class="pt"><b>${pad||"0"}</b><span>${dm?"Hit points to take from or give to":"New initiative for"} ${esc(c.name)}</span></div>
+  <div class="pk">${[1,2,3,4,5,6,7,8,9,0].map(n=>`<button data-a="pad" data-v="${n}">${n}</button>`).join("")}<button data-a="pad" data-v="b" aria-label="Delete">⌫</button><button class="quiet" data-a="padx">Cancel</button></div>
+  <div class="pa">${dm?`<button class="mi" data-a="padgo" data-v="-">− Damage</button><button class="pl" data-a="padgo" data-v="+">+ Heal</button>`:`<button class="on" data-a="padgo" data-v="=" style="color:#1a130c">Set initiative</button>`}</div></div>`;};
+ const row=c=>`<div class="ir${c.id===cur?" cur":""}${c.hp<=0?" dn":""}">
+ ${touch?`<button class="inn${padT==="ini:"+c.id?" sel":""}" data-a="padsel" data-v="ini:${c.id}" aria-label="Initiative for ${esc(c.name)}">${c.init}</button>`:`<input class="inn" id="ini-${c.id}" data-c="${c.id}" type="number" inputmode="numeric" value="${c.init}" aria-label="Initiative for ${esc(c.name)}">`}
+ ${side(c)}
+ <div class="im"><b>${esc(c.name)}</b><small>${c.custom?"Added at the table":`AC ${c.ac} · ${esc(c.atk)}`}</small></div>
+ <div class="dm">${touch?`<button class="dmgf${padT==="dmg:"+c.id?" sel":""}" data-a="padsel" data-v="dmg:${c.id}" aria-label="Damage or heal ${esc(c.name)}">±</button>`:`<input class="dmgf" id="dmg-${c.id}" data-c="${c.id}" type="number" inputmode="numeric" min="0" placeholder="0" aria-label="Hit points to add or subtract for ${esc(c.name)}"><button class="mi" data-a="dmg" data-v="${c.id}:-" title="Subtract from ${esc(c.name)}" aria-label="Subtract from ${esc(c.name)}">−</button><button class="pl" data-a="dmg" data-v="${c.id}:+" title="Add to ${esc(c.name)}" aria-label="Add to ${esc(c.name)}">+</button>`}<button class="out" data-a="inc" data-v="${c.id}" title="Send ${esc(c.name)} to the bench" aria-label="Send ${esc(c.name)} to the bench">×</button></div></div>`;
+ return `${head("Initiative",`<button class="quiet" data-a="turn" data-v="-1" aria-label="Previous turn">◀</button><span class="mv">Round ${S.round}</span><button class="pri" data-a="turn" data-v="1">Next turn ▶</button>`)}<div class="pb">${padBox()}<div class="ini">${o.length?o.map(row).join(""):'<div class="empty">Nobody is in combat.</div>'}</div>
+ <div class="bench"><small>Bench</small>${bench.map(c=>`<button class="bn" data-a="inc" data-v="${c.id}" title="Bring ${esc(c.name)} into combat">${side(c)}${esc(c.name)}${c.note?` <em>${esc(c.note)}</em>`:""}</button>${c.custom?`<button class="quiet bx" data-a="cdel" data-v="${c.id}" aria-label="Remove ${esc(c.name)}">✕</button>`:""}`).join("")}<button class="bn add${addOpen?" on":""}" data-a="addo">+ Add</button></div>
+ ${addOpen?`<div class="addf"><input id="aname" type="text" autocomplete="off" placeholder="Name" aria-label="Name"><input id="ahp" type="number" inputmode="numeric" min="1" placeholder="HP" aria-label="Hit points"><button data-a="cadd" data-v="enemy">Enemy</button><button data-a="cadd" data-v="ally">Ally</button><button data-a="cadd" data-v="party">Party</button></div><p class="hint">Type a name and hit points, then tap a side. They join the fight at initiative 10.</p>`:""}</div>`;};
 
 P.stakes=()=>{const m=MOVES[S.mv],st=m.st||{},has=mvOrder(m).filter(k=>st[k]),none=PCO.filter(k=>!st[k]);
  return `${head("Stakes",`<span class="mv">Decisions in front of each character</span>`)}<div class="pb"><div class="stg">${has.map(k=>`<div class="stk${S.stOpen&&S.stOpen[k]?" open":""}" data-a="stk" data-v="${k}" role="button" tabindex="0"><div>${chip(k,m.who[k][0])}</div><b>${esc(st[k][0])}</b><ul>${st[k][1].map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div>`).join("")}</div>${none.length?`<p class="hint">No decision in this movement for ${none.map(k=>PCN[k]).join(" or ")}.</p>`:""}</div>`;};
@@ -536,9 +580,10 @@ function report(){const L=[],d=new Date(),z=n=>String(n).padStart(2,"0");
  EVID.forEach(e=>L.push(`- [${S.ev[e[0]]?"x":" "}] ${e[1]?"⚑ ":""}${e[2]} (${e[3]}; for ${e[5].map(k=>PCN[k]).join(", ")})${S.ev[e[0]]?"":": NOT FOUND"+(e[1]?", carries to the next session":"")}`));
  L.push("","## Roll call","");
  ROLL.forEach(r=>{const st=S.roll[r[0]];L.push(`- ${r[1]}: ${st}${r[0]==="noemie"&&st==="down"?(S.pip?", 1 pip left":", no pips, dying"):""}${st!==r[3]?` (started ${r[3]})`:""}`);});
- L.push("","## The fight","",`- The Hand: ${S.hp} of 91 HP${S.hp<=0?", dead":""}`,`- Round: ${S.round}`,`- Initiative: ${S.init.map(e=>`${e.name} ${e.lab||e.v}`).join(", ")}`);
+ L.push("","## The fight","",`- Round: ${S.round}`);
+ S.cmb.forEach(c=>L.push(`- ${c.name} (${c.side}${c.custom?", added at the table":""}): ${c.hp} of ${c.maxHp} HP${c.hp<=0?", down":""}, initiative ${c.init}, ${c.inCombat?"in the fight":"on the bench"}${c.cond.length?", statuses: "+c.cond.join(", "):""}`));
  L.push("","## Had the floor","",...PCO.map(k=>`- ${PCN[k]}: ${S.tally[k]}`));
- const st={mv:S.mv,beats:S.beats,tally:S.tally,roll:S.roll,pip:S.pip,hp:S.hp,round:S.round,ev:S.ev,init:S.init,turnId:S.turnId};
+ const st={mv:S.mv,beats:S.beats,tally:S.tally,roll:S.roll,pip:S.pip,cmb:S.cmb,round:S.round,turnId:S.turnId,ev:S.ev};
  L.push("","## Board state","","Paste this whole export back into the screen's Export box to restore the board.","","```json",JSON.stringify({key:KEY,state:st}),"```","");
  return L.join("\n");}
 const xval=()=>{const e=document.getElementById("xtext");return e?e.value:"";};
@@ -550,31 +595,35 @@ const modalHTML=()=>`<div class="modal"><div class="mbox"><div class="ph"><span 
 
 const ROWS={1:"fit-content(45%) fit-content(40%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) fit-content(40%) minmax(0,3.7fr) minmax(0,.95fr) minmax(0,.55fr)"};
 const LAYOUT={
-1:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["stats","1","3 / 7"],["hand","2","3 / 5"],["init","2","5 / 7"],["voices","1","7"],["roll","2","7","mini"]],
+1:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["stats","1","3 / 7"],["health","2","3 / 5"],["init","2","5 / 7"],["voices","1","7"],["roll","2","7","mini"]],
 2:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["roll","1 / -1","3"],["evidence","1 / -1","4 / 6"],["voices","1","6 / 8"],["sealed","2","6 / 8"]],
 3:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["speech","1 / -1","3"],["roll","1","4","mini"],["evidence","2","4","mini"],["sealed","1 / -1","5"]]
 };
 
-function render(){const app=document.getElementById("app");const keep={};
+function render(){const app=document.getElementById("app");const keep={},vals={};
+ app.querySelectorAll("input.dmgf,.addf input").forEach(i=>{if(i.value)vals[i.id]=i.value;});
+ const ae=document.activeElement,was=ae&&ae.tagName==="INPUT"?ae.id:null;
  app.querySelectorAll("[data-k]").forEach(el=>{const s=el.querySelector(".pb")||el.querySelector(".spg")||el;keep[el.dataset.k]=s.scrollTop;});
  app.className=touch&&!single?"touch":"";
  if(touch&&!single){const views=TV[S.tab],vi=Math.min((S.tv&&S.tv[S.tab])||0,views.length-1),v=views[vi];
   app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
   <div class="tgrid"><section class="pn spot" data-k="t-spot">${P.spot()}</section>
   <div class="tright"><div class="seg">${views.map((x,i)=>`<button class="${i===vi?"on":""}" data-a="tv" data-v="${i}">${x[0]}</button>`).join("")}</div>
-  <div class="tview" style="--n:${v[1].length}">${v[1].map(k=>`<section class="pn" data-k="t-${S.tab}-${k}">${P[k]()}</section>`).join("")}</div></div></div>`;}
+  <div class="tview${v[2]?" "+v[2]:""}" style="--n:${v[1].length}">${v[1].map(k=>`<section class="pn" data-k="t-${S.tab}-${k}">${P[k]()}</section>`).join("")}</div></div></div>`;}
  else if(single){app.innerHTML=`<div class="grid one"><section class="pn${single==="spot"?" spot":""}" data-k="one-${single}">${P[single]()}</section></div>`;}
  else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
  <div class="grid" style="grid-template-rows:${ROWS[S.tab]}">${LAYOUT[S.tab].map(l=>`<section class="pn${l[0]==="spot"?" spot":""}${l[3]?" "+l[3]:""}" data-k="${S.tab}-${l[0]}" style="grid-column:${l[1]};grid-row:${l[2]}">${P[l[0]]()}</section>`).join("")}</div>`;}
  if(modal&&!single)app.insertAdjacentHTML("beforeend",modalHTML());
- app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el.querySelector(".spg")||el;s.scrollTop=v;}});}
+ app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el.querySelector(".spg")||el;s.scrollTop=v;}});
+ Object.keys(vals).forEach(id=>{const i=document.getElementById(id);if(i)i.value=vals[id];});
+ const f=wantFocus||was;wantFocus=null;if(f){const el=document.getElementById(f);if(el)el.focus();}}
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function hpAdj(c,d){c.hp=clamp(c.hp+d,0,c.maxHp);if(c.roll)S.roll[c.roll]=c.hp>0?"standing":(c.side==="enemy"?"dead":"down");}
 const A={
  tab:v=>{S.tab=+v;S.sealOpen=false;S.sealView=null;},
  tv:v=>{if(!S.tv)S.tv={1:0,2:0,3:0};S.tv[S.tab]=+v;S.sealOpen=false;S.sealView=null;},
- pad:v=>{pad=v==="b"?pad.slice(0,-1):(pad+v).replace(/^0+/,"").slice(0,3);},
- padhit:v=>{const n=parseInt(pad,10);if(n>0)A.hp(v==="heal"?n:-n);pad="";},
+
  stk:v=>{if(!S.stOpen)S.stOpen={};S.stOpen[v]=!S.stOpen[v];},
  mv:v=>{S.stOpen={};S.mv=clamp(S.mv+ +v,0,4);S.tab=MVTAB[S.mv];S.sealOpen=false;S.sealView=null;},
  beat:v=>{S.beats[v]=!S.beats[v];},
@@ -582,17 +631,22 @@ const A={
  tally0:()=>{PCO.forEach(k=>S.tally[k]=0);},
  rc:v=>{const o=["standing","down","dead"];S.roll[v]=o[(o.indexOf(S.roll[v])+1)%3];},
  pip:()=>{S.pip=S.pip?0:1;},
- hp:v=>{S.hp=clamp(S.hp+ +v,0,91);if(S.hp<=0)S.roll.hand="dead";},
- hpset:()=>{if(S.armHp){S.hp=91;S.roll.hand="standing";}else{S.armHp=true;return "keephp";}},
- dmg:()=>{const el=document.getElementById("dmg"),n=parseInt(el&&el.value,10);if(n>0)A.hp(-n);},
  rnd:v=>{S.round=clamp(S.round+ +v,1,20);},
- turn:v=>{const L=S.init,n=L.length;if(!n)return;let i=L.findIndex(x=>x.id===S.turnId),g=0;if(i<0)i=+v>0?-1:0;do{i+= +v;if(i>=n){i=0;S.round=clamp(S.round+1,1,20);}if(i<0){i=n-1;S.round=clamp(S.round-1,1,20);}g++;}while(!iniActive(L[i])&&g<2*n);S.turnId=L[i].id;},
- iset:v=>{S.turnId=v;},
- iedit:()=>{iniEdit=!iniEdit;if(!iniEdit)sortInit();},
- iadj:v=>{const k=v.lastIndexOf(":"),e=S.init.find(x=>x.id===v.slice(0,k));if(e){e.v=clamp(e.v+ +v.slice(k+1),-10,40);e.lab="";}},
- idel:v=>{if(armDel!==v){armDel=v;return "keepdel";}const i=S.init.findIndex(x=>x.id===v);if(i<0)return;if(S.turnId===v&&S.init.length>1)S.turnId=S.init[(i+1)%S.init.length].id;S.init.splice(i,1);normalize();},
- iadd:v=>{let id=v,name;if(v){name=ROLL.find(x=>x[0]===v)[1];}else{let n=1;while(S.init.some(x=>x.id==="x"+n))n++;id="x"+n;name="Extra "+n;}if(!S.init.some(x=>x.id===id))S.init.push({id,name,v:10,lab:"",note:"Added"});},
- iaddname:()=>{const el=document.getElementById("iname"),name=((el&&el.value)||"").trim().slice(0,40);if(!name)return;let n=1;while(S.init.some(x=>x.id==="x"+n))n++;S.init.push({id:"x"+n,name,v:10,lab:"",note:"Added"});},
+ dmg:v=>{const k=v.split(":"),c=cmb(k[0]),f=document.getElementById("dmg-"+k[0]);const n=Math.abs(parseInt(f&&f.value,10));if(!c||!n){wantFocus="dmg-"+k[0];return;}hpAdj(c,k[1]==="-"?-n:n);if(f){f.value="";f.blur();}},
+ ini:v=>{const k=v.split(":"),c=cmb(k[0]),n=parseInt(k[1],10);if(c&&!isNaN(n))c.init=clamp(n,-20,99);},
+ inc:v=>{const c=cmb(v);if(c){c.inCombat=!c.inCombat;if(S.picker===v)S.picker=null;if(padT&&padT.split(":")[1]===v){padT=null;pad="";}}},
+ pick:v=>{S.picker=S.picker===v?null:v;},
+ cond:v=>{const k=v.split(":"),c=cmb(k[0]);if(!c)return;const i=c.cond.indexOf(k[1]);if(i<0)c.cond.push(k[1]);else c.cond.splice(i,1);},
+ notes:()=>{S.notesOpen=!S.notesOpen;},
+ fight0:()=>{if(S.armFight){S.cmb=JSON.parse(JSON.stringify(CMB0));S.round=1;S.turnId=null;S.picker=null;padT=null;pad="";S.roll.hand="standing";S.roll.cassian="standing";S.armFight=false;}else{S.armFight=true;return "keepfight";}},
+ turn:v=>{const o=order();if(!o.length)return;let i=o.findIndex(c=>c.id===curId())+ +v;if(i>=o.length){i=0;S.round=clamp(S.round+1,1,99);}if(i<0){if(S.round>1){i=o.length-1;S.round--;}else i=0;}S.turnId=o[i].id;},
+ padsel:v=>{padT=padT===v?null:v;pad="";},
+ pad:v=>{pad=v==="b"?pad.slice(0,-1):(pad+v).replace(/^0+(?=\d)/,"").slice(0,3);},
+ padx:()=>{padT=null;pad="";},
+ padgo:v=>{if(!padT)return;const k=padT.split(":"),c=cmb(k[1]),n=parseInt(pad,10);if(c&&!isNaN(n)){if(k[0]==="dmg"){if(n>0)hpAdj(c,v==="-"?-n:n);}else c.init=clamp(n,-20,99);}padT=null;pad="";},
+ addo:()=>{addOpen=!addOpen;if(addOpen)wantFocus="aname";},
+ cadd:v=>{const nm=((document.getElementById("aname")||{}).value||"").trim().slice(0,40),hp=clamp(parseInt((document.getElementById("ahp")||{}).value,10)||1,1,999);if(!nm){wantFocus="aname";return;}let n=1;while(cmb("x"+n))n++;S.cmb.push({id:"x"+n,name:nm,side:v,init:10,inCombat:true,hp:hp,maxHp:hp,ac:"",atk:"",res:[],cond:[],custom:true});addOpen=false;},
+ cdel:v=>{const i=S.cmb.findIndex(c=>c.id===v&&c.custom);if(i>=0)S.cmb.splice(i,1);},
  xopen:()=>{modal=true;xdraft=null;xnote="";armRestore=false;},
  xclose:()=>{modal=false;xdraft=null;xnote="";armRestore=false;},
  xcopy:()=>{const t=xval(),ok=()=>xsay("Copied"),fb=()=>{try{const el=document.getElementById("xtext");el.focus();el.select();if(!document.execCommand("copy"))throw 0;ok();}catch(e){xsay("Select the text and copy it by hand");}};try{navigator.clipboard.writeText(t).then(ok,fb);}catch(e){fb();}return "stay";},
@@ -608,11 +662,12 @@ const A={
  sview:v=>{S.sealView=v;},
  reset:()=>{if(S.armReset){S=fresh();}else{S.armReset=true;return "keep";}}
 };
-function act(el){const a=el.dataset.a;if(!A[a])return;const r=A[a](el.dataset.v);if(r==="stay")return;if(r!=="keepdel")armDel=null;if(r!=="keep")S.armReset=false;if(r!=="keephp")S.armHp=false;save();render();if(a==="dmg"){const i=document.getElementById("dmg");if(i)i.focus();}}
+function act(el){const a=el.dataset.a;if(!A[a])return;const r=A[a](el.dataset.v);if(r==="stay")return;if(r!=="keep")S.armReset=false;if(r!=="keepfight")S.armFight=false;save();render();}
 document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(el&&!el.disabled){e.preventDefault();act(el);}});
+document.addEventListener("change",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("inn")){A.ini(t.dataset.c+":"+t.value);save();render();}});
 document.addEventListener("keydown",e=>{const t=e.target;
  if(t&&t.tagName==="TEXTAREA")return;
- if(t&&t.tagName==="INPUT"){if(e.key==="Enter"){e.preventDefault();act({dataset:{a:t.id==="iname"?"iaddname":"dmg"}});}return;}
+ if(t&&t.tagName==="INPUT"){if(e.key==="Enter"){e.preventDefault();if(t.classList.contains("dmgf")){A.dmg(t.dataset.c+":-");save();render();}else t.blur();}return;}
  if((e.key==="Enter"||e.key===" ")&&t&&t.dataset&&t.dataset.a&&t.tagName!=="BUTTON"){e.preventDefault();act(t);return;}
  if(e.ctrlKey||e.metaKey||e.altKey)return;
  if(e.key==="1"||e.key==="2"||e.key==="3"){A.tab(e.key);save();render();}});
