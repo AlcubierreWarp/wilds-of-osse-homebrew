@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "screen",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8713", "--directory", "screen"],
+      "port": 8713
+    }
+  ]
+}

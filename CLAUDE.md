@@ -12,7 +12,8 @@ Change model: Direct. Commit to main.
 - `src/`: the content, one file per group, and `_meta.json` (source block, version, timestamps). Edit these.
 - `wilds-of-osse.json`: the combined file players load. Generated; never edit it by hand.
 - `tools/build.py`: the merge script.
-- `screen/`: game master screen pages.
+- `screen/`: game master screen pages. One page per session, `screen/sNN.html`.
+- `.claude/skills/session-screen/`: how to build and publish a session screen. Follow it for every new one.
 - `.github/workflows/build-homebrew.yml`: rebuilds and commits the combined file when `src/` changes.
 
 ## Conventions
