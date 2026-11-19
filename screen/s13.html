@@ -138,6 +138,13 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 .stk>b{display:block;font:700 17px/1.22 Georgia,serif;margin:6px 0}
 .stk ul{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:14.5px;line-height:1.3}
 .stk li{padding-left:9px;border-left:3px solid var(--gold)}
+.fold .stk{cursor:pointer}
+.fold .stk>b{margin-bottom:0}
+.fold .stk>b::after{content:" ▸";color:var(--soft);font-family:system-ui}
+.fold .stk.open>b::after{content:" ▾"}
+.fold .stk ul{display:none;margin-top:6px}
+.fold .stk.open ul{display:flex}
+.fold .hint{margin-top:4px}
 .evt{font-size:15px;line-height:1.32}
 .mini .ev{padding:5px 8px;margin-bottom:4px}.mini .evt{display:none}.mini .evh b{font-size:16px}
 
@@ -411,11 +418,11 @@ const CLOCKS=[
 const KEY="osse-s13-v1";
 function seedInit(){let last=0;return INIT.map(r=>{const num=/^\d+$/.test(r[2]);if(num)last=+r[2];return {id:r[0],name:r[1],v:last,lab:num?"":r[2],note:r[3]};});}
 function normalize(){if(!Array.isArray(S.init)||!S.init.every(e=>e&&e.id&&e.name))S.init=seedInit();S.init.forEach(e=>{if(typeof e.v!=="number")e.v=0;});if(!S.init.some(e=>e.id===S.turnId))S.turnId=S.init.length?S.init[0].id:null;if(!S.tv)S.tv={1:0,2:0,3:0};}
-function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,init:seedInit(),turnId:INIT[0][0],ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false,tv:{1:0,2:0,3:0}};}
+function fresh(){const r={};ROLL.forEach(x=>r[x[0]]=x[3]);return {tab:1,mv:0,beats:{},tally:{bel:0,gab:0,gus:0,tim:0},roll:r,pip:1,hp:91,round:1,turn:0,init:seedInit(),turnId:INIT[0][0],ev:{},voice:null,speech:"corvane",stat:0,sealOpen:false,sealView:null,armReset:false,armHp:false,tv:{1:0,2:0,3:0},stOpen:{}};}
 let S=fresh();
 try{const j=JSON.parse(localStorage.getItem(KEY)||"null");if(j&&j.roll){S=Object.assign(fresh(),j);if(j.turnId===undefined&&INIT[j.turn])S.turnId=INIT[j.turn][0];normalize();S.sealOpen=false;S.armReset=false;S.armHp=false;}}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false,tv:S.tv};S=Object.assign(fresh(),j,mine);normalize();render();}}catch(_){}});
+window.addEventListener("storage",e=>{if(e.key!==KEY||!e.newValue)return;try{const j=JSON.parse(e.newValue);if(j&&j.roll){const mine={tab:S.tab,voice:S.voice,stat:S.stat,speech:S.speech,sealOpen:S.sealOpen,sealView:S.sealView,armReset:false,armHp:false,tv:S.tv,stOpen:S.stOpen};S=Object.assign(fresh(),j,mine);normalize();render();}}catch(_){}});
 let single=null,touch=false,pad="",iniEdit=false,armDel=null,modal=false,xdraft=null,xnote="",armRestore=false;
 const ALIAS={cassian:"cas",corvane:"cor"};
 const autoTouch=()=>{try{return matchMedia("(pointer:coarse)").matches&&innerWidth>innerHeight&&innerHeight<=900;}catch(e){return false;}};
@@ -474,7 +481,7 @@ P.init=()=>{const L=S.init;
  :`<div class="btns"><button data-a="turn" data-v="-1">◀ Back</button><button class="pri" data-a="turn" data-v="1" style="flex:1">Next turn ▶</button></div><p class="hint">Tap a name to jump to its turn.</p>`}</div>`;};
 
 P.stakes=()=>{const m=MOVES[S.mv],st=m.st||{},has=mvOrder(m).filter(k=>st[k]),none=PCO.filter(k=>!st[k]);
- return `${head("Stakes",`<span class="mv">${S.mv+1}. ${esc(m.t)}</span>`)}<div class="pb"><div class="stg">${has.map(k=>`<div class="stk"><div>${chip(k,m.who[k][0])}</div><b>${esc(st[k][0])}</b><ul>${st[k][1].map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div>`).join("")}</div>${none.length?`<p class="hint">No decision in this movement for ${none.map(k=>PCN[k]).join(" or ")}.</p>`:""}</div>`;};
+ return `${head("Stakes",`<span class="mv">Decisions in front of each character</span>`)}<div class="pb"><div class="stg">${has.map(k=>`<div class="stk${S.stOpen&&S.stOpen[k]?" open":""}" data-a="stk" data-v="${k}" role="button" tabindex="0"><div>${chip(k,m.who[k][0])}</div><b>${esc(st[k][0])}</b><ul>${st[k][1].map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div>`).join("")}</div>${none.length?`<p class="hint">No decision in this movement for ${none.map(k=>PCN[k]).join(" or ")}.</p>`:""}</div>`;};
 
 P.evidence=()=>`${head("Evidence",`<span class="mv">${EVID.filter(e=>S.ev[e[0]]).length} of ${EVID.length} found</span>`)}<div class="pb">${EVID.map(e=>{const d=S.ev[e[0]];return `<div class="ev${d?" done":""}" data-a="ev" data-v="${e[0]}" role="button" tabindex="0"><i>${d?"✓":""}</i><div><div class="evh"><b>${e[1]?'<span class="flag">⚑ </span>':""}${esc(e[2])}</b><u>${esc(e[3])}</u>${e[5].map(k=>chip(k,0)).join(" ")}</div><div class="evt">${esc(e[4])}</div></div></div>`;}).join("")}</div>`;
 
@@ -530,11 +537,11 @@ const modalHTML=()=>`<div class="modal"><div class="mbox"><div class="ph"><span 
  <textarea id="xtext" spellcheck="false" aria-label="Board export">${esc(xdraft!==null?xdraft:report())}</textarea>
  <div class="btns"><button class="on" data-a="xcopy">Copy</button>${navigator.share?'<button data-a="xshare">Share</button>':""}<button data-a="xfile">Save as file</button><span class="xmsg" id="xmsg">${esc(xnote)}</span><span class="sp"></span><button class="quiet" data-a="xrestore">${armRestore?"Tap again to replace the board":"Restore from pasted export"}</button></div></div></div>`;
 
-const ROWS={1:"fit-content(45%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) repeat(5,minmax(0,1fr))"};
+const ROWS={1:"fit-content(45%) fit-content(40%) repeat(5,minmax(0,1fr))",2:"fit-content(40%) fit-content(40%) fit-content(250px) minmax(0,1fr) minmax(0,1fr) minmax(0,.6fr) minmax(0,.6fr)",3:"fit-content(40%) fit-content(40%) minmax(0,3.7fr) minmax(0,1fr) minmax(0,.8fr)"};
 const LAYOUT={
-1:[["spot","1 / -1","1"],["stats","1","2 / 6"],["hand","2","2 / 4"],["init","2","4 / 6"],["voices","1","6"],["roll","2","6","mini"]],
-2:[["spot","1 / -1","1"],["roll","1 / -1","2"],["evidence","1 / -1","3 / 5"],["voices","1","5 / 7"],["sealed","2","5 / 7"]],
-3:[["spot","1 / -1","1"],["speech","1 / -1","2 / 5"],["roll","1","5","mini"],["evidence","2","5","mini"],["sealed","1 / -1","6"]]
+1:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["stats","1","3 / 7"],["hand","2","3 / 5"],["init","2","5 / 7"],["voices","1","7"],["roll","2","7","mini"]],
+2:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["roll","1 / -1","3"],["evidence","1 / -1","4 / 6"],["voices","1","6 / 8"],["sealed","2","6 / 8"]],
+3:[["spot","1 / -1","1"],["stakes","1 / -1","2","fold"],["speech","1 / -1","3"],["roll","1","4","mini"],["evidence","2","4","mini"],["sealed","1 / -1","5"]]
 };
 
 function render(){const app=document.getElementById("app");const keep={};
@@ -557,7 +564,8 @@ const A={
  tv:v=>{if(!S.tv)S.tv={1:0,2:0,3:0};S.tv[S.tab]=+v;S.sealOpen=false;S.sealView=null;},
  pad:v=>{pad=v==="b"?pad.slice(0,-1):(pad+v).replace(/^0+/,"").slice(0,3);},
  padhit:v=>{const n=parseInt(pad,10);if(n>0)A.hp(v==="heal"?n:-n);pad="";},
- mv:v=>{S.mv=clamp(S.mv+ +v,0,4);S.tab=MVTAB[S.mv];S.sealOpen=false;S.sealView=null;},
+ stk:v=>{if(!S.stOpen)S.stOpen={};S.stOpen[v]=!S.stOpen[v];},
+ mv:v=>{S.stOpen={};S.mv=clamp(S.mv+ +v,0,4);S.tab=MVTAB[S.mv];S.sealOpen=false;S.sealView=null;},
  beat:v=>{S.beats[v]=!S.beats[v];},
  tally:v=>{S.tally[v]++;},
  tally0:()=>{PCO.forEach(k=>S.tally[k]=0);},

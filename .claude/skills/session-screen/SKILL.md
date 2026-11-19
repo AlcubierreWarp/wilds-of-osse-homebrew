@@ -37,7 +37,7 @@ From the plan, pull:
 | Roleplay, investigation | Roll call, Evidence (full width), Voices, Sealed |
 | Speeches, endings | Speech view in large type with fill-ins from Roll call, Roll call, Evidence, Sealed |
 
-- Spotlight is the top row of every tab. Sealed is at the bottom and closed.
+- Spotlight is the top row of every tab. Stakes is a strip right under it, showing each decision, with the considerations opening on a tap. Sealed is at the bottom and closed.
 - Retire panels the session does not need. Add a bespoke one when a scene has its own mechanic (S13: The Hand).
 - Every panel also works alone at `#panel=<name>`, and each tab at `#tabN`.
 - Initiative is editable at the table: adjust a roll, remove a name, add one from the cast or by typing. Keep that.
