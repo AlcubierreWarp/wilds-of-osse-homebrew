@@ -1,3 +1,10 @@
+# Table hub
+
+The site's home page, `index.html`, gathers every link: https://alcubierrewarp.github.io/wilds-of-osse-homebrew/
+
+- **For the players**: the 5e.tools homebrew address and Gus's archive with Shane's code. The code comes from the relay (`hub.json`, public on purpose), so it never sits in this repository. `relay/gus/deploy.sh --new-player-code` changes the code and the hub at once.
+- **Game master**: behind a passcode (Keychain service `osse-dm-passcode`; change it with `relay/gus/deploy.sh --new-dm-passcode`). The passcode also unlocks Gus's archive as game master, and the hub's link opens the archive already unlocked. It keeps players from wandering in; it is not strong security.
+
 # DM Screen tools: The Toast (Session 12)
 
 Small single-file tools for the 5e.tools DM Screen. Add one with a panel's **Embed** option and paste its address.

@@ -97,6 +97,7 @@ Run the `screen` preview server (`.claude/launch.json`) and check in the browser
 ## 6. Publish
 
 1. Add a section for the session to `screen/README.md`. Base address: `https://alcubierrewarp.github.io/wilds-of-osse-homebrew/screen/sNN.html`.
+   Also add the session as a new group at the top of the `DM` list in `index.html` (the table hub), with its tabs and iPad view, using relative addresses (`screen/sNN.html#tab1`).
 2. Run the pre-commit check from `CLAUDE.md`. If the build only changed timestamps in `wilds-of-osse.json`, do not commit that file.
 3. Commit to main and push.
 4. Wait for GitHub Pages, then confirm the base address returns 200 and matches the committed file.

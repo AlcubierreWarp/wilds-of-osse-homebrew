@@ -2,7 +2,8 @@
 # Deploys or updates the GUS relay on the "default" AWS profile in ca-central-1.
 # First run creates the bucket, role, function, public address and both access keys.
 # Later runs only update the function code. Pass --new-keys to replace both keys,
-# or --new-player-code to give the player a new short code (like ABCD-EFGH) that can be typed on the login screen.
+# --new-player-code to give the player a new short code (like ABCD-EFGH) that can be typed on the login screen
+# (it also updates the code the table hub shows), or --new-dm-passcode for the hub's game master passcode.
 # The keys go to the macOS Keychain (services osse-gus-gm and osse-gus-player), never to a file.
 set -euo pipefail
 export AWS_PROFILE=default AWS_REGION=ca-central-1 AWS_PAGER=""
@@ -34,6 +35,16 @@ if [ "${1:-}" = "--new-player-code" ]; then
   aws ssm put-parameter --name /osse/gus/player-key-sha256 --type SecureString --overwrite \
     --value "$(printf %s "$code" | shasum -a 256 | cut -d' ' -f1)" >/dev/null
   security add-generic-password -U -a osse -s osse-gus-player -w "$code"
+  printf '{"codes":{"gus":"%s"}}' "$code" | aws s3 cp - "s3://$BUCKET/hub.json" --content-type application/json >/dev/null
+  aws lambda update-function-configuration --function-name osse-gus-relay \
+    --environment "Variables={BUCKET=$BUCKET,KEYS_AT=$(date +%s)}" >/dev/null
+  aws lambda wait function-updated-v2 --function-name osse-gus-relay
+fi
+if [ "${1:-}" = "--new-dm-passcode" ]; then
+  code=$(python3 -c 'import secrets; a="ABCDEFGHJKMNPQRSTUVWXYZ23456789"; c="".join(secrets.choice(a) for _ in range(8)); print(c[:4]+"-"+c[4:])')
+  aws ssm put-parameter --name /osse/gus/dm-pass-sha256 --type SecureString --overwrite \
+    --value "$(printf %s "$code" | shasum -a 256 | cut -d' ' -f1)" >/dev/null
+  security add-generic-password -U -a osse -s osse-dm-passcode -w "$code"
   aws lambda update-function-configuration --function-name osse-gus-relay \
     --environment "Variables={BUCKET=$BUCKET,KEYS_AT=$(date +%s)}" >/dev/null
   aws lambda wait function-updated-v2 --function-name osse-gus-relay

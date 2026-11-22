@@ -3,6 +3,7 @@
 Storage is one private S3 bucket:
   vault.json   every document, with game master notes (game master key only)
   public.json  revealed copies and the last push (player key or game master key)
+  hub.json     the player codes the table hub shows (public)
   assets/<id>  attachments, served through short-lived signed links
 
 Access keys are never stored here. SSM Parameter Store holds only their SHA-256 hashes.
@@ -29,7 +30,7 @@ S3 = boto3.client(
 )
 SSM = boto3.client("ssm", region_name=REGION)
 
-VAULT, PUBLIC = "vault.json", "public.json"
+VAULT, PUBLIC, HUB = "vault.json", "public.json", "hub.json"
 DOC_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,59}$")
 ASSET_ID = re.compile(r"^[a-f0-9]{32}$")
 TYPES = {"image/png", "image/jpeg", "image/gif", "image/webp", "application/pdf"}
@@ -50,10 +51,10 @@ def now():
 def hashes():
     global _hashes
     if _hashes is None:
-        names = ["/osse/gus/gm-key-sha256", "/osse/gus/player-key-sha256"]
+        names = ["/osse/gus/gm-key-sha256", "/osse/gus/player-key-sha256", "/osse/gus/dm-pass-sha256"]
         found = SSM.get_parameters(Names=names, WithDecryption=True)["Parameters"]
         by_name = {p["Name"]: p["Value"] for p in found}
-        _hashes = (by_name[names[0]], by_name[names[1]])
+        _hashes = tuple(by_name.get(n) for n in names)
     return _hashes
 
 
@@ -62,10 +63,11 @@ def role(headers):
     if not key or len(key) > 200:
         return None
     digest = hashlib.sha256(key.encode()).hexdigest()
-    gm, player = hashes()
-    if hmac.compare_digest(digest, gm):
+    gm, player, dm_pass = hashes()
+    # The table hub's short game master passcode opens the same doors as the game master key.
+    if any(h and hmac.compare_digest(digest, h) for h in (gm, dm_pass)):
         return "gm"
-    if hmac.compare_digest(digest, player):
+    if player and hmac.compare_digest(digest, player):
         return "player"
     return None
 
@@ -143,12 +145,16 @@ def handler(event, _context):
     method = event["requestContext"]["http"]["method"]
     if method == "OPTIONS":
         return reply(204)
+    parts = (event.get("rawPath") or "/").strip("/").split("/")
+    if method == "GET" and parts == ["hub"]:
+        # The table hub's player codes. Public on purpose: the hub shows them to the players.
+        return reply(200, load(HUB, {"codes": {}}))
+
     headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
     who = role(headers)
     if who is None:
         return reply(401, {"error": "locked"})
 
-    parts = (event.get("rawPath") or "/").strip("/").split("/")
     pub = load(PUBLIC, {"rev": 0, "shelf": {}, "signal": None})
 
     if method == "GET" and parts == ["files"]:

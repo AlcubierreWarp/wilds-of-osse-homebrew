@@ -12,6 +12,7 @@ Change model: Direct. Commit to main.
 - `src/`: the content, one file per group, and `_meta.json` (source block, version, timestamps). Edit these.
 - `wilds-of-osse.json`: the combined file players load. Generated; never edit it by hand.
 - `tools/build.py`: the merge script.
+- `index.html`: the table hub (site home page). Player links and codes first, then game master links behind a passcode. Its link lists are at the top of its script; keep them current.
 - `screen/`: game master screen pages. One page per session, `screen/sNN.html`.
 - `relay/gus/`: the AWS relay behind `screen/gus.html` (Gus's memory archive). `deploy.sh` deploys it; keys live in the macOS Keychain.
 - `.claude/skills/session-screen/`: how to build and publish a session screen. Follow it for every new one.

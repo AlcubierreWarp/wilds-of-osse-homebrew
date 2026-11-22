@@ -1,7 +1,7 @@
 """Local stand-in for the GUS relay, for testing gus.html without AWS.
 
 Runs the real handler.py against in-memory storage on http://localhost:8714.
-Test keys: game master "test-gm", player "test-player".
+Test keys: game master "test-gm" (or hub passcode "test-dm"), player "test-player".
 Open http://localhost:8713/gus.html?relay=http://localhost:8714#gm=test-gm
 """
 import hashlib
@@ -11,7 +11,7 @@ import types
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-OBJECTS = {}
+OBJECTS = {"hub.json": b'{"codes": {"gus": "test-player"}}'}
 
 
 class NoSuchKey(Exception):
@@ -38,7 +38,7 @@ class FakeS3:
 
 class FakeSSM:
     def get_parameters(self, Names, WithDecryption):
-        values = {"gm": "test-gm", "player": "test-player"}
+        values = {"gm": "test-gm", "player": "test-player", "dm": "test-dm"}
         return {"Parameters": [
             {"Name": n, "Value": hashlib.sha256(values[n.rsplit("/", 1)[1].split("-")[0]].encode()).hexdigest()}
             for n in Names]}

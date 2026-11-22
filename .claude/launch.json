@@ -4,14 +4,32 @@
     {
       "name": "screen",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8713", "--directory", "screen"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8713",
+        "--directory",
+        "screen"
+      ],
       "port": 8713
     },
     {
       "name": "gus-relay-mock",
       "runtimeExecutable": "/usr/bin/python3",
-      "runtimeArgs": ["relay/gus/mock.py"],
+      "runtimeArgs": [
+        "relay/gus/mock.py"
+      ],
       "port": 8714
+    },
+    {
+      "name": "hub",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8715"
+      ],
+      "port": 8715
     }
   ]
 }
