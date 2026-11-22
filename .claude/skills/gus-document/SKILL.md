@@ -12,6 +12,7 @@ Gus's documents live in the archive relay, and the archive page lays them out as
 - **Voice, numbering and taxonomy:** follow the `gus-intel-docs` skill (sections 2 and 3: Steven, the gags, sincere beats, field exercises, `1.1` / `A.1` / `STEP 1` numbering, cross-reference style). Ignore its HTML, CSS and PDF sections: the archive does the layout.
 - **Canon:** check story facts against the Ossë vault (the campaign's source of truth). Played sessions outrank plans. Never put a DM secret on a handout unless Tom says so.
 - **Which layout:** the `kind` field picks it, and each kind keeps its own look.
+- **Standard unless Tom says emergency.** Use `protocol` only when Tom explicitly calls the document an emergency protocol or emergency directive. Protocols go on the archive's Emergency tab, which flashes red on Gus's screen. Every other document is a standard one (`manual`, `annex`, or `report`/`letter`/`other`) and goes on the Files tab.
 
 | Document | kind | Title | ref | Look |
 |---|---|---|---|---|

@@ -1,7 +1,8 @@
 #!/bin/bash
 # Deploys or updates the GUS relay on the "default" AWS profile in ca-central-1.
 # First run creates the bucket, role, function, public address and both access keys.
-# Later runs only update the function code. Pass --new-keys to replace both keys.
+# Later runs only update the function code. Pass --new-keys to replace both keys,
+# or --new-player-code to give the player a new short code (like ABCD-EFGH) that can be typed on the login screen.
 # The keys go to the macOS Keychain (services osse-gus-gm and osse-gus-player), never to a file.
 set -euo pipefail
 export AWS_PROFILE=default AWS_REGION=ca-central-1 AWS_PAGER=""
@@ -28,6 +29,15 @@ make_key() {
     --value "$(printf %s "$key" | shasum -a 256 | cut -d' ' -f1)" >/dev/null
   security add-generic-password -U -a osse -s "$service" -w "$key"
 }
+if [ "${1:-}" = "--new-player-code" ]; then
+  code=$(python3 -c 'import secrets; a="ABCDEFGHJKMNPQRSTUVWXYZ23456789"; c="".join(secrets.choice(a) for _ in range(8)); print(c[:4]+"-"+c[4:])')
+  aws ssm put-parameter --name /osse/gus/player-key-sha256 --type SecureString --overwrite \
+    --value "$(printf %s "$code" | shasum -a 256 | cut -d' ' -f1)" >/dev/null
+  security add-generic-password -U -a osse -s osse-gus-player -w "$code"
+  aws lambda update-function-configuration --function-name osse-gus-relay \
+    --environment "Variables={BUCKET=$BUCKET,KEYS_AT=$(date +%s)}" >/dev/null
+  aws lambda wait function-updated-v2 --function-name osse-gus-relay
+fi
 if [ "${1:-}" = "--new-keys" ] || ! aws ssm get-parameter --name /osse/gus/gm-key-sha256 >/dev/null 2>&1; then
   make_key gm osse-gus-gm
   make_key player osse-gus-player

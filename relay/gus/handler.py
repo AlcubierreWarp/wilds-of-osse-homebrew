@@ -153,6 +153,14 @@ def handler(event, _context):
 
     if method == "GET" and parts == ["files"]:
         return reply(200, {**pub, "links": links(pub["shelf"].values())})
+    if method == "POST" and len(parts) == 2 and parts[0] == "opened" and DOC_ID.match(parts[1]):
+        # Gus opened a file. Only the player key counts, so the game master previewing player view changes nothing.
+        copy = pub["shelf"].get(parts[1])
+        if who == "player" and copy and not copy.get("openedAt"):
+            copy["openedAt"] = now()
+            pub["rev"] += 1
+            save(PUBLIC, pub)
+        return reply(200, {**pub, "links": links(pub["shelf"].values())})
     if who != "gm":
         return reply(403, {"error": "game master only"})
 
@@ -196,7 +204,10 @@ def handler(event, _context):
         docs[doc_id] = doc
         save(VAULT, vault)
         if doc_id in pub["shelf"]:
+            opened = pub["shelf"][doc_id].get("openedAt")
             pub["shelf"][doc_id] = public_copy(doc, pub["shelf"][doc_id].get("revealedAt"))
+            if opened:
+                pub["shelf"][doc_id]["openedAt"] = opened
             pub["rev"] += 1
             save(PUBLIC, pub)
         if old and (not doc["asset"] or doc["asset"]["id"] != old.get("id")):
@@ -212,6 +223,18 @@ def handler(event, _context):
         pub["rev"] += 1
         save(PUBLIC, pub)
         drop_asset((doc or {}).get("asset"))
+        return full()
+
+    if method == "POST" and op in ("read", "unread"):
+        copy = pub["shelf"].get(doc_id)
+        if not copy:
+            return reply(404, {"error": "not revealed"})
+        if op == "read":
+            copy["openedAt"] = copy.get("openedAt") or now()
+        else:
+            copy.pop("openedAt", None)
+        pub["rev"] += 1
+        save(PUBLIC, pub)
         return full()
 
     if method != "POST" or op not in ("reveal", "push", "hide"):

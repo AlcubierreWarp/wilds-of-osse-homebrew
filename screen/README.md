@@ -68,9 +68,11 @@ Two access links open it, one for each role. The keys are in the macOS Keychain,
 | Who | Keychain service | Link |
 |---|---|---|
 | Game master | `osse-gus-gm` | address + `#gm=<key>` |
-| Shane | `osse-gus-player` | address + `#k=<key>` |
+| Shane | `osse-gus-player` | the plain address, then type the short code (like `ABCD-EFGH`) on the login screen |
 
-A device remembers its key after the first visit, and the key leaves the address bar. "Lock this device" at the bottom forgets it. To replace both keys, run `relay/gus/deploy.sh --new-keys`, then send Shane his new link.
+A locked terminal shows a login screen; the code is case-insensitive and the dash is optional. A device remembers its code after the first unlock. "Lock this device" at the bottom forgets it. To give Shane a new code, run `relay/gus/deploy.sh --new-player-code`. To replace both keys, run `relay/gus/deploy.sh --new-keys`.
+
+What Gus has opened is kept in the relay, so a new browser or device does not flag old files as new. The game master strip shows when Gus opened a file, with Mark unread and Mark opened to change it.
 
 | Button | What Shane sees |
 |---|---|
