@@ -15,6 +15,7 @@ Change model: Direct. Commit to main.
 - `screen/`: game master screen pages. One page per session, `screen/sNN.html`.
 - `relay/gus/`: the AWS relay behind `screen/gus.html` (Gus's memory archive). `deploy.sh` deploys it; keys live in the macOS Keychain.
 - `.claude/skills/session-screen/`: how to build and publish a session screen. Follow it for every new one.
+- `.claude/skills/gus-document/`: how to write a new Gus document and file it, sealed, in Gus's archive. Follow it for every new one.
 - `.github/workflows/build-homebrew.yml`: rebuilds and commits the combined file when `src/` changes.
 
 ## Conventions

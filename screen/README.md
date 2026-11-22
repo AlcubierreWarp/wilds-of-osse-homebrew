@@ -78,6 +78,8 @@ A device remembers its key after the first visit, and the key leaves the address
 | Reveal quietly | The file joins his list, marked New |
 | Take back | The file leaves his list |
 
-A file with a PDF attached shows the PDF itself, page by page, inside Gus's frame, with an Open the PDF button and a text version underneath. The text version, and any file without a PDF, is laid out as letter-sized Marshal pages modelled on the handouts: field manuals get the chapter hero, annexes the file grid, protocols the oxblood band and numbered steps. The editor's hint lists the markup (`**1.1 Title.**` items, `## Field exercise`, `## Step 2 · …`, `[stamp: …]`, `---` for the footer, `[page]` for a new page). In the text, `||words||` is blacked out, and the player's copy never holds the words. Attachments can be images or PDFs up to 20 MB.
+Every file is laid out as letter-sized Marshal pages modelled on the handouts: field manual chapters get the chapter block, annexes the file grid, emergency protocols the oxblood band and numbered steps. The Open PDF button at the top opens the attached PDF, or, when there is none, prints the pages so the browser can save them as a PDF. The editor's hint lists the markup (`**1.1 Title.**` rules, `## Field exercise`, `## Step 2 · …`, `[stamp: …]`, `---` for the footer, `[page]` for a new page).
+
+New documents written by Claude go in sealed through `relay/gus/add_doc.py` (see the `gus-document` skill): only the game master sees them until revealed or pushed at the table. In the text, `||words||` is blacked out, and the player's copy never holds the words. Attachments can be images or PDFs up to 20 MB.
 
 To test without AWS, start `relay/gus/mock.py` (the `gus-relay-mock` entry in `.claude/launch.json`) and open `http://localhost:8713/gus.html?relay=http://localhost:8714#gm=test-gm`.
