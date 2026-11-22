@@ -155,33 +155,121 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
 .attach{margin:0 0 24px}
 .eof{margin-top:30px;text-align:center;font:500 10.5px/1.4 var(--f-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .eof span{font-family:var(--f-rune);color:var(--arcane);letter-spacing:.4em;margin:0 10px}
-/* Marshal paper inside Gus's window */
+/* Marshal paper inside Gus's window: letter-sized pages laid out like the Marshal handouts. */
 .stage{position:relative;padding:clamp(16px,3.2vw,34px) clamp(12px,3.2vw,34px) clamp(20px,3.2vw,34px)}
-.sheet{max-width:820px;margin:0 auto;background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:clamp(18px,4vw,40px);
-  box-shadow:0 0 0 6px var(--paper),0 0 0 7px var(--paper-rule),0 14px 34px rgba(0,0,0,.55);font:15.5px/1.62 var(--f-type)}
-.sh-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:600 11px/1.4 var(--f-marshal);letter-spacing:.16em;text-transform:uppercase;color:var(--oxblood);padding-bottom:10px;border-bottom:1px solid var(--paper-rule)}
-.sh-head{display:flex;align-items:center;gap:14px;margin:16px 0}
-.sh-head svg{flex:none;width:46px;height:46px}
-.sh-org{font:600 20px/1.1 var(--f-marshal);letter-spacing:.12em;color:#26324a}
-.sh-dir{font:500 11.5px/1.4 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;color:#8a7f70}
-.sh-band{background:var(--oxblood);color:var(--paper);padding:14px 18px;margin:0 0 6px}
-.sh-band .sh-ref{display:block;font:600 11px/1.4 var(--f-marshal);letter-spacing:.2em;text-transform:uppercase;opacity:.85}
-.sh-band h2{margin:4px 0 0;font:600 clamp(21px,3.2vw,28px)/1.15 var(--f-marshal);letter-spacing:.05em;color:var(--paper);text-wrap:balance}
-.sh-hazard{height:8px;margin-bottom:18px;background:repeating-linear-gradient(-55deg,var(--oxblood) 0 14px,var(--paper) 14px 28px);opacity:.85}
-.sh-meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 16px;margin:0 0 20px;font-size:14px}
-.sh-meta dt{font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--oxblood)}
-.sh-meta dd{margin:0}
-.sheet .body{font-size:15.5px;line-height:1.62}
-.sheet .body h3{margin:1.4em 0 .4em;font:600 14px/1.3 var(--f-marshal);letter-spacing:.12em;text-transform:uppercase;color:var(--oxblood)}
-.sheet .body h3::before{content:none}
-.sheet .body strong{color:var(--oxblood);font-weight:700}
-.sheet .body li::marker{color:var(--oxblood)}
-.sheet .body blockquote{background:#fbf6ec;border:1px solid var(--paper-rule);box-shadow:0 2px 6px rgba(60,40,20,.12);color:var(--paper-ink);font-style:italic}
-.sheet .body hr{background:var(--paper-rule)}
-.sheet figure{background:var(--paper-2);border-color:var(--paper-rule)}
-.sheet figcaption{color:#6d6355}
-.sh-foot{margin-top:26px;padding-top:10px;border-top:1px solid var(--paper-rule);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#6d6355}
-.sheet.kind-letter .body{font-style:italic}
+.m-pages{container-type:inline-size;display:flex;flex-direction:column;gap:24px;max-width:820px;margin:0 auto}
+.m-page{position:relative;aspect-ratio:8.5/11;display:flex;flex-direction:column;background:var(--paper);color:#1f1d1a;
+  padding:clamp(22px,6.4cqw,54px) clamp(20px,6.6cqw,56px) clamp(20px,4.2cqw,36px);
+  font:clamp(11px,1.34cqw,12.5px)/1.4 var(--f-type);box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.m-page::before,.m-page::after{content:"";position:absolute;pointer-events:none}
+.m-page::before{inset:clamp(7px,3.3cqw,27px);border:1px solid #67625a}
+.m-page::after{inset:clamp(10px,3.9cqw,32px);border:1px solid #bdb6aa}
+.m-page > *{position:relative;z-index:1}
+.m-top{display:flex;justify-content:space-between;gap:1em;flex-wrap:wrap;padding-bottom:.35em;border-bottom:1px solid #7b1f24;
+  font:500 1em/1.3 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;color:#7b1f24}
+.m-lh{display:flex;align-items:center;gap:1.2em;margin:1em 0 .9em}
+.m-lh svg{flex:none;width:4.6em;height:4.6em}
+.m-org{font:600 1.6em/1.15 var(--f-marshal);letter-spacing:.08em;color:#26324a}
+.m-dir{font:400 1em/1.4 var(--f-marshal);letter-spacing:.16em;color:#8b857b}
+.m-series,.m-cont{display:flex;justify-content:space-between;gap:1em;flex-wrap:wrap;padding:.35em 0;border-top:1px dashed #a9a196;border-bottom:1px dashed #a9a196}
+.m-series{font:400 .98em/1.4 var(--f-marshal);letter-spacing:.14em;color:#8b857b}
+.m-cont{border-top:0;margin-top:.6em;font-size:.82em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#26324a}
+.m-cont span:last-child{font-weight:400;text-transform:none;color:#1f1d1a}
+.m-hero{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.4em 1.4em;align-items:start;margin:1.2em 0 .9em}
+.m-hero.annex{grid-template-columns:minmax(0,1fr) auto;margin-top:.9em}
+.m-hero.has-aside{grid-template-columns:auto minmax(0,.9fr) minmax(0,1.25fr)}
+.m-chap{width:7.4em;height:7.4em;margin:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1em;
+  background:#1f2d45;color:#efe6d6;outline:1px solid #1f2d45;outline-offset:3px;font-family:var(--f-marshal)}
+.m-chap span{font-size:.8em;letter-spacing:.24em;text-transform:uppercase;opacity:.85}
+.m-chap b{font-weight:500;font-size:3.6em;line-height:1}
+.m-eyebrow{font:400 1.05em/1.3 var(--f-marshal);letter-spacing:.2em;text-transform:uppercase;color:#a5484c}
+.m-title{margin:.1em 0 .3em;font:700 1.85em/1.12 var(--f-type);letter-spacing:.05em;text-transform:uppercase;color:#1b1a18;text-wrap:balance}
+.m-hero.annex .m-title{font-size:1.45em}
+.m-sub{font-size:1.12em;line-height:1.4}
+.m-intro{margin-top:.15em;font-size:.94em;line-height:1.4;font-style:italic;color:#3e3b36}
+.m-intro em{font-style:italic}
+.m-stamp{display:inline-block;padding:.22em .7em;border:3px solid #a5484c;border-radius:5px;color:#a5484c;opacity:.88;transform:rotate(-8deg);
+  font:500 1.3em/1.1 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.m-hero-stamp{margin:.6em .4em 0 0}
+.m-stamp-row{display:flex;justify-content:flex-end;padding:1.4em 2.2em .4em}
+.m-file{display:grid;grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);gap:.05em 1em;margin:0;padding:.45em 0;border-top:1px dashed #a9a196;border-bottom:1px dashed #a9a196;font-size:.9em}
+.m-file dt{font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#26324a}
+.m-file dd{margin:0}
+.m-band{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1em;margin:.4em 0 0;background:#6e1b20;color:#f3ebdc;padding:1em 1.2em}
+.m-band-eye{font:500 .9em/1.3 var(--f-marshal);letter-spacing:.18em;text-transform:uppercase;opacity:.9}
+.m-band-title{margin-top:.15em;font:600 1.9em/1.1 var(--f-marshal);letter-spacing:.04em;text-transform:uppercase;text-wrap:balance}
+.m-band-meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.05em .8em;align-content:start;margin:-.4em -.6em -.4em 0;padding:.5em .8em;background:var(--paper);color:#1f1d1a;border:2px solid #6e1b20;font-size:.8em}
+.m-band-meta dt{font-weight:700;text-transform:uppercase;color:#7b1f24}
+.m-band-meta dd{margin:0}
+.m-band-meta .m-status{grid-column:1/-1;margin-top:.3em;font:500 1.3em/1.2 var(--f-marshal);letter-spacing:.08em;text-transform:uppercase;color:#7b1f24}
+.m-hazard{height:.85em;margin-bottom:1.1em;background:repeating-linear-gradient(-58deg,#6e1b20 0 1.2em,var(--paper) 1.2em 2.4em);border-bottom:1px solid #6e1b20}
+.m-meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.05em 1em;margin:0 0 1em;font-size:.92em}
+.m-meta dt{font-weight:700;text-transform:uppercase;color:#7b1f24}
+.m-meta dd{margin:0}
+.m-body{flex:1}
+.m-body p{margin:0 0 .8em}
+.m-sec{margin:1.1em 0 .6em;padding-bottom:.2em;border-bottom:1px solid #8c93a1;font:600 1.18em/1.3 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;color:#26324a}
+.m-item{display:grid;grid-template-columns:3.7em minmax(0,1fr);margin:0 0 .35em}
+.m-num{font-weight:700;color:#26324a}
+.m-ttl{font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.m-aside{font-style:italic;color:#6a645a}
+.m-tablewrap{margin:0 0 .6em 3.7em;overflow-x:auto}
+.m-table{width:100%;border-collapse:collapse;font-size:.95em}
+.m-table th{text-align:left;padding:.3em .5em;border-bottom:1px solid #26324a;font-size:.85em;text-transform:uppercase;letter-spacing:.05em;color:#26324a}
+.m-table td{padding:.45em .5em;border-bottom:1px dashed #b3ab9d;vertical-align:top}
+.m-table td:first-child{width:36%;font-weight:700}
+.m-box{margin:.9em 0 .3em;padding:.75em 1.2em;background:#e8dfd1;border:1px solid #3a4355}
+.m-box-h{margin-bottom:.15em;font:400 1.1em/1.3 var(--f-marshal);letter-spacing:.12em;text-transform:uppercase;color:#1f1d1a}
+.m-box p{margin:.4em 0 0;font-style:italic;color:#4a463f}
+.m-checks{list-style:none;margin:.2em 0;padding:0}
+.m-checks li{margin:.2em 0;padding-left:1.35em;text-indent:-1.35em}
+.m-checks li::before{content:"";display:inline-block;width:.8em;height:.8em;margin-right:.55em;border:1px solid #2a2724;vertical-align:-.05em}
+.m-list{margin:.2em 0 .7em;padding-left:1.3em}
+.m-list li::marker{color:#7b1f24}
+.m-body strong{font-weight:700}
+.m-page blockquote{margin:.6em 0 .8em;padding:.8em 1.1em;background:#fbf7ef;border:1px solid #cfc6b6;box-shadow:0 2px 5px rgba(0,0,0,.12);font-style:italic}
+.m-card{position:relative;padding:.9em 1.1em .7em;background:#faf6ee;border:1px solid #d8cfbf;box-shadow:2px 4px 10px rgba(0,0,0,.2);transform:rotate(1.2deg);font-size:.88em;line-height:1.45}
+.m-card::before{content:"";position:absolute;left:.9em;top:-1.4em;width:.75em;height:3.1em;border:2px solid #8a8f98;border-radius:.5em}
+.m-card-h{margin-bottom:.45em;padding-bottom:.3em;border-bottom:1px dashed #b3ab9d;font:500 1.1em/1.3 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;color:#7b1f24}
+.m-card p{margin:0 0 .5em}
+.m-card .m-stamp-row{justify-content:flex-start;padding:.1em 0 0}
+.m-card .m-stamp{font-size:.95em;border-width:2px;transform:rotate(-6deg)}
+.m-card p:last-child{text-align:right;margin:-1.4em 0 0}
+.m-body > .m-card{margin:1em 0 1.4em}
+.m-step{position:relative;display:grid;grid-template-columns:2.4em minmax(0,1fr);gap:0 .9em;margin:.8em 0}
+.m-step::before{content:"";position:absolute;left:1.15em;top:2.4em;bottom:-.9em;border-left:1px dashed #c39f9a}
+.m-step:last-of-type::before{display:none}
+.m-step-n{position:relative;z-index:1;width:2.1em;height:2.1em;display:flex;align-items:center;justify-content:center;border:1.5px solid #7b1f24;border-radius:50%;background:var(--paper);color:#7b1f24;font:500 1.1em/1 var(--f-marshal)}
+.m-step-h{font-weight:700;text-transform:uppercase}
+.m-step-h span{margin-right:.7em;font:500 .9em var(--f-marshal);letter-spacing:.12em;color:#7b1f24}
+.m-step.final .m-step-b{padding:.6em .9em;border:2px solid #7b1f24;background:#ecdfd4}
+.m-step-b p{margin:0 0 .5em}
+.m-page .m-foot{display:flex;justify-content:space-between;gap:.4em 1.5em;flex-wrap:wrap;margin-top:1.4em;padding-top:.55em;border-top:1px solid #9c968c;font:400 .78em/1.4 var(--f-type);letter-spacing:normal;text-transform:none;color:#3d3a35}
+.m-page figure{background:var(--paper-2);border-color:var(--paper-rule)}
+.m-page figcaption{color:#6d6355}
+.m-foot b{font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.m-foot span:last-child{text-align:right}
+.m-sig{text-align:right;font-style:normal;letter-spacing:.06em}
+.m-page blockquote p{margin:0 0 .7em}.m-page blockquote p:last-child{margin:0}
+.m-lead{margin:-.4em 0 .8em}
+.m-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(13em,1fr));gap:.6em 1.4em;margin:.5em 0 .3em}
+.m-opt{padding:.45em .8em;border:1px solid #3a4355;background:#e6e2da;font-size:.95em;line-height:1.4}
+.m-opt + .m-opt{border-color:#a5484c;background:#eddcd3}
+.m-opt b{display:block;font:400 1.02em/1.3 var(--f-marshal);letter-spacing:.12em;text-transform:uppercase;color:#26324a}
+.m-opt + .m-opt b{color:#7b1f24}
+.m-step .m-checks li::before{border-color:#7b1f24}
+.m-hero-aside .m-card{transform:rotate(1.6deg)}
+@container (max-width:560px){
+  .m-hero,.m-hero.has-aside{grid-template-columns:auto minmax(0,1fr)}
+  .m-hero.annex{grid-template-columns:minmax(0,1fr)}
+  .m-hero > .m-stamp,.m-hero > .m-hero-aside{grid-column:1/-1;justify-self:end}
+  .m-hero > .m-hero-aside{justify-self:stretch;margin-top:1.6em}
+  .m-chap{width:5.6em;height:5.6em}.m-chap b{font-size:2.6em}
+  .m-file{grid-template-columns:auto minmax(0,1fr)}
+  .m-band{grid-template-columns:minmax(0,1fr)}.m-band-meta{margin:0}
+  .m-tablewrap{margin-left:0}
+  .m-item{grid-template-columns:3.2em minmax(0,1fr)}
+}
 .pdfpages{display:flex;flex-direction:column;align-items:center;gap:18px;min-height:120px}
 .pdfpages canvas{display:block;width:100%;max-width:820px;height:auto;background:var(--paper);box-shadow:0 0 0 1px var(--paper-rule),0 14px 34px rgba(0,0,0,.55)}
 .pdfpages .state{padding:40px 0}
@@ -495,23 +583,163 @@ function assetHTML(a){
   return `<p class="attach"><a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">Open ${esc(a.name || "attachment")}</a></p>`;
 }
 
+/* Marshal pages. The body text marks the layout:
+   [page] new page · --- footer lines follow · [stamp: Word] · ## Field exercise … box · ## Addendum … clipped card
+   ## Step 2 · Title / ## Final step · Title · other ## section heading · **1.1 Title.** item text, then *aside line*
+   | a | b | table · - [ ] checkbox · + option box · > quoted message. Lead lines before the first item open the page. */
+const NUMWORD = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12};
+const ITEM = /^\*\*((?:[A-Z]\.)?\d+(?:\.\d+)*)\s+(.+?)\*\*\s*(.*)$/;
+function mParse(src, useLead){
+  const pages = []; let pg, m;
+  let lead = useLead, foot = false, para = [], quote = [], list = null, table = null, item = null, ctx = null, steps = 0;
+  const newPage = () => { pg = {html:"", foot:[], lead:[], stamp:"", aside:""}; pages.push(pg); foot = false; };
+  const emit = h => { if (ctx) ctx.body += h; else pg.html += h; };
+  const endPara = () => {
+    if (!para.length) return;
+    if (lead && !ctx) pg.lead.push(...para); else emit("<p>" + para.map(inline).join("<br>") + "</p>");
+    para = [];
+  };
+  const endQuote = () => {
+    if (!quote.length) return;
+    const sig = quote.length > 1 && quote[quote.length - 1].length <= 14 ? quote.pop() : "";
+    emit("<blockquote>" + quote.map(q => `<p>${inline(q)}</p>`).join("") + (sig ? `<p class="m-sig">${inline(sig)}</p>` : "") + "</blockquote>");
+    quote = [];
+  };
+  const endList = () => {
+    if (!list) return;
+    if (list.kind === "opt") emit(`<div class="m-opts">${list.items.map(t => { const o = t.match(/^\*\*(.+?)\*\*\s*(.*)$/);
+      return `<div class="m-opt"><b>${inline(o ? o[1].replace(/\.$/, "") : "")}</b>${inline(o ? o[2] : t)}</div>`; }).join("")}</div>`);
+    else emit(`<ul class="${list.kind === "check" ? "m-checks" : "m-list"}">${list.items.map(t => `<li>${inline(t)}</li>`).join("")}</ul>`);
+    list = null;
+  };
+  const endTable = () => {
+    if (!table) return;
+    const [hd, ...rows] = table;
+    emit(`<div class="m-tablewrap"><table class="m-table"><thead><tr>${hd.map(c => `<th>${inline(c)}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+    table = null;
+  };
+  const endItem = () => {
+    if (!item) return;
+    emit(`<div class="m-item"><span class="m-num">${esc(item.num)}</span><div><div class="m-ttl">${inline(item.ttl)}</div>${
+      item.text.map(t => `<div>${inline(t)}</div>`).join("")}${item.aside.map(t => `<div class="m-aside">${inline(t)}</div>`).join("")}</div></div>`);
+    item = null;
+  };
+  const endBlocks = () => { endPara(); endQuote(); endList(); endTable(); endItem(); };
+  const endCtx = () => {
+    endBlocks();
+    if (!ctx) return;
+    const c = ctx; ctx = null; let h;
+    if (c.type === "box") h = `<div class="m-box"><div class="m-box-h">${inline(c.head)}</div>${c.body}</div>`;
+    else if (c.type === "card") h = `<div class="m-card"><div class="m-card-h">${inline(c.head)}</div>${c.body}</div>`;
+    else h = `<div class="m-step${c.final ? " final" : ""}"><span class="m-step-n">${c.n}</span><div class="m-step-b"><div class="m-step-h"><span>${inline(c.label)}</span>${inline(c.head)}</div>${c.body}</div></div>`;
+    if (c.toAside) pg.aside = h; else emit(h);
+  };
+  const leave = () => { if (lead) { endPara(); lead = false; } };
+  newPage();
+  for (const raw of String(src || "").replace(/\r/g, "").split("\n")) {
+    const l = raw.trim();
+    if (/^\[page\]$/i.test(l)) { endCtx(); lead = false; newPage(); continue; }
+    if (foot) { if (l) pg.foot.push(l); continue; }
+    if (!l) { endPara(); endQuote(); endList(); endTable(); endItem(); continue; }
+    if (/^---+$/.test(l)) { endCtx(); lead = false; foot = true; continue; }
+    if ((m = l.match(/^\[stamp:\s*(.+?)\]$/i))) {
+      const s = `<span class="m-stamp">${esc(m[1])}</span>`;
+      if (lead && !ctx) { endPara(); pg.stamp = s; }
+      else if (ctx && ctx.type === "card") { endBlocks(); ctx.body += `<div class="m-stamp-row">${s}</div>`; }
+      else { endCtx(); emit(`<div class="m-stamp-row">${s}</div>`); }
+      continue;
+    }
+    if ((m = l.match(/^##\s+(.*)/))) {
+      const h = m[1]; endCtx();
+      let s;
+      if (/^addendum\b/i.test(h)) { ctx = {type:"card", head:h, body:"", toAside: lead}; if (lead) endPara(); continue; }
+      leave();
+      if (/^field exercise\b/i.test(h)) ctx = {type:"box", head:h, body:""};
+      else if ((s = h.match(/^(final step|step\s+(\d+))\s*[·:.-]\s*(.*)$/i))) {
+        steps = s[2] ? +s[2] : steps + 1;
+        ctx = {type:"step", n: steps, label: s[1], head: s[3], body:"", final: /^final/i.test(s[1])};
+      } else emit(`<h3 class="m-sec">${inline(h)}</h3>`);
+      continue;
+    }
+    if ((m = l.match(ITEM))) {
+      if (ctx && ctx.type !== "step") endCtx(); leave(); endBlocks();
+      item = {num: m[1], ttl: m[2].replace(/\.$/, ""), text: m[3] ? [m[3]] : [], aside: []};
+      continue;
+    }
+    if (item && (m = l.match(/^\*([^*].*)\*$/))) { item.aside.push(m[1]); continue; }
+    if (l.startsWith("|")) {
+      leave(); endPara(); endQuote(); endList(); endItem();
+      if (/^\|[\s:|-]+\|?$/.test(l)) continue;
+      (table = table || []).push(l.replace(/^\||\|$/g, "").split("|").map(c => c.trim()));
+      continue;
+    }
+    if ((m = l.match(/^>\s?(.*)/))) { leave(); endPara(); endList(); endTable(); endItem(); quote.push(m[1]); continue; }
+    if ((m = l.match(/^(-\s+\[\s?\]|\+|[-*])\s+(.*)/))) {
+      leave(); endPara(); endQuote(); endTable(); endItem();
+      const kind = m[1] === "+" ? "opt" : (m[1].includes("[") || (ctx && ctx.type === "box")) ? "check" : "list";
+      if (list && list.kind !== kind) endList();
+      (list = list || {kind, items: []}).items.push(m[2]);
+      continue;
+    }
+    if (item) { item.text.push(l); continue; }
+    endQuote(); endList(); endTable(); para.push(l);
+  }
+  endCtx();
+  return pages;
+}
+
 const SEAL = `<svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="#26324a" stroke-width="1.6"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="24" r="16.5" stroke-width="1"/>
   <path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M38.8 9.2l-3.5 3.5M12.7 35.3l-3.5 3.5" stroke-width="1.2"/>
   <path d="M12 24c4-6 20-6 24 0-4 6-20 6-24 0z"/></g><circle cx="24" cy="24" r="4.2" fill="#26324a"/><circle cx="25.4" cy="22.8" r="1.2" fill="#f3ebdc"/></svg>`;
-
-function sheetHTML(d, withImage){
+const unstar = s => String(s).replace(/^\*+|\*+$/g, "");
+function mLead(lines){
+  if (!lines.length) return "";
+  const [first, ...rest] = lines;
+  return `<div class="m-sub">${inline(unstar(first))}</div>${rest.length ? `<div class="m-intro">${rest.map(r => inline(unstar(r))).join("<br>")}</div>` : ""}`;
+}
+function mHeader(d, pg, idx){
   const k = KIND[d.kind] || KIND.other;
+  const [refA, ...refR] = String(d.ref || k.label).split(/\s+·\s+/);
+  const refB = refR.join(" · ");
+  const spaced = refA.replace(/\s*\/\s*/g, " / ");
+  let h = `<div class="m-top"><span>Construct eyes only</span><span>${esc(d.classification || "")}</span></div>`;
+  if (idx > 0) return h + `<div class="m-cont"><span>${esc(spaced)} · ${esc(d.title || "")}</span><span>continued</span></div>`;
+  h += `<div class="m-lh">${SEAL}<div><div class="m-org">Arcane Marshals</div><div class="m-dir">Marshal Intelligence · Construct Directorate</div></div></div>`;
+  const side = pg.aside ? `<div class="m-hero-aside">${pg.aside}</div>` : pg.stamp ? `<span class="m-hero-stamp">${pg.stamp}</span>` : "";
   const row = (label, v) => v ? `<dt>${label}</dt><dd>${esc(v)}</dd>` : "";
-  return `<div class="sheet kind-${esc(d.kind || "other")}">
-    <div class="sh-top"><span>Construct eyes only</span><span>${esc(d.classification || "")}</span></div>
-    <div class="sh-head">${SEAL}<div><div class="sh-org">Arcane Marshals</div><div class="sh-dir">Marshal Intelligence · Construct Directorate</div></div></div>
-    <div class="sh-band"><span class="sh-ref">${esc(d.ref || k.label)}</span><h2>${esc(d.title || "Untitled")}</h2></div>
-    <div class="sh-hazard" aria-hidden="true"></div>
-    <dl class="sh-meta">${row("Type", k.label)}${row("From", d.from)}${row("To", d.to)}${row("Dated", d.date)}</dl>
-    ${withImage ? assetHTML(d.asset) : ""}
-    <div class="body">${md(d.body)}</div>
-    <div class="sh-foot"><span>Property of the Arcane Marshals</span><span>End of file</span></div>
-  </div>`;
+  if (d.kind === "manual") {
+    const t = String(d.title || "").match(/^chapter\s+(\w+)\s*[:·.-]\s*(.*)$/i);
+    const num = t ? (NUMWORD[t[1].toLowerCase()] || t[1]) : "";
+    return h + `<div class="m-series"><span>${esc(refB)}</span><span>${esc(spaced)}</span></div>
+      <div class="m-hero${pg.aside ? " has-aside" : ""}">${num !== "" ? `<div class="m-chap"><span>Chapter</span><b>${esc(num)}</b></div>` : "<span></span>"}
+      <div>${t ? `<div class="m-eyebrow">Chapter ${esc(t[1])}</div>` : ""}<h2 class="m-title">${esc(t ? t[2] : d.title || "Untitled")}</h2>${mLead(pg.lead)}</div>${side}</div>`;
+  }
+  if (d.kind === "annex") {
+    const [author, reviewer] = String(d.from || "").split(/\.\s+Reviewed by\s+/i);
+    return h + `<dl class="m-file">${row("File", spaced)}${row("Author", author)}${row("Decrypted for", d.to)}${row("Reviewed by", reviewer)}</dl>
+      <div class="m-hero annex"><div><h2 class="m-title">${esc(d.title || "Untitled")}</h2>${mLead(pg.lead)}</div>${side}</div>`;
+  }
+  let status = "";
+  const lead = pg.lead.filter(l => { const s = unstar(l).match(/^status:\s*(.+?)\.?$/i); if (s) status = s[1]; return !s; });
+  const meta = d.kind === "protocol"
+    ? `${row("Trigger", String(d.date || "").replace(/^trigger:\s*/i, ""))}${row("Recipient", d.to)}${row("Author", d.from)}${status ? `<dd class="m-status">Status: ${esc(status)}</dd>` : ""}`
+    : `${row("Type", k.label)}${row("From", d.from)}${row("To", d.to)}${row("Dated", d.date)}`;
+  return h + `<div class="m-band"><div><div class="m-band-eye">${d.kind === "protocol" ? "⚠ " : ""}${esc(refA)}</div><h2 class="m-band-title">${esc(d.title || "Untitled")}</h2></div>
+    <dl class="m-band-meta">${meta}</dl></div><div class="m-hazard" aria-hidden="true"></div>
+    ${lead.length ? `<div class="m-intro m-lead">${lead.map(l => inline(l)).join("<br>")}</div>` : ""}${side ? `<div class="m-stamp-row">${side}</div>` : ""}`;
+}
+function marshalPages(d, withImage){
+  const pages = mParse(d.body, ["manual", "annex", "protocol"].includes(d.kind));
+  const n = pages.length;
+  return `<div class="m-pages">${pages.map((pg, i) => {
+    const [left = "Property of the Arcane Marshals", ...right] = pg.foot.length ? pg.foot : ["Property of the Arcane Marshals", n > 1 ? `Page ${i + 1} of ${n}` : "End of file"];
+    const lh = left.split(/\s+·\s+/);
+    const leftHTML = lh.length > 1 ? `<b>${inline(lh[0])}</b> · ${inline(lh.slice(1).join(" · "))}` : inline(left);
+    return `<section class="m-page kind-${esc(d.kind || "other")}">${mHeader(d, pg, i)}
+      ${i === 0 && withImage ? assetHTML(d.asset) : ""}<div class="m-body">${pg.html}</div>
+      <footer class="m-foot"><span>${leftHTML}</span><span>${right.map(inline).join("<br>")}</span></footer></section>`;
+  }).join("")}</div>`;
 }
 
 function docHTML(d){
@@ -523,9 +751,9 @@ function docHTML(d){
     const link = S.links[a.id];
     inner = `<div class="pdfpages" data-asset="${esc(a.id)}"><p class="state">Unfolding the document</p></div>
       ${link ? `<div class="pdf-tools"><a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">Open the PDF</a></div>` : ""}
-      ${d.body ? `<details class="textver"><summary>Read it as text</summary>${sheetHTML(d, false)}</details>` : ""}`;
+      ${d.body ? `<details class="textver"><summary>Read it as text</summary>${marshalPages(d, false)}</details>` : ""}`;
   } else {
-    inner = sheetHTML(d, true);
+    inner = marshalPages(d, true);
   }
   return `<div class="frame"><article class="win">
     <div class="titlebar"><span class="runes" aria-hidden="true">ᚠᚢᚦᚨᚱᚲᚷᚹᚺ</span><span class="tb">${esc(d.ref || k.label)}</span></div>
@@ -601,7 +829,7 @@ function openEditor(id){
         <label>Order in the list<input id="f-order" type="number" value="${v("order")}"></label>
       </div>
       <label>Text<textarea id="f-body" rows="16">${v("body")}</textarea></label>
-      <p class="hint">Blank line starts a paragraph · <code>## Heading</code> · <code>- item</code> · <code>1. step</code> · <code>&gt; quoted line</code> · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words)</p>
+      <p class="hint">Blank line starts a paragraph · <code>**1.1 Title.** text</code> numbered item, <code>*aside*</code> on the next line · <code>## Section</code> · <code>## Field exercise · …</code> box · <code>## Step 2 · Title</code> · <code>## Final step · Title</code> · <code>## Addendum · …</code> clipped card · <code>- item</code> · <code>- [ ] checkbox</code> · <code>+ **Option.** text</code> · <code>| a | b |</code> table · <code>&gt; quoted line</code> · <code>[stamp: Released]</code> · <code>---</code> then footer lines · <code>[page]</code> new page · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words). Lines before the first item open the page: the first is the subtitle, the rest the intro.</p>
       <label>Attachment: image or PDF, up to 20 MB<input id="f-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"></label>
       ${d.asset ? `<label class="check"><input type="checkbox" id="f-noasset"> Remove ${esc(d.asset.name || "the attachment")}</label>` : ""}
       <label>Game master note · never shown to Gus<textarea id="f-note" rows="4">${v("note")}</textarea></label>
@@ -687,56 +915,124 @@ document.addEventListener("click", e => {
   }
 });
 
-/* Rune traces in the background: right-angled conduits with a pulse of light running along each. */
-(function traces(){
+/* Background circuitry: buses of parallel traces leave rune chips and the screen edges, run across the page
+   with 45-degree jogs and end in vias. Pulses of light travel along the traces. */
+(function circuits(){
   const c = $("#traces"), x = c.getContext("2d");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const G = 56; let W = 0, H = 0, paths = [];
+  const base = document.createElement("canvas"), bx = base.getContext("2d");
+  const U = 24, PITCH = 9, RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
+  let W = 0, H = 0, traces = [], chips = [];
+  const rnd = (a, b) => a + Math.random() * (b - a), irnd = (a, b) => Math.floor(rnd(a, b + 1));
+  const DIRS = [[1,0],[0,1],[-1,0],[0,-1]];
+  function route(x0, y0, di){
+    const pts = [[x0, y0]]; let px = x0, py = y0, d = di, turned = false;
+    const out = () => px < -60 || py < -60 || px > W + 60 || py > H + 60;
+    for (let s = 0; s < 14 && !out(); s++) {
+      const [dx, dy] = DIRS[d], run = U * irnd(2, 9);
+      px += dx * run; py += dy * run; pts.push([px, py]);
+      if (s > 2 && Math.random() < .14) break;
+      const side = Math.random() < .5 ? 1 : 3, [qx, qy] = DIRS[(d + side) % 4], j = U * irnd(1, 3);
+      px += (dx + qx) * j; py += (dy + qy) * j; pts.push([px, py]);
+      if (!turned && Math.random() < .22) { d = (d + side) % 4; turned = true; }
+    }
+    return pts;
+  }
+  function offset(pts, o){
+    const n = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1; return [-dy / l, dx / l]; };
+    return pts.map((p, i) => {
+      const n1 = i ? n(pts[i-1], p) : n(p, pts[i+1]), n2 = i < pts.length - 1 ? n(p, pts[i+1]) : n1;
+      let mx = n1[0] + n2[0], my = n1[1] + n2[1]; const ml = Math.hypot(mx, my) || 1; mx /= ml; my /= ml;
+      const k = o / (mx * n1[0] + my * n1[1]);
+      return [p[0] + mx * k, p[1] + my * k];
+    });
+  }
+  function bus(x0, y0, d, k){
+    const centre = route(x0, y0, d);
+    for (let i = 0; i < k; i++) {
+      const pts = offset(centre, (i - (k - 1) / 2) * PITCH), seg = []; let len = 0;
+      for (let j = 1; j < pts.length; j++) { const s = Math.hypot(pts[j][0] - pts[j-1][0], pts[j][1] - pts[j-1][1]); seg.push(s); len += s; }
+      traces.push({pts, seg, len, lit: Math.random() < .7, off: Math.random() * len, speed: rnd(55, 130), gap: rnd(.4, 1.6)});
+    }
+  }
   function build(){
     const dpr = Math.min(2, devicePixelRatio || 1);
-    W = innerWidth; H = innerHeight; c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr,0,0,dpr,0,0);
-    paths = [];
-    const n = Math.round(Math.min(18, W * H / 60000) + 4);
-    for (let i = 0; i < n; i++) {
-      let px = Math.round(Math.random() * W / G) * G, py = Math.round(Math.random() * H / G) * G, dir = Math.random() * 4 | 0;
-      const pts = [[px,py]], seg = []; let len = 0;
-      const steps = 5 + (Math.random() * 6 | 0);
-      for (let s = 0; s < steps; s++) {
-        const d = G * (1 + (Math.random() * 4 | 0));
-        if (dir === 0) px += d; else if (dir === 1) py += d; else if (dir === 2) px -= d; else py -= d;
-        pts.push([px,py]); seg.push(d); len += d;
-        dir = (dir + (Math.random() < .5 ? 1 : 3)) % 4;
-      }
-      paths.push({pts, seg, len, off: Math.random(), speed: .03 + Math.random() * .05});
-    }
-  }
-  function at(p, f){
-    let d = f * p.len;
-    for (let k = 0; k < p.seg.length; k++) {
-      if (d <= p.seg[k]) { const a = p.pts[k], b = p.pts[k+1], t = d / p.seg[k]; return [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t]; }
-      d -= p.seg[k];
-    }
-    return p.pts[p.pts.length - 1];
-  }
-  function draw(t){
-    x.clearRect(0, 0, W, H); x.lineWidth = 1;
-    for (const p of paths) {
-      x.strokeStyle = "rgba(134,228,255,0.075)"; x.beginPath();
-      p.pts.forEach((q,i) => i ? x.lineTo(q[0]+.5, q[1]+.5) : x.moveTo(q[0]+.5, q[1]+.5)); x.stroke();
-      x.fillStyle = "rgba(210,168,81,0.24)";
-      for (const q of p.pts) { x.beginPath(); x.arc(q[0]+.5, q[1]+.5, 2, 0, 7); x.fill(); }
-      if (!reduce) {
-        const [qx,qy] = at(p, ((t / 1000) * p.speed + p.off) % 1);
-        const g = x.createRadialGradient(qx, qy, 0, qx, qy, 14);
-        g.addColorStop(0, "rgba(170,236,255,0.55)"); g.addColorStop(1, "rgba(134,228,255,0)");
-        x.fillStyle = g; x.beginPath(); x.arc(qx, qy, 14, 0, 7); x.fill();
+    W = innerWidth; H = innerHeight;
+    for (const cv of [c, base]) { cv.width = W * dpr; cv.height = H * dpr; }
+    x.setTransform(dpr,0,0,dpr,0,0); bx.setTransform(dpr,0,0,dpr,0,0);
+    traces = []; chips = [];
+    const area = W * H;
+    const nChips = Math.max(2, Math.min(6, Math.round(area / 260000)));
+    for (let i = 0; i < nChips; i++) {
+      const w = U * irnd(3, 5), h = U * irnd(2, 3);
+      const cx = Math.round(rnd(.08, .92) * W / U) * U, cy = Math.round(rnd(.1, .9) * H / U) * U;
+      if (chips.some(o => Math.abs(o.x + o.w / 2 - cx) < (o.w + w) / 2 + U * 3 && Math.abs(o.y + o.h / 2 - cy) < (o.h + h) / 2 + U * 3)) continue;
+      chips.push({x: cx - w / 2, y: cy - h / 2, w, h, rune: RUNES[irnd(0, RUNES.length - 1)]});
+      for (let b = 0, nb = irnd(1, 3); b < nb; b++) {
+        const d = irnd(0, 3), k = irnd(2, 4), [dx, dy] = DIRS[d];
+        bus(cx + dx * w / 2, cy + dy * h / 2, d, k);
       }
     }
+    const nEdge = Math.round(Math.min(10, area / 140000) + 3);
+    for (let i = 0; i < nEdge; i++) {
+      const horiz = Math.random() < .7, from = Math.random() < .5, k = irnd(1, 5);
+      if (horiz) bus(from ? -40 : W + 40, Math.round(rnd(.05, .95) * H / U) * U, from ? 0 : 2, k);
+      else bus(Math.round(rnd(.05, .95) * W / U) * U, from ? -40 : H + 40, from ? 1 : 3, k);
+    }
+    paintBase();
   }
-  let last = 0;
+  function via(g, p, r, a){ g.beginPath(); g.arc(p[0], p[1], r, 0, 7); g.strokeStyle = `rgba(210,168,81,${a})`; g.stroke(); }
+  function paintBase(){
+    bx.clearRect(0, 0, W, H); bx.lineWidth = 1; bx.lineJoin = "round";
+    bx.strokeStyle = "rgba(134,228,255,0.085)";
+    for (const t of traces) { bx.beginPath(); t.pts.forEach((q, i) => i ? bx.lineTo(q[0], q[1]) : bx.moveTo(q[0], q[1])); bx.stroke(); }
+    for (const t of traces) { via(bx, t.pts[0], 2.6, .22); via(bx, t.pts[t.pts.length - 1], 2.6, .22); }
+    bx.font = '22px "Noto Sans Runic", serif'; bx.textAlign = "center"; bx.textBaseline = "middle";
+    for (const ch of chips) {
+      bx.fillStyle = "rgba(11,9,8,0.85)"; bx.fillRect(ch.x, ch.y, ch.w, ch.h);
+      bx.strokeStyle = "rgba(210,168,81,0.26)"; bx.strokeRect(ch.x + .5, ch.y + .5, ch.w - 1, ch.h - 1);
+      bx.strokeStyle = "rgba(210,168,81,0.12)"; bx.strokeRect(ch.x + 4.5, ch.y + 4.5, ch.w - 9, ch.h - 9);
+      bx.strokeStyle = "rgba(210,168,81,0.2)"; bx.beginPath();
+      for (let px = ch.x + 8; px < ch.x + ch.w - 4; px += 8) { bx.moveTo(px + .5, ch.y); bx.lineTo(px + .5, ch.y - 4); bx.moveTo(px + .5, ch.y + ch.h); bx.lineTo(px + .5, ch.y + ch.h + 4); }
+      for (let py = ch.y + 8; py < ch.y + ch.h - 4; py += 8) { bx.moveTo(ch.x, py + .5); bx.lineTo(ch.x - 4, py + .5); bx.moveTo(ch.x + ch.w, py + .5); bx.lineTo(ch.x + ch.w + 4, py + .5); }
+      bx.stroke();
+      bx.fillStyle = "rgba(210,168,81,0.3)"; bx.fillText(ch.rune, ch.x + ch.w / 2, ch.y + ch.h / 2 + 1);
+    }
+  }
+  function at(t, s){
+    for (let k = 0; k < t.seg.length; k++) {
+      if (s <= t.seg[k]) { const a = t.pts[k], b = t.pts[k+1], f = s / t.seg[k]; return [a[0] + (b[0]-a[0]) * f, a[1] + (b[1]-a[1]) * f]; }
+      s -= t.seg[k];
+    }
+    return t.pts[t.pts.length - 1];
+  }
+  function draw(ms){
+    x.clearRect(0, 0, W, H); x.drawImage(base, 0, 0, W, H);
+    if (reduce) return;
+    const sec = ms / 1000; x.lineCap = "round";
+    for (const t of traces) {
+      if (!t.lit) continue;
+      const cycle = t.len * (1 + t.gap), s = (sec * t.speed + t.off) % cycle;
+      if (s > t.len + 60) continue;
+      const head = Math.min(s, t.len);
+      for (let i = 0; i < 6; i++) {
+        const a = Math.max(0, head - i * 10), b = Math.max(0, head - (i + 1) * 10);
+        if (a === b || s - i * 10 > t.len + 10) continue;
+        const p = at(t, a), q = at(t, b);
+        x.strokeStyle = `rgba(150,232,255,${0.5 * (1 - i / 6)})`; x.lineWidth = 2 - i * .2;
+        x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(q[0], q[1]); x.stroke();
+      }
+      const fade = s > t.len ? 1 - (s - t.len) / 60 : 1, [hx, hy] = at(t, head);
+      const g = x.createRadialGradient(hx, hy, 0, hx, hy, 12);
+      g.addColorStop(0, `rgba(190,242,255,${0.6 * fade})`); g.addColorStop(1, "rgba(134,228,255,0)");
+      x.fillStyle = g; x.beginPath(); x.arc(hx, hy, 12, 0, 7); x.fill();
+    }
+  }
+  let last = 0, timer;
   function loop(t){ if (!document.hidden && t - last > 33) { draw(t); last = t; } requestAnimationFrame(loop); }
   build();
-  addEventListener("resize", () => { build(); draw(performance.now()); });
+  addEventListener("resize", () => { clearTimeout(timer); timer = setTimeout(() => { build(); draw(performance.now()); }, 150); });
+  if (document.fonts) document.fonts.ready.then(() => { paintBase(); draw(performance.now()); });
   if (reduce) draw(0); else requestAnimationFrame(loop);
 })();
 
