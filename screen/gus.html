@@ -699,9 +699,11 @@ function mParse(src, useLead){
   return pages;
 }
 
-const SEAL = `<svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="#26324a" stroke-width="1.6"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="24" r="16.5" stroke-width="1"/>
-  <path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M38.8 9.2l-3.5 3.5M12.7 35.3l-3.5 3.5" stroke-width="1.2"/>
-  <path d="M12 24c4-6 20-6 24 0-4 6-20 6-24 0z"/></g><circle cx="24" cy="24" r="4.2" fill="#26324a"/><circle cx="25.4" cy="22.8" r="1.2" fill="#f3ebdc"/></svg>`;
+const SEAL = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#22344b" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="39" fill="none" stroke="#22344b" stroke-width="1" stroke-dasharray="3 3"/>
+  <g stroke="#22344b" stroke-width="2" fill="none"><path d="M50 8L50 18"/><path d="M50 82L50 92"/><path d="M8 50L18 50"/><path d="M82 50L92 50"/></g>
+  <path d="M22 50Q50 24 78 50Q50 76 22 50Z" fill="#f4efe2" stroke="#22344b" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="10" fill="#22344b"/><circle cx="53" cy="47" r="3" fill="#f4efe2"/></svg>`;
 const unstar = s => String(s).replace(/^\*+|\*+$/g, "");
 function mLead(lines){
   if (!lines.length) return "";
