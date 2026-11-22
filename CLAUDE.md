@@ -13,6 +13,7 @@ Change model: Direct. Commit to main.
 - `wilds-of-osse.json`: the combined file players load. Generated; never edit it by hand.
 - `tools/build.py`: the merge script.
 - `screen/`: game master screen pages. One page per session, `screen/sNN.html`.
+- `relay/gus/`: the AWS relay behind `screen/gus.html` (Gus's memory archive). `deploy.sh` deploys it; keys live in the macOS Keychain.
 - `.claude/skills/session-screen/`: how to build and publish a session screen. Follow it for every new one.
 - `.github/workflows/build-homebrew.yml`: rebuilds and commits the combined file when `src/` changes.
 

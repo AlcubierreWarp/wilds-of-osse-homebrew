@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>GUS Memory Archive</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Runic&display=swap">
+<style>
+/* Layout: a brass nameplate over a red velvet band; the file drawer on the left, the document window on the right; one column on phones. */
+:root{
+  --ink:#0b0908; --panel:#14100e; --panel-2:#1c1612; --line:#3b2d1d;
+  --text:#efe5d0; --muted:#b8a889;
+  --gold:#d2a851; --gold-hi:#f5dc96; --gold-lo:#7a5622; --engrave:#2b1a08;
+  --velvet:#6b1220; --velvet-hi:#9b2333; --velvet-lo:#33070e;
+  --arcane:#86e4ff; --arcane-soft:rgba(134,228,255,.3); --warn:#f0b35a;
+  --f-display:"Marcellus SC","Cinzel",Georgia,serif;
+  --f-body:"Spectral",Georgia,"Times New Roman",serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-rune:"Noto Sans Runic","Segoe UI Historic","Apple Symbols",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--text)}
+body{font:16px/1.55 var(--f-body);min-height:100vh;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+img{max-width:100%}
+#traces{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;max-width:1280px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:max(16px,env(safe-area-inset-top,0px)) 48px}
+
+/* Brass nameplate */
+.plate{position:relative;display:flex;align-items:center;gap:16px 20px;flex-wrap:wrap;padding:16px 24px;border-radius:8px 8px 0 0;
+  background:linear-gradient(180deg,var(--gold-hi) 0%,var(--gold) 40%,#a97d34 75%,var(--gold-lo) 100%);color:var(--engrave);
+  box-shadow:inset 0 1px 0 rgba(255,250,225,.65),inset 0 -2px 0 rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.6)}
+.rivets{position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:
+  radial-gradient(circle at 11px 11px,#fff4c8 0 1.4px,#8d6829 2.4px 4px,transparent 4.6px),
+  radial-gradient(circle at calc(100% - 11px) 11px,#fff4c8 0 1.4px,#8d6829 2.4px 4px,transparent 4.6px),
+  radial-gradient(circle at 11px calc(100% - 11px),#fff4c8 0 1.4px,#8d6829 2.4px 4px,transparent 4.6px),
+  radial-gradient(circle at calc(100% - 11px) calc(100% - 11px),#fff4c8 0 1.4px,#8d6829 2.4px 4px,transparent 4.6px)}
+.lens{flex:none;width:46px;height:46px;border-radius:50%;
+  background:radial-gradient(circle at 40% 36%,#effcff 0 7%,var(--arcane) 20%,#1d5466 52%,#06141a 72%);
+  box-shadow:0 0 0 3px var(--gold-lo),0 0 0 5px var(--gold-hi),0 0 0 7px var(--gold-lo),0 0 22px 4px var(--arcane-soft);
+  animation:pulse 4.5s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 3px var(--gold-lo),0 0 0 5px var(--gold-hi),0 0 0 7px var(--gold-lo),0 0 30px 9px rgba(134,228,255,.45)}}
+.plate-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.eyebrow{font:500 11px/1.3 var(--f-mono);letter-spacing:.22em;text-transform:uppercase}
+.plate h1{margin:0;font:400 clamp(21px,3.2vw,30px)/1.1 var(--f-display);letter-spacing:.07em;text-shadow:0 1px 0 rgba(255,244,205,.7),0 -1px 0 rgba(0,0,0,.25);text-wrap:balance}
+.serial{font:500 12px/1 var(--f-mono);letter-spacing:.2em;opacity:.85}
+.serial s{text-decoration:none;opacity:.45}
+.modes{display:flex;border:1px solid var(--gold-lo);border-radius:4px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.35)}
+.modes button{all:unset;cursor:pointer;padding:8px 12px;font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--engrave)}
+.modes button.on{background:var(--engrave);color:var(--gold-hi)}
+.modes button:focus-visible{outline:2px solid var(--velvet);outline-offset:-2px}
+
+/* Velvet band */
+.velvet{display:flex;align-items:center;justify-content:center;gap:10px 18px;flex-wrap:wrap;min-height:36px;padding:6px 14px;
+  border-top:2px solid var(--gold-lo);border-bottom:2px solid var(--gold);border-radius:0 0 6px 6px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 3px,transparent 3px 26px,rgba(255,255,255,.05) 26px 28px,transparent 28px 52px),
+    radial-gradient(120% 260% at 50% -60%,var(--velvet-hi),var(--velvet) 45%,var(--velvet-lo));
+  box-shadow:inset 0 6px 10px rgba(0,0,0,.45),inset 0 -4px 8px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.5);
+  color:var(--gold-hi);font:500 11px/1.3 var(--f-mono);letter-spacing:.2em;text-transform:uppercase}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:8px;vertical-align:1px}
+.live .dot{background:var(--arcane);box-shadow:0 0 8px var(--arcane)}
+.lost .dot,.refused .dot,.locked .dot{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+
+/* Two panes */
+.grid{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);gap:22px;margin-top:22px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.drawer{border:1px solid var(--gold-lo);border-radius:6px;background:linear-gradient(180deg,rgba(28,22,18,.95),rgba(20,16,14,.95));padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+@media (min-width:821px){.drawer{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}}
+.drawer-head{display:flex;justify-content:space-between;align-items:baseline;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:10px}
+.drawer-head .n{font:500 12px var(--f-mono);color:var(--muted)}
+.files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.file{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:4px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+.file:hover{border-color:var(--gold-lo)}
+.file:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
+.file.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold-lo),0 0 18px rgba(134,228,255,.16)}
+.file .rune{font:22px/1 var(--f-rune);color:var(--gold);text-align:center}
+.file.on .rune{color:var(--arcane);text-shadow:0 0 10px var(--arcane)}
+.file .meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.file .ref{font:500 10.5px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file .t{font:400 16px/1.25 var(--f-display);letter-spacing:.03em;color:var(--text)}
+.chip{font:500 10px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;padding:4px 7px;border-radius:2px;white-space:nowrap}
+.chip.sealed{background:var(--velvet);color:var(--gold-hi);border:1px solid var(--velvet-hi)}
+.chip.filed{border:1px solid var(--gold-lo);color:var(--gold)}
+.chip.pushed{border:1px solid var(--arcane);color:var(--arcane);box-shadow:0 0 8px var(--arcane-soft)}
+.chip.new{background:var(--arcane);color:#062029}
+.empty{margin:0;color:var(--muted);font-size:15px}
+
+/* Buttons */
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 14px;border-radius:3px;
+  font:500 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--gold-lo);background:var(--panel-2);color:var(--gold-hi)}
+.btn:hover{border-color:var(--gold)}
+.btn:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.btn.brass{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 55%,#a97d34);color:var(--engrave);border-color:var(--gold-lo)}
+.btn.arcane{border-color:var(--arcane);color:var(--arcane);box-shadow:0 0 10px rgba(134,228,255,.18),inset 0 0 10px rgba(134,228,255,.08)}
+.btn.velvet{background:var(--velvet);border-color:var(--velvet-hi);color:var(--gold-hi)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.wide{width:100%}
+
+/* Game master strip above the window */
+.gm{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.state{font:500 12px/1.4 var(--f-mono);letter-spacing:.08em;color:var(--muted)}
+.state b{color:var(--gold-hi);font-weight:500}
+.note{border:1px dashed var(--gold-lo);background:rgba(107,18,32,.2);border-radius:4px;padding:12px 14px;font-size:15px}
+.note .eyebrow{color:var(--gold);display:block;margin-bottom:6px}
+.note p{margin:0 0 6px}
+
+/* Document window */
+.frame{position:relative;padding:3px;border-radius:9px;min-width:0;
+  background:linear-gradient(145deg,var(--gold-hi),var(--gold) 28%,var(--gold-lo) 58%,var(--gold) 84%,var(--gold-hi));
+  box-shadow:0 20px 50px rgba(0,0,0,.7),0 0 40px rgba(134,228,255,.06)}
+.win{position:relative;border-radius:7px;overflow:hidden;background:radial-gradient(130% 70% at 50% 0%,#211913,var(--panel) 62%)}
+.win::before{content:"";position:absolute;inset:46px 10px 10px;border:1px solid rgba(134,228,255,.2);border-radius:3px;pointer-events:none;
+  box-shadow:inset 0 0 14px rgba(134,228,255,.07),0 0 10px rgba(134,228,255,.08)}
+.titlebar{display:flex;align-items:center;gap:12px;min-height:36px;padding:7px 14px;background:linear-gradient(180deg,#2c2016,#18120d);border-bottom:1px solid var(--gold-lo);
+  font:500 11px/1.2 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.titlebar .runes{font-family:var(--f-rune);letter-spacing:.35em;color:var(--arcane);text-shadow:0 0 8px var(--arcane-soft);white-space:nowrap;overflow:hidden}
+.titlebar .tb{margin-left:auto;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.doc{position:relative;max-width:72ch;margin:0 auto;padding:clamp(24px,4.5vw,52px) clamp(22px,4.5vw,52px) clamp(28px,4vw,44px)}
+.stamp{display:inline-block;margin-bottom:16px;padding:6px 12px;font:500 11.5px/1.3 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-hi);
+  background:var(--velvet);border:1px solid var(--gold-lo);box-shadow:0 0 0 3px var(--velvet-lo)}
+.doc h2{margin:0 0 18px;font:400 clamp(26px,3.6vw,36px)/1.12 var(--f-display);letter-spacing:.04em;color:var(--gold-hi);text-wrap:balance;text-shadow:0 0 18px rgba(245,220,150,.12)}
+.hdr{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;margin:0 0 26px;padding:14px 0;border-block:1px solid var(--line)}
+.hdr dt{font:500 11px/1.9 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.hdr dd{margin:0}
+.body{font-size:18.5px;line-height:1.7}
+.body p{margin:0 0 1em}
+.body h3{margin:1.6em 0 .5em;font:400 19px/1.3 var(--f-display);letter-spacing:.06em;color:var(--gold)}
+.body h3::before{content:"ᛜ";font-family:var(--f-rune);color:var(--arcane);text-shadow:0 0 8px var(--arcane-soft);margin-right:10px}
+.body ul,.body ol{margin:0 0 1em;padding-left:1.4em}
+.body li{margin:.25em 0}
+.body li::marker{color:var(--gold)}
+.body blockquote{margin:1.1em 0;padding:12px 18px;border:1px solid rgba(134,228,255,.35);border-radius:3px;background:rgba(134,228,255,.05);
+  box-shadow:0 0 14px rgba(134,228,255,.1);font-style:italic;color:#e7f8ff}
+.body hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-lo),transparent);margin:1.6em 0}
+.body strong{color:var(--gold-hi);font-weight:600}
+.redact{display:inline-block;background:#000;color:#000;border-radius:1px;letter-spacing:-.05em;box-shadow:0 0 0 1px #2c2c2c;line-height:1.1;user-select:none}
+.kind-letter .body{font-style:italic;font-size:19.5px}
+.kind-log .body{font-family:var(--f-mono);font-size:15.5px;line-height:1.65;color:#d5eef6}
+.kind-log .body strong{color:var(--arcane)}
+figure{margin:0 0 24px;padding:8px;border:1px solid var(--gold-lo);background:#0c0a08;border-radius:3px}
+figure img{display:block;margin:0 auto;border-radius:2px}
+figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px;text-align:center}
+.attach{margin:0 0 24px}
+.eof{margin-top:30px;text-align:center;font:500 10.5px/1.4 var(--f-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.eof span{font-family:var(--f-rune);color:var(--arcane);letter-spacing:.4em;margin:0 10px}
+.rest{padding:clamp(36px,6vw,70px) 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.rest .lens{width:64px;height:64px}
+.rest h2{margin:6px 0 0;font:400 24px/1.2 var(--f-display);letter-spacing:.06em;color:var(--gold-hi)}
+.rest p{margin:0;max-width:44ch;color:var(--muted)}
+
+/* Editor */
+.editor .doc{max-width:none;display:flex;flex-direction:column;gap:14px}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+@media (max-width:560px){.fgrid{grid-template-columns:minmax(0,1fr)}}
+.editor label{display:flex;flex-direction:column;gap:6px;font:500 11px/1.3 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.editor label.check{flex-direction:row;align-items:center;gap:10px}
+.editor input,.editor select,.editor textarea{font:16px/1.5 var(--f-body);color:var(--text);background:#0e0b09;border:1px solid var(--line);border-radius:3px;padding:9px 10px;width:100%;letter-spacing:0;text-transform:none}
+.editor input[type=checkbox]{width:auto}
+.editor input[type=file]{font:13px var(--f-mono)}
+.editor textarea{resize:vertical}
+.editor input:focus,.editor select:focus,.editor textarea:focus{outline:none;border-color:var(--arcane);box-shadow:0 0 0 2px rgba(134,228,255,.2)}
+.hint{margin:-6px 0 0;font:13px/1.5 var(--f-mono);color:var(--muted)}
+.hint code{color:var(--gold-hi)}
+.msg{font:500 12px var(--f-mono);color:var(--warn)}
+
+/* Incoming push */
+.incoming{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;padding:24px;
+  background:radial-gradient(circle at 50% 45%,rgba(20,48,58,.75),rgba(5,4,3,.94) 60%);animation:fade .3s ease-out}
+@keyframes fade{from{opacity:0}}
+.ring{position:relative;width:190px;height:190px;animation:spin 6s linear infinite}
+.ring span{position:absolute;left:50%;top:50%;font:20px/1 var(--f-rune);color:var(--arcane);text-shadow:0 0 10px var(--arcane)}
+.ring .lens{position:absolute;inset:60px;width:auto;height:auto;animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.incoming .eyebrow{color:var(--arcane)}
+.incoming h2{margin:0;font:400 clamp(24px,4vw,34px)/1.2 var(--f-display);letter-spacing:.06em;color:var(--gold-hi);text-align:center;text-wrap:balance}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;padding:10px 16px;border:1px solid var(--gold-lo);border-radius:4px;
+  background:var(--panel-2);color:var(--gold-hi);font:500 12px var(--f-mono);letter-spacing:.1em;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+footer{margin-top:34px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:var(--muted);font:500 10.5px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:uppercase}
+footer .btn{padding:4px 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="traces" aria-hidden="true"></canvas>
+<div class="app">
+  <header class="plate">
+    <span class="rivets" aria-hidden="true"></span>
+    <span class="lens" aria-hidden="true"></span>
+    <div class="plate-text">
+      <span class="eyebrow">Arcane Marshals of Varenthal</span>
+      <h1>General Service Unit Seven</h1>
+      <span class="serial" aria-label="Serial G U S, the rest scratched away">Serial G·U·S <s>▒▒▒·▒▒</s> · Memory archive</span>
+    </div>
+    <div class="modes" id="modes" hidden role="group" aria-label="Screen mode">
+      <button type="button" data-a="mode" data-v="dm" id="m-dm">Game master</button>
+      <button type="button" data-a="mode" data-v="player" id="m-pl">Player view</button>
+    </div>
+  </header>
+  <div class="velvet" id="band" role="status"><span><span class="dot"></span>Connecting to the archive</span></div>
+  <main class="grid">
+    <aside class="drawer" id="list" aria-label="Files"></aside>
+    <section id="view" aria-live="polite"></section>
+  </main>
+  <footer>
+    <span>Property of the Arcane Marshals · Return to the Sanctuary</span>
+    <button type="button" class="btn ghost" data-a="lock">Lock this device</button>
+  </footer>
+</div>
+<div class="incoming" id="incoming" hidden role="alert"></div>
+<div class="toast" id="toast" hidden role="status"></div>
+<script>
+"use strict";
+const RELAY = (location.hostname === "localhost" && new URLSearchParams(location.search).get("relay"))
+  || "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws";
+const TYPES = ["image/png","image/jpeg","image/gif","image/webp","application/pdf"];
+const KIND = {
+  protocol:{label:"Protocol",rune:"ᛉ"}, letter:{label:"Letter",rune:"ᚹ"}, annex:{label:"Annex",rune:"ᚨ"},
+  log:{label:"System log",rune:"ᛜ"}, report:{label:"Report",rune:"ᚱ"}, image:{label:"Image",rune:"ᛟ"}, other:{label:"Document",rune:"ᛞ"}
+};
+const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
+const S = {view:"player", vault:{}, shelf:{}, signal:null, links:{}, sel:null, edit:null, busy:false,
+  confirm:null, link:"connecting", fails:0, primed:false};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e) { return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e) {} },
+  del(k){ try { localStorage.removeItem(k); } catch(e) {} }
+};
+const tab = {
+  get(k){ try { return sessionStorage.getItem(k); } catch(e) { return null; } },
+  set(k,v){ try { sessionStorage.setItem(k,v); } catch(e) {} }
+};
+
+/* Access links: #gm=<key> for the game master, #k=<key> for the player. Saved on this device, then cleared from the address bar. */
+(function readKeys(){
+  const p = new URLSearchParams(location.hash.slice(1));
+  if (p.get("gm")) store.set("gus-key-gm", p.get("gm"));
+  if (p.get("k")) store.set("gus-key-player", p.get("k"));
+  if (p.get("gm") || p.get("k")) history.replaceState(null, "", location.pathname + location.search);
+})();
+const gmKey = () => store.get("gus-key-gm");
+const playerKey = () => store.get("gus-key-player");
+function decideView(){ S.view = gmKey() && tab.get("gus-view") !== "player" ? "dm" : "player"; }
+const key = () => S.view === "dm" ? gmKey() : (playerKey() || gmKey());
+
+let seen;
+try { seen = new Set(JSON.parse(store.get("gus-seen") || "[]")); } catch(e) { seen = new Set(); }
+function markSeen(id){ if (!id || seen.has(id)) return; seen.add(id); store.set("gus-seen", JSON.stringify([...seen])); }
+
+async function api(method, path, body){
+  const headers = {"x-gus-key": key() || ""};
+  if (body !== undefined) headers["content-type"] = "application/json";
+  let r;
+  try { r = await fetch(RELAY + path, {method, headers, body: body === undefined ? undefined : JSON.stringify(body), cache:"no-store"}); }
+  catch(e) { throw {status:0, message:"The archive can't be reached. Check the connection."}; }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw {status:r.status, message: j.error === "locked" ? "This key was refused." : (j.error || "That did not go through. Try again.")};
+  return j;
+}
+
+const current = () => S.view === "dm" ? S.vault : S.shelf;
+function list(){
+  return Object.entries(current()).map(([id,d]) => ({id, ...d}))
+    .sort((a,b) => (a.order ?? 99) - (b.order ?? 99) || String(a.title).localeCompare(String(b.title)));
+}
+
+function apply(j){
+  const t = Date.now();
+  for (const [id,url] of Object.entries(j.links || {})) {
+    const c = S.links[id];
+    if (!c || t - c.t > 40 * 60e3) S.links[id] = {url, t};
+  }
+  S.shelf = j.shelf || {};
+  S.signal = j.signal || null;
+  if (j.vault) S.vault = j.vault.docs || {};
+  if (S.sel && !current()[S.sel]) S.sel = null;
+  maybeIncoming();
+}
+
+/* Polling: the player screen checks every 3 seconds, the game master every 5, both slower when the tab is hidden. */
+let timer = null, inflight = false;
+async function poll(){
+  clearTimeout(timer);
+  if (!key()) { S.link = "locked"; render(); return; }
+  if (!inflight) {
+    inflight = true;
+    try { apply(await api("GET", S.view === "dm" ? "/gm" : "/files")); S.link = "live"; S.fails = 0; }
+    catch(e) { S.link = (e.status === 401 || e.status === 403) ? "refused" : "lost"; S.fails++; }
+    finally { inflight = false; S.primed = true; render(); }
+  }
+  if (S.link === "refused") return;
+  const base = S.view === "dm" ? 5000 : 3000;
+  timer = setTimeout(poll, document.hidden ? 20000 : base * Math.min(4, 1 + Math.floor(S.fails / 2)));
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) poll(); });
+
+function maybeIncoming(){
+  const s = S.signal;
+  if (S.view !== "player" || !s || !S.shelf[s.id]) return;
+  const last = +(store.get("gus-signal") || 0);
+  if (!(s.at > last)) return;
+  store.set("gus-signal", String(s.at));
+  if (Date.now() - s.at > 15 * 60e3) return;
+  incoming(s.id);
+}
+function incoming(id){
+  const d = S.shelf[id] || {};
+  const n = 16;
+  const ring = Array.from({length:n}, (_,i) =>
+    `<span style="transform:translate(-50%,-50%) rotate(${i*360/n}deg) translateY(-84px)">${RUNES[i % RUNES.length]}</span>`).join("");
+  const el = $("#incoming");
+  el.innerHTML = `<div class="ring" aria-hidden="true">${ring}<span class="lens"></span></div>
+    <span class="eyebrow">Incoming file${d.ref ? " · " + esc(d.ref) : ""}</span><h2>${esc(d.title || "Untitled")}</h2>`;
+  el.hidden = false;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setTimeout(() => {
+    el.hidden = true;
+    S.sel = id; markSeen(id); render();
+    if (matchMedia("(max-width: 820px)").matches) $("#view").scrollIntoView({behavior: reduce ? "auto" : "smooth"});
+  }, reduce ? 700 : 2200);
+}
+
+let toastTimer;
+function toast(text){
+  const el = $("#toast"); el.textContent = text; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 2600);
+}
+
+/* Text format: blank line = new paragraph, ## heading, - list, 1. numbered list, > quoted line, --- divider, **bold**, *italic*, ||blacked out||. */
+function inline(s){
+  return esc(s)
+    .replace(/\|\|(.+?)\|\|/g, (m,t) => `<span class="redact" role="img" aria-label="blacked out">${"█".repeat(Math.min(40, Math.max(3, t.length)))}</span>`)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>");
+}
+function md(src){
+  const lines = String(src || "").replace(/\r/g, "").split("\n");
+  let out = "", para = [], open = null, m;
+  const endP = () => { if (para.length) { out += "<p>" + para.map(inline).join("<br>") + "</p>"; para = []; } };
+  const endL = () => { if (open) { out += `</${open}>`; open = null; } };
+  const item = (tag, text) => { endP(); if (open !== tag) { endL(); out += `<${tag}>`; open = tag; } out += `<li>${inline(text)}</li>`; };
+  for (const raw of lines) {
+    const l = raw.trimEnd();
+    if (!l.trim()) { endP(); endL(); }
+    else if ((m = l.match(/^##\s+(.*)/))) { endP(); endL(); out += `<h3>${inline(m[1])}</h3>`; }
+    else if (/^---+$/.test(l.trim())) { endP(); endL(); out += "<hr>"; }
+    else if ((m = l.match(/^>\s?(.*)/))) { endP(); endL(); out += `<blockquote>${inline(m[1])}</blockquote>`; }
+    else if ((m = l.match(/^[-*]\s+(.*)/))) item("ul", m[1]);
+    else if ((m = l.match(/^\d+[.)]\s+(.*)/))) item("ol", m[1]);
+    else { endL(); para.push(l); }
+  }
+  endP(); endL();
+  return out;
+}
+
+function chip(id){
+  if (S.view === "dm") {
+    if (S.signal && S.signal.id === id && S.shelf[id]) return '<span class="chip pushed">On screen</span>';
+    return S.shelf[id] ? '<span class="chip filed">Revealed</span>' : '<span class="chip sealed">Sealed</span>';
+  }
+  return seen.has(id) ? "" : '<span class="chip new">New</span>';
+}
+
+let lastList = "", lastView = "", lastBand = "";
+function paint(el, html, prev){ if (html !== prev) el.innerHTML = html; return html; }
+
+function render(){
+  const L = list();
+  if (!S.sel && L.length && !S.edit && matchMedia("(min-width: 821px)").matches) {
+    S.sel = S.view === "player" ? [...L].sort((a,b) => (b.revealedAt||0) - (a.revealedAt||0))[0].id : L[0].id;
+    if (S.view === "player") markSeen(S.sel);
+  }
+  const dm = S.view === "dm";
+  $("#modes").hidden = !gmKey();
+  $("#m-dm").classList.toggle("on", dm); $("#m-pl").classList.toggle("on", !dm);
+  $("#m-dm").setAttribute("aria-pressed", dm); $("#m-pl").setAttribute("aria-pressed", !dm);
+
+  const words = {connecting:"Connecting to the archive", live:"Archive link live", lost:"Archive link lost · retrying",
+    refused:"Access refused", locked:"Terminal locked"}[S.link];
+  const count = S.link === "live" ? `<span>${L.length} ${L.length === 1 ? "file" : "files"} ${dm ? "in the vault" : "on record"}</span>` : "";
+  const band = $("#band"); band.className = "velvet " + S.link;
+  lastBand = paint(band, `<span><span class="dot"></span>${words}</span>${count}${dm ? "<span>Game master</span>" : ""}`, lastBand);
+
+  let h = `<div class="drawer-head"><span class="eyebrow">${dm ? "All files" : "Files on record"}</span><span class="n">${L.length}</span></div>`;
+  if (dm && S.link === "live") h += `<button type="button" class="btn brass wide" data-a="new">New file</button>`;
+  if (S.link === "live" && !L.length) h += `<p class="empty">${dm ? "No files yet. Add the first one with New file." : "No files on record yet. When the game master gives Gus a document, it appears here."}</p>`;
+  if (L.length) h += `<ul class="files">${L.map(d => { const k = KIND[d.kind] || KIND.other; return `<li><button type="button" class="file${S.sel === d.id ? " on" : ""}" data-a="sel" data-id="${esc(d.id)}" aria-pressed="${S.sel === d.id}">
+    <span class="rune" aria-hidden="true">${k.rune}</span><span class="meta"><span class="ref">${esc(d.ref || k.label)}</span><span class="t">${esc(d.title || "Untitled")}</span></span>${chip(d.id)}</button></li>`; }).join("")}</ul>`;
+  lastList = paint($("#list"), h, lastList);
+
+  if (S.edit) return;
+  lastView = paint($("#view"), viewHTML(), lastView);
+}
+
+function rest(title, text){
+  return `<div class="frame"><div class="win"><div class="titlebar"><span class="runes" aria-hidden="true">ᚠᚢᚦᚨᚱᚲᚷᚹᚺ</span><span class="tb">GSU-7</span></div>
+    <div class="rest"><span class="lens" aria-hidden="true"></span><h2>${title}</h2><p>${text}</p></div></div></div>`;
+}
+
+function viewHTML(){
+  if (S.link === "locked") return rest("Terminal locked", "This terminal opens from its access link. Ask your game master for it.");
+  if (S.link === "refused") return rest("Access refused", "The key saved on this device was not accepted. Open the terminal again from its access link.");
+  if (!S.primed) return rest("Waking the archive", "Reading Gus's memory. This takes a moment.");
+  const d = S.sel && current()[S.sel];
+  if (!d) {
+    if (S.link === "lost") return rest("Archive link lost", "The terminal will keep trying. Files appear as soon as the link is back.");
+    return rest(S.view === "dm" ? "Choose a file" : "Awaiting files", S.view === "dm"
+      ? "Pick a file to read it, reveal it or push it to Gus's screen."
+      : "Pick a file to read it. New files open here the moment they arrive.");
+  }
+  return (S.view === "dm" ? gmStrip(S.sel, d) : "") + docHTML(d);
+}
+
+function when(ms){
+  if (!ms) return "";
+  return new Date(ms).toLocaleString("en-CA", {weekday:"short", hour:"numeric", minute:"2-digit"});
+}
+function gmStrip(id, d){
+  const pub = S.shelf[id];
+  const onScreen = S.signal && S.signal.id === id && pub;
+  const state = !pub ? "<b>Sealed.</b> Only you can see this file."
+    : onScreen ? `<b>On Gus's screen.</b> Pushed ${esc(when(S.signal.at))}`
+    : `<b>Revealed.</b> In Gus's files since ${esc(when(pub.revealedAt))}`;
+  const busy = S.busy ? ' aria-disabled="true"' : "";
+  return `<div class="gm"><span class="state">${state}</span><div class="ctl">
+    <button type="button" class="btn arcane" data-a="push" data-id="${esc(id)}"${busy}>Push to Gus's screen</button>
+    ${pub ? `<button type="button" class="btn" data-a="hide" data-id="${esc(id)}"${busy}>Take back</button>`
+          : `<button type="button" class="btn brass" data-a="reveal" data-id="${esc(id)}"${busy}>Reveal quietly</button>`}
+    <button type="button" class="btn" data-a="edit" data-id="${esc(id)}">Edit</button>
+    ${S.confirm === id ? `<button type="button" class="btn velvet" data-a="delete" data-id="${esc(id)}"${busy}>Tap again to delete</button>`
+                       : `<button type="button" class="btn ghost" data-a="delete" data-id="${esc(id)}">Delete</button>`}
+  </div>${d.note ? `<div class="note"><span class="eyebrow">Game master note · never shown to Gus</span>${md(d.note)}</div>` : ""}</div>`;
+}
+
+function assetHTML(a){
+  if (!a || !/^[a-f0-9]{32}$/.test(a.id || "")) return "";
+  const link = S.links[a.id];
+  if (!link) return `<p class="attach"><span class="state">Attachment loading</span></p>`;
+  if (String(a.type).startsWith("image/")) return `<figure><img src="${esc(link.url)}" alt="${esc(a.name || "Attached image")}"><figcaption>${esc(a.name || "Attachment")}</figcaption></figure>`;
+  return `<p class="attach"><a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">Open ${esc(a.name || "attachment")}</a></p>`;
+}
+
+function docHTML(d){
+  const k = KIND[d.kind] || KIND.other;
+  const row = (label, v) => v ? `<dt>${label}</dt><dd>${esc(v)}</dd>` : "";
+  return `<div class="frame"><article class="win kind-${esc(d.kind || "other")}">
+    <div class="titlebar"><span class="runes" aria-hidden="true">ᚠᚢᚦᚨᚱᚲᚷᚹᚺ</span><span class="tb">${esc(d.ref || k.label)}</span></div>
+    <div class="doc">
+      ${d.classification ? `<div class="stamp">${esc(d.classification)}</div>` : ""}
+      <h2>${esc(d.title || "Untitled")}</h2>
+      <dl class="hdr">${row("Type", k.label)}${row("From", d.from)}${row("To", d.to)}${row("Dated", d.date)}</dl>
+      ${assetHTML(d.asset)}
+      <div class="body">${md(d.body)}</div>
+      <div class="eof"><span aria-hidden="true">ᛟ</span>End of file<span aria-hidden="true">ᛟ</span></div>
+    </div></article></div>`;
+}
+
+function openEditor(id){
+  const d = id ? S.vault[id] : {kind:"report", order: list().length + 1};
+  S.edit = {id: id || null, asset: d.asset || null};
+  const v = f => esc(d[f] ?? "");
+  const opts = Object.entries(KIND).map(([k,o]) => `<option value="${k}"${d.kind === k ? " selected" : ""}>${o.label}</option>`).join("");
+  $("#view").innerHTML = `<div class="frame"><form class="win editor" id="ed" novalidate>
+    <div class="titlebar"><span class="runes" aria-hidden="true">ᚠᚢᚦᚨᚱᚲᚷᚹᚺ</span><span class="tb">${id ? "Edit file" : "New file"}</span></div>
+    <div class="doc">
+      <div class="fgrid">
+        <label>Title<input id="f-title" value="${v("title")}" autocomplete="off"></label>
+        <label>Reference<input id="f-ref" value="${v("ref")}" placeholder="Annex C · EP-07" autocomplete="off"></label>
+        <label>Type<select id="f-kind">${opts}</select></label>
+        <label>Classification stamp<input id="f-class" value="${v("classification")}" placeholder="Sealed · unit eyes only" autocomplete="off"></label>
+        <label>From<input id="f-from" value="${v("from")}" autocomplete="off"></label>
+        <label>To<input id="f-to" value="${v("to")}" autocomplete="off"></label>
+        <label>Dated<input id="f-date" value="${v("date")}" autocomplete="off"></label>
+        <label>Order in the list<input id="f-order" type="number" value="${v("order")}"></label>
+      </div>
+      <label>Text<textarea id="f-body" rows="16">${v("body")}</textarea></label>
+      <p class="hint">Blank line starts a paragraph · <code>## Heading</code> · <code>- item</code> · <code>1. step</code> · <code>&gt; quoted line</code> · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words)</p>
+      <label>Attachment: image or PDF, up to 20 MB<input id="f-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"></label>
+      ${d.asset ? `<label class="check"><input type="checkbox" id="f-noasset"> Remove ${esc(d.asset.name || "the attachment")}</label>` : ""}
+      <label>Game master note · never shown to Gus<textarea id="f-note" rows="4">${v("note")}</textarea></label>
+      <div class="ctl"><button type="submit" class="btn brass">Save file</button><button type="button" class="btn ghost" data-a="cancel">Cancel</button><span class="msg" id="f-msg"></span></div>
+    </div></form></div>`;
+  lastView = "";
+  $("#ed").addEventListener("submit", saveEdit);
+  $("#f-title").focus();
+}
+const setMsg = t => { const el = $("#f-msg"); if (el) el.textContent = t; };
+function slug(t){
+  const s = t.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s-]/g, "").trim().replace(/[\s-]+/g, "-").slice(0, 40).replace(/^-+|-+$/g, "");
+  return (s || "file") + "-" + Math.random().toString(36).slice(2, 6);
+}
+async function saveEdit(ev){
+  ev.preventDefault();
+  if (S.busy) return;
+  const g = id => document.getElementById(id);
+  const title = g("f-title").value.trim();
+  if (!title) { setMsg("Give the file a title."); g("f-title").focus(); return; }
+  S.busy = true; setMsg("Saving");
+  try {
+    const id = S.edit.id || slug(title);
+    let asset = S.edit.asset;
+    if (g("f-noasset") && g("f-noasset").checked) asset = null;
+    const f = g("f-file").files[0];
+    if (f) {
+      const type = f.type || (/\.pdf$/i.test(f.name) ? "application/pdf" : "");
+      if (!TYPES.includes(type)) throw {message:"Use a PNG, JPEG, GIF, WebP or PDF file."};
+      if (f.size > 20 * 1024 * 1024) throw {message:"That file is over 20 MB."};
+      setMsg("Uploading " + f.name);
+      const up = await api("POST", "/gm/upload", {type});
+      const r = await fetch(up.put, {method:"PUT", headers:{"content-type":type}, body:f}).catch(() => null);
+      if (!r || !r.ok) throw {message:"The upload failed. Try again."};
+      asset = {id: up.id, type, name: f.name};
+    }
+    const order = Number(g("f-order").value);
+    const doc = {title, ref:g("f-ref").value.trim(), kind:g("f-kind").value, classification:g("f-class").value.trim(),
+      from:g("f-from").value.trim(), to:g("f-to").value.trim(), date:g("f-date").value.trim(),
+      order: Number.isFinite(order) && g("f-order").value !== "" ? order : 99, body:g("f-body").value, note:g("f-note").value, asset};
+    const j = await api("PUT", "/gm/doc/" + id, doc);
+    S.edit = null; S.sel = id; apply(j); lastView = ""; toast("Saved.");
+  } catch(e) { setMsg(e.message || "Could not save. Try again."); }
+  finally { S.busy = false; render(); }
+}
+
+async function act(op, id){
+  if (S.busy) return;
+  S.busy = true; render();
+  try {
+    const j = op === "delete" ? await api("DELETE", "/gm/doc/" + id) : await api("POST", `/gm/${op}/${id}`, {});
+    if (op === "delete") S.sel = null;
+    apply(j);
+    toast({push:"Pushed to Gus's screen.", reveal:"Revealed. It is in Gus's files.", hide:"Taken back from Gus's files.", delete:"Deleted."}[op]);
+  } catch(e) { toast(e.message); }
+  finally { S.busy = false; S.confirm = null; render(); }
+}
+
+let confirmTimer;
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-a]");
+  if (!b) return;
+  const a = b.dataset.a, id = b.dataset.id;
+  if (a === "sel") {
+    S.sel = id; S.confirm = null; S.edit = null;
+    if (S.view === "player") markSeen(id);
+    render();
+    if (matchMedia("(max-width: 820px)").matches) $("#view").scrollIntoView({behavior:"smooth"});
+  } else if (a === "mode") {
+    tab.set("gus-view", b.dataset.v); decideView();
+    S.sel = null; S.edit = null; S.confirm = null; S.primed = false; S.link = "connecting"; lastView = ""; render(); poll();
+  } else if (a === "new") { S.sel = null; S.confirm = null; openEditor(null); render(); }
+  else if (a === "edit") { S.confirm = null; openEditor(id); }
+  else if (a === "cancel") { S.edit = null; lastView = ""; render(); }
+  else if (a === "delete") {
+    if (S.confirm === id) act("delete", id);
+    else { S.confirm = id; render(); clearTimeout(confirmTimer); confirmTimer = setTimeout(() => { S.confirm = null; render(); }, 4000); }
+  }
+  else if (a === "push" || a === "reveal" || a === "hide") act(a, id);
+  else if (a === "lock") {
+    store.del("gus-key-gm"); store.del("gus-key-player");
+    decideView(); S.vault = {}; S.shelf = {}; S.sel = null; S.edit = null; lastView = ""; poll(); toast("Locked. This device needs its access link again.");
+  }
+});
+
+/* Rune traces in the background: right-angled conduits with a pulse of light running along each. */
+(function traces(){
+  const c = $("#traces"), x = c.getContext("2d");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const G = 56; let W = 0, H = 0, paths = [];
+  function build(){
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight; c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr,0,0,dpr,0,0);
+    paths = [];
+    const n = Math.round(Math.min(18, W * H / 60000) + 4);
+    for (let i = 0; i < n; i++) {
+      let px = Math.round(Math.random() * W / G) * G, py = Math.round(Math.random() * H / G) * G, dir = Math.random() * 4 | 0;
+      const pts = [[px,py]], seg = []; let len = 0;
+      const steps = 5 + (Math.random() * 6 | 0);
+      for (let s = 0; s < steps; s++) {
+        const d = G * (1 + (Math.random() * 4 | 0));
+        if (dir === 0) px += d; else if (dir === 1) py += d; else if (dir === 2) px -= d; else py -= d;
+        pts.push([px,py]); seg.push(d); len += d;
+        dir = (dir + (Math.random() < .5 ? 1 : 3)) % 4;
+      }
+      paths.push({pts, seg, len, off: Math.random(), speed: .03 + Math.random() * .05});
+    }
+  }
+  function at(p, f){
+    let d = f * p.len;
+    for (let k = 0; k < p.seg.length; k++) {
+      if (d <= p.seg[k]) { const a = p.pts[k], b = p.pts[k+1], t = d / p.seg[k]; return [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t]; }
+      d -= p.seg[k];
+    }
+    return p.pts[p.pts.length - 1];
+  }
+  function draw(t){
+    x.clearRect(0, 0, W, H); x.lineWidth = 1;
+    for (const p of paths) {
+      x.strokeStyle = "rgba(134,228,255,0.075)"; x.beginPath();
+      p.pts.forEach((q,i) => i ? x.lineTo(q[0]+.5, q[1]+.5) : x.moveTo(q[0]+.5, q[1]+.5)); x.stroke();
+      x.fillStyle = "rgba(210,168,81,0.24)";
+      for (const q of p.pts) { x.beginPath(); x.arc(q[0]+.5, q[1]+.5, 2, 0, 7); x.fill(); }
+      if (!reduce) {
+        const [qx,qy] = at(p, ((t / 1000) * p.speed + p.off) % 1);
+        const g = x.createRadialGradient(qx, qy, 0, qx, qy, 14);
+        g.addColorStop(0, "rgba(170,236,255,0.55)"); g.addColorStop(1, "rgba(134,228,255,0)");
+        x.fillStyle = g; x.beginPath(); x.arc(qx, qy, 14, 0, 7); x.fill();
+      }
+    }
+  }
+  let last = 0;
+  function loop(t){ if (!document.hidden && t - last > 33) { draw(t); last = t; } requestAnimationFrame(loop); }
+  build();
+  addEventListener("resize", () => { build(); draw(performance.now()); });
+  if (reduce) draw(0); else requestAnimationFrame(loop);
+})();
+
+decideView();
+render();
+poll();
+</script>
+</body>
+</html>

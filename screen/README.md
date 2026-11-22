@@ -54,3 +54,30 @@ Single panels, one per 5e.tools Embed. Use these on a landscape screen:
 | Stat blocks | `#panel=stats` |
 | Sealed | `#panel=sealed` |
 | Stakes | `#panel=stakes` |
+
+## Gus's memory archive
+
+`gus.html` is a terminal for the documents Gus receives. You add files, keep them sealed, and reveal or push them during play. Shane reads them on his own device, and a pushed file opens on his screen within a few seconds.
+
+Address: https://alcubierrewarp.github.io/wilds-of-osse-homebrew/screen/gus.html
+
+The page itself holds no documents. They live in a private relay on AWS (`relay/gus/`, default profile, ca-central-1), which sends the player only what has been revealed. Game master notes and sealed files never leave the relay.
+
+Two access links open it, one for each role. The keys are in the macOS Keychain, never in this repository:
+
+| Who | Keychain service | Link |
+|---|---|---|
+| Game master | `osse-gus-gm` | address + `#gm=<key>` |
+| Shane | `osse-gus-player` | address + `#k=<key>` |
+
+A device remembers its key after the first visit, and the key leaves the address bar. "Lock this device" at the bottom forgets it. To replace both keys, run `relay/gus/deploy.sh --new-keys`, then send Shane his new link.
+
+| Button | What Shane sees |
+|---|---|
+| Push to Gus's screen | The file opens on his screen with an incoming-file signal |
+| Reveal quietly | The file joins his list, marked New |
+| Take back | The file leaves his list |
+
+In the text, `||words||` is blacked out, and the player's copy never holds the words. Attachments can be images or PDFs up to 20 MB.
+
+To test without AWS, start `relay/gus/mock.py` (the `gus-relay-mock` entry in `.claude/launch.json`) and open `http://localhost:8713/gus.html?relay=http://localhost:8714#gm=test-gm`.
