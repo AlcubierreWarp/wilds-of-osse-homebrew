@@ -78,6 +78,8 @@ A device remembers its key after the first visit, and the key leaves the address
 | Reveal quietly | The file joins his list, marked New |
 | Take back | The file leaves his list |
 
+Emergency protocols (files of the Emergency protocol type) sit on their own Emergency tab in the file list. On Gus's screen that tab glows bright red while a protocol he has not opened is waiting; pushing one switches him to it. Everything else is on the Files tab.
+
 Every file is laid out as letter-sized Marshal pages modelled on the handouts: field manual chapters get the chapter block, annexes the file grid, emergency protocols the oxblood band and numbered steps. The Open PDF button at the top opens the attached PDF, or, when there is none, builds a PDF of the pages in the browser and downloads it (html2canvas and jsPDF, loaded on first use; the print dialog is the fallback if they cannot load). The editor's hint lists the markup (`**1.1 Title.**` rules, `## Field exercise`, `## Step 2 · …`, `[stamp: …]`, `---` for the footer, `[page]` for a new page).
 
 New documents written by Claude go in sealed through `relay/gus/add_doc.py` (see the `gus-document` skill): only the game master sees them until revealed or pushed at the table. In the text, `||words||` is blacked out, and the player's copy never holds the words. Attachments can be images or PDFs up to 20 MB.

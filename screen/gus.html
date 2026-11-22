@@ -85,6 +85,16 @@ img{max-width:100%}
 @media (min-width:821px){.drawer{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}}
 .drawer-head{display:flex;justify-content:space-between;align-items:baseline;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:10px}
 .drawer-head .n{font:500 12px var(--f-mono);color:var(--muted)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tab{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:8px;padding:10px 8px;border:1px solid var(--gold-lo);border-radius:4px;
+  font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);text-align:center}
+.tab .n{opacity:.75}
+.tab:hover{border-color:var(--gold)}
+.tab.on{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,#a97d34);color:var(--engrave);border-color:var(--gold-hi)}
+.tab.ep.on{background:linear-gradient(180deg,#9d2530,#6e1b20);color:#ffe7e2;border-color:#c8414c}
+.tab.alert{background:#e3202f;color:#fff;border-color:#ff7880;box-shadow:0 0 16px 3px rgba(255,38,54,.7);animation:alarm 1.3s ease-in-out infinite}
+@keyframes alarm{50%{background:#a3121d;box-shadow:0 0 5px 0 rgba(255,38,54,.35)}}
+.tab:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
 .files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .file{all:unset;box-sizing:border-box;cursor:pointer;width:100%;display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;
   border:1px solid var(--line);border-radius:4px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
@@ -367,7 +377,7 @@ const KIND = {
   log:{label:"System log",rune:"ᛜ"}, report:{label:"Report",rune:"ᚱ"}, image:{label:"Image",rune:"ᛟ"}, other:{label:"Document",rune:"ᛞ"}
 };
 const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
-const S = {view:"player", vault:{}, shelf:{}, signal:null, links:{}, sel:null, edit:null, busy:false,
+const S = {tab:"files", view:"player", vault:{}, shelf:{}, signal:null, links:{}, sel:null, edit:null, busy:false,
   confirm:null, link:"connecting", fails:0, primed:false};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -460,7 +470,7 @@ function incoming(id){
     `<span style="transform:translate(-50%,-50%) rotate(${i*360/n}deg) translateY(-84px)">${RUNES[i % RUNES.length]}</span>`).join("");
   const el = $("#incoming");
   el.innerHTML = `<div class="ring" aria-hidden="true">${ring}<span class="lens"></span></div>
-    <span class="eyebrow">Incoming file${d.ref ? " · " + esc(d.ref) : ""}</span><h2>${esc(d.title || "Untitled")}</h2>`;
+    <span class="eyebrow">${isEp(d) ? "Emergency protocol unsealed" : "Incoming file"}${d.ref && !isEp(d) ? " · " + esc(d.ref) : ""}</span><h2>${esc(d.title || "Untitled")}</h2>`;
   el.hidden = false;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   setTimeout(() => {
@@ -517,8 +527,13 @@ function chip(id){
 let lastList = "", lastView = "", lastBand = "";
 function paint(el, html, prev){ if (html !== prev) el.innerHTML = html; return html; }
 
+/* Emergency protocols sit on their own tab. It lights up red while one Gus has not opened yet. */
+const isEp = d => d && d.kind === "protocol";
 function render(){
-  const L = list();
+  const all = list();
+  const cur = S.sel && current()[S.sel];
+  if (cur && !S.edit) S.tab = isEp(cur) ? "ep" : "files";
+  const L = all.filter(d => isEp(d) === (S.tab === "ep"));
   if (!S.sel && L.length && !S.edit && matchMedia("(min-width: 821px)").matches) {
     S.sel = S.view === "player" ? [...L].sort((a,b) => (b.revealedAt||0) - (a.revealedAt||0))[0].id : L[0].id;
     if (S.view === "player") markSeen(S.sel);
@@ -530,13 +545,20 @@ function render(){
 
   const words = {connecting:"Connecting to the archive", live:"Archive link live", lost:"Archive link lost · retrying",
     refused:"Access refused", locked:"Terminal locked"}[S.link];
-  const count = S.link === "live" ? `<span>${L.length} ${L.length === 1 ? "file" : "files"} ${dm ? "in the vault" : "on record"}</span>` : "";
+  const count = S.link === "live" ? `<span>${all.length} ${all.length === 1 ? "file" : "files"} ${dm ? "in the vault" : "on record"}</span>` : "";
   const band = $("#band"); band.className = "velvet " + S.link;
   lastBand = paint(band, `<span><span class="dot"></span>${words}</span>${count}${dm ? "<span>Game master</span>" : ""}`, lastBand);
 
-  let h = `<div class="drawer-head"><span class="eyebrow">${dm ? "All files" : "Files on record"}</span><span class="n">${L.length}</span></div>`;
+  const eps = all.filter(isEp), ep = S.tab === "ep";
+  const alert = !dm && eps.some(d => !seen.has(d.id));
+  let h = `<div class="tabs" role="group" aria-label="File sections">
+    <button type="button" class="tab${ep ? "" : " on"}" data-a="tab" data-v="files" aria-pressed="${!ep}">Files <span class="n">${all.length - eps.length}</span></button>
+    <button type="button" class="tab ep${ep ? " on" : ""}${alert ? " alert" : ""}" data-a="tab" data-v="ep" aria-pressed="${ep}"${alert ? ' aria-label="Emergency, unread protocol"' : ""}>⚠ Emergency <span class="n">${eps.length}</span></button></div>`;
+  h += `<div class="drawer-head"><span class="eyebrow">${ep ? "Emergency protocols" : dm ? "All files" : "Files on record"}</span><span class="n">${L.length}</span></div>`;
   if (dm && S.link === "live") h += `<button type="button" class="btn brass wide" data-a="new">New file</button>`;
-  if (S.link === "live" && !L.length) h += `<p class="empty">${dm ? "No files yet. Add the first one with New file." : "No files on record yet. When the game master gives Gus a document, it appears here."}</p>`;
+  if (S.link === "live" && !L.length) h += `<p class="empty">${ep
+    ? (dm ? "No emergency protocols yet. A file of the Emergency protocol type appears here." : "No emergency protocols on record. If one unseals, this tab lights up.")
+    : (dm ? "No files yet. Add the first one with New file." : "No files on record yet. When the game master gives Gus a document, it appears here.")}</p>`;
   if (L.length) h += `<ul class="files">${L.map(d => { const k = KIND[d.kind] || KIND.other; return `<li><button type="button" class="file${S.sel === d.id ? " on" : ""}" data-a="sel" data-id="${esc(d.id)}" aria-pressed="${S.sel === d.id}">
     <span class="rune" aria-hidden="true">${k.rune}</span><span class="meta"><span class="ref">${esc(d.ref || k.label)}</span><span class="t">${esc(d.title || "Untitled")}</span></span>${chip(d.id)}</button></li>`; }).join("")}</ul>`;
   lastList = paint($("#list"), h, lastList);
@@ -923,6 +945,10 @@ document.addEventListener("click", e => {
   }
   else if (a === "push" || a === "reveal" || a === "hide") act(a, id);
   else if (a === "print") downloadPdf(b);
+  else if (a === "tab") {
+    if (S.tab !== b.dataset.v) { S.tab = b.dataset.v; S.sel = null; S.confirm = null; S.edit = null; lastView = ""; }
+    render();
+  }
   else if (a === "lock") {
     store.del("gus-key-gm"); store.del("gus-key-player");
     decideView(); S.vault = {}; S.shelf = {}; S.sel = null; S.edit = null; lastView = ""; poll(); toast("Locked. This device needs its access link again.");
