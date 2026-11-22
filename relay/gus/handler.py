@@ -112,8 +112,8 @@ def clean(body):
 
 
 def black_out(text):
-    """||secret|| becomes a bar of the same length, so the player copy never holds the words."""
-    return re.sub(r"\|\|(.+?)\|\|", lambda m: "||" + "█" * min(40, max(3, len(m.group(1)))) + "||", text or "")
+    """||secret|| becomes bars with the same word breaks, so the player copy never holds the words."""
+    return re.sub(r"\|\|(.+?)\|\|", lambda m: "||" + (re.sub(r"\S", "█", m.group(1)[:400]) or "███") + "||", text or "")
 
 
 def public_copy(doc, revealed_at):

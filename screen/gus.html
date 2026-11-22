@@ -153,7 +153,7 @@ img{max-width:100%}
   box-shadow:0 0 14px rgba(134,228,255,.1);font-style:italic;color:#e7f8ff}
 .body hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-lo),transparent);margin:1.6em 0}
 .body strong{color:var(--gold-hi);font-weight:600}
-.redact{display:inline-block;background:#000;color:#000;border-radius:1px;letter-spacing:-.05em;box-shadow:0 0 0 1px #2c2c2c;line-height:1.1;user-select:none}
+.redact{background:#151413;color:#151413;padding:.05em .12em;border-radius:1px;-webkit-box-decoration-break:clone;box-decoration-break:clone;user-select:none}
 figure{margin:0 0 24px;padding:8px;border:1px solid var(--gold-lo);background:#0c0a08;border-radius:3px}
 figure img{display:block;margin:0 auto;border-radius:2px}
 figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px;text-align:center}
@@ -472,9 +472,11 @@ function toast(text){
 }
 
 /* Text format: blank line = new paragraph, ## heading, - list, 1. numbered list, > quoted line, --- divider, **bold**, *italic*, ||blacked out||. */
+/* A blacked-out passage keeps its word breaks, so the bar runs on in the line and wraps like the sentence it hides. */
+function bars(t){ const b = t.replace(/&[#a-z0-9]+;/gi, "x").slice(0, 400).replace(/\S/g, "█"); return b.length < 3 ? "███" : b; }
 function inline(s){
   return esc(s)
-    .replace(/\|\|(.+?)\|\|/g, (m,t) => `<span class="redact" role="img" aria-label="blacked out">${"█".repeat(Math.min(40, Math.max(3, t.length)))}</span>`)
+    .replace(/\|\|(.+?)\|\|/g, (m,t) => `<span class="redact" role="img" aria-label="blacked out">${bars(t)}</span>`)
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>");
 }
