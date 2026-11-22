@@ -59,8 +59,19 @@ h2 small{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:upp
   color:var(--gold-hi);background:#0b0908;border:1px solid var(--gold-lo);border-radius:4px}
 .lock input::placeholder{color:rgba(210,168,81,.3)}
 .msg{min-height:1.4em;margin:0;font:500 12px/1.4 var(--f-mono);letter-spacing:.06em;color:var(--bad)}
-.group{margin-top:22px}
-.group h3.g{margin:0 0 10px;font:500 12px/1.4 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.group{margin-top:14px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:0 14px}
+.group[open]{padding-bottom:14px}
+.group summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:13px 0}
+.group summary::-webkit-details-marker{display:none}
+.group summary::before{content:"▸";color:var(--gold);font-size:14px;transition:transform .15s}
+.group[open] summary::before{transform:rotate(90deg)}
+.group summary:focus-visible{outline:2px solid var(--arcane);outline-offset:2px;border-radius:3px}
+.gtext{margin:0 0 10px;color:var(--muted);font-size:15px}
+.cnote{flex-basis:100%;font-size:14px;color:var(--muted);font-style:italic}
+.code{margin-bottom:10px}
+.links li{display:flex;gap:8px;align-items:center}
+.links li a{flex:1;min-width:0}
+.group h3.g{margin:0;font:500 12px/1.4 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .links{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
 .links a{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 12px;border:1px solid transparent;border-radius:4px;text-decoration:none;color:var(--text);background:rgba(255,255,255,.025)}
 .links a:hover{border-color:var(--line);background:rgba(210,168,81,.06)}
@@ -81,7 +92,7 @@ footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-
   </header>
 
   <section aria-labelledby="players">
-    <h2 id="players">For the players <small>Links and codes</small></h2>
+    <h2 id="players">For the players <small>Where we play</small></h2>
     <div class="cards" id="player-cards"></div>
   </section>
 
@@ -104,7 +115,7 @@ footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-
     </div>
   </section>
 
-  <footer>Wilds of Ossë · homebrew for 5e.tools</footer>
+  <footer>Wilds of Ossë</footer>
 </div>
 
 <script>
@@ -113,25 +124,27 @@ footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-
    Codes are not: the player codes come from the Gus relay, so no code sits in this public repository. */
 const RAW = "https://raw.githubusercontent.com/AlcubierreWarp/wilds-of-osse-homebrew/main/wilds-of-osse.json";
 const PLAYER = [
-  {title: "Homebrew for 5e.tools", who: "Everyone",
-   text: "The campaign's creatures and items. In 5e.tools, open the Bestiary, choose Manage Homebrew, then Load from URL, and paste this address. Use the refresh button there after an update.",
-   copy: RAW},
+  {title: "D&D Beyond", who: "Everyone",
+   text: "Character sheets, spells and the campaign.", href: "https://www.dndbeyond.com/my-campaigns", open: "Open D&D Beyond"},
+  {title: "Roll20", who: "Everyone",
+   text: "The virtual table, maps and tokens.", href: "https://app.roll20.net/campaigns/search/", open: "Open Roll20"},
   {title: "Gus's memory archive", who: "Shane · Gus",
-   text: "Gus's documents from Marshal Intelligence. Open it on your own device and enter the code once.",
-   href: "screen/gus.html", open: "Open the archive", code: "gus"},
+   text: "Gus's documents from Marshal Intelligence. Open it on your own device and enter the code your game master gave you.",
+   href: "screen/gus.html", open: "Open the archive"},
 ];
+/* Game master groups. Sessions are folded except the newest; put a new session first. */
 const DM = [
-  {group: "Gus's memory archive", links: [
+  {group: "Gus's memory archive", id: "gus", links: [
     {label: "Game master view", href: "screen/gus.html", note: "opens unlocked", gm: true},
-  ]},
-  {group: "Session 13 · The Last Bell", links: [
+  ], code: {key: "gus", label: "Shane's code", note: "Give this to Shane. He enters it once on his device."}},
+  {group: "Session 13 · The Last Bell", id: "s13", session: true, links: [
     {label: "Whole screen", href: "screen/s13.html", note: "s13.html"},
     {label: "Tab 1 · Last Bell", href: "screen/s13.html#tab1", note: "movement 1"},
     {label: "Tab 2 · Aftermath", href: "screen/s13.html#tab2", note: "movements 2 and 3"},
     {label: "Tab 3 · Hard Out", href: "screen/s13.html#tab3", note: "movements 4 and 5"},
     {label: "iPad, landscape", href: "screen/s13.html#ipad", note: "tap only"},
   ]},
-  {group: "Session 12 · The Toast", links: [
+  {group: "Session 12 · The Toast", id: "s12", session: true, links: [
     {label: "All seven in one", href: "screen/all.html", note: "all.html"},
     {label: "Round clock", href: "screen/clock.html", note: "clock.html"},
     {label: "Champions", href: "screen/champions.html", note: "champions.html"},
@@ -141,10 +154,10 @@ const DM = [
     {label: "Initiative", href: "screen/initiative.html", note: "initiative.html"},
     {label: "Stat blocks", href: "screen/statblocks.html", note: "statblocks.html"},
   ]},
-  {group: "Homebrew", links: [
-    {label: "Combined file (raw link)", href: RAW, note: "wilds-of-osse.json"},
+  {group: "Homebrew for 5e.tools", id: "brew", links: [
+    {label: "Combined file (raw link)", href: RAW, note: "wilds-of-osse.json", copy: RAW},
     {label: "Repository on GitHub", href: "https://github.com/AlcubierreWarp/wilds-of-osse-homebrew", note: "source"},
-  ]},
+  ], text: "In 5e.tools: Bestiary, Manage Homebrew, Load from URL, then paste the raw link. Refresh there after an update."},
 ];
 
 const RELAY = (location.hostname === "localhost" && new URLSearchParams(location.search).get("relay"))
@@ -159,25 +172,36 @@ const store = {
 let codes = null;
 
 function playerCards(){
-  $("#player-cards").innerHTML = PLAYER.map((c, i) => `<article class="card">
+  $("#player-cards").innerHTML = PLAYER.map(c => `<article class="card">
     <span class="who">${esc(c.who)}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
-    ${c.copy ? `<div class="url">${esc(c.copy)}</div>` : ""}
-    ${c.code ? `<div class="code"><span class="k">Code</span><b>${esc(codes === null ? "…" : codes[c.code] || "Ask the game master")}</b>
-      ${codes && codes[c.code] ? `<button type="button" class="btn ghost small" data-copy="${esc(codes[c.code])}">Copy code</button>` : ""}</div>` : ""}
-    <div class="row">${c.href ? `<a class="btn" href="${esc(c.href)}">${esc(c.open || "Open")}</a>` : ""}
-      ${c.copy ? `<button type="button" class="btn${c.href ? " ghost" : ""}" data-copy="${esc(c.copy)}">Copy the address</button>` : ""}</div>
+    <div class="row"><a class="btn" href="${esc(c.href)}" target="_blank" rel="noopener">${esc(c.open || "Open")}</a></div>
   </article>`).join("");
 }
 
-async function loadCodes(){
-  try { const r = await fetch(RELAY + "/hub", {cache: "no-store"}); codes = r.ok ? ((await r.json()).codes || {}) : {}; }
+/* Player codes come from the Gus relay, only with the game master passcode, so none sits in this public repository. */
+async function loadCodes(code){
+  try { const r = await fetch(RELAY + "/hub", {headers: {"x-gus-key": code}, cache: "no-store"}); codes = r.ok ? ((await r.json()).codes || {}) : {}; }
   catch(e) { codes = {}; }
-  playerCards();
+  dmBody();
 }
 
+function folded(g, i){
+  const saved = store.get("osse-hub-open-" + g.id);
+  if (saved !== null) return saved === "0";
+  return g.session && DM.filter(x => x.session).indexOf(g) > 0;
+}
 function dmBody(){
-  $("#dm-body").innerHTML = DM.map(g => `<div class="group"><h3 class="g">${esc(g.group)}</h3><ul class="links">${g.links.map(l =>
-    `<li><a href="${esc(l.href)}"${l.gm ? ' data-gm="1"' : ""}${/^https?:/.test(l.href) ? ' target="_blank" rel="noopener"' : ""}>${esc(l.label)}<span>${esc(l.note || "")}</span></a></li>`).join("")}</ul></div>`).join("");
+  $("#dm-body").innerHTML = DM.map((g, i) => {
+    const code = g.code ? (codes === null ? "…" : codes[g.code.key] || "Not set") : "";
+    return `<details class="group" data-id="${esc(g.id)}"${folded(g, i) ? "" : " open"}><summary><h3 class="g">${esc(g.group)}</h3></summary>
+    ${g.text ? `<p class="gtext">${esc(g.text)}</p>` : ""}
+    ${g.code ? `<div class="code"><span class="k">${esc(g.code.label)}</span><b>${esc(code)}</b>
+      ${codes && codes[g.code.key] ? `<button type="button" class="btn ghost small" data-copy="${esc(codes[g.code.key])}">Copy code</button>` : ""}
+      <span class="cnote">${esc(g.code.note)}</span></div>` : ""}
+    <ul class="links">${g.links.map(l =>
+      `<li><a href="${esc(l.href)}" target="_blank" rel="noopener"${l.gm ? ' data-gm="1"' : ""}>${esc(l.label)}<span>${esc(l.note || "")}</span></a>
+      ${l.copy ? `<button type="button" class="btn ghost small" data-copy="${esc(l.copy)}">Copy</button>` : ""}</li>`).join("")}</ul></details>`;
+  }).join("");
 }
 
 /* Same code style as Gus's login: abcd efgh is read as ABCD-EFGH. */
@@ -191,8 +215,12 @@ async function check(code){
 }
 function showDm(on){
   $("#dm").hidden = !on; $("#dm-lock").hidden = on;
-  if (on) dmBody();
+  if (on) { codes = null; dmBody(); loadCodes(store.get("osse-hub-dm")); }
 }
+document.addEventListener("toggle", e => {
+  const d = e.target.closest && e.target.closest("details.group");
+  if (d) store.set("osse-hub-open-" + d.dataset.id, d.open ? "1" : "0");
+}, true);
 
 $("#dm-form").addEventListener("submit", async e => {
   e.preventDefault();
@@ -221,7 +249,6 @@ document.addEventListener("click", async e => {
 });
 
 playerCards();
-loadCodes();
 const saved = store.get("osse-hub-dm");
 if (saved) {
   showDm(true);

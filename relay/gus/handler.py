@@ -3,7 +3,7 @@
 Storage is one private S3 bucket:
   vault.json   every document, with game master notes (game master key only)
   public.json  revealed copies and the last push (player key or game master key)
-  hub.json     the player codes the table hub shows (public)
+  hub.json     the player codes the table hub shows to the game master
   assets/<id>  attachments, served through short-lived signed links
 
 Access keys are never stored here. SSM Parameter Store holds only their SHA-256 hashes.
@@ -146,14 +146,15 @@ def handler(event, _context):
     if method == "OPTIONS":
         return reply(204)
     parts = (event.get("rawPath") or "/").strip("/").split("/")
-    if method == "GET" and parts == ["hub"]:
-        # The table hub's player codes. Public on purpose: the hub shows them to the players.
-        return reply(200, load(HUB, {"codes": {}}))
-
     headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
     who = role(headers)
     if who is None:
         return reply(401, {"error": "locked"})
+    if method == "GET" and parts == ["hub"]:
+        # The player codes the table hub shows in its game master section.
+        if who != "gm":
+            return reply(403, {"error": "game master only"})
+        return reply(200, load(HUB, {"codes": {}}))
 
     pub = load(PUBLIC, {"rev": 0, "shelf": {}, "signal": None})
 

@@ -13,7 +13,7 @@ FN=osse-gus-relay
 ROLE=osse-gus-relay
 ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
 BUCKET="osse-gus-relay-$ACCOUNT"
-ORIGINS='["https://alcubierrewarp.github.io","http://localhost:8713"]'
+ORIGINS='["https://alcubierrewarp.github.io","https://osse.thomashuet.ca","http://localhost:8713","http://localhost:8715"]'
 
 if ! aws s3api head-bucket --bucket "$BUCKET" >/dev/null 2>&1; then
   aws s3api create-bucket --bucket "$BUCKET" --create-bucket-configuration LocationConstraint=$AWS_REGION >/dev/null
@@ -82,4 +82,7 @@ else
   aws lambda add-permission --function-name $FN --statement-id public-invoke --action lambda:InvokeFunction \
     --principal "*" --invoked-via-function-url >/dev/null
 fi
+aws lambda wait function-updated-v2 --function-name $FN
+aws lambda update-function-url-config --function-name $FN --cors \
+  "{\"AllowOrigins\":$ORIGINS,\"AllowMethods\":[\"GET\",\"PUT\",\"POST\",\"DELETE\"],\"AllowHeaders\":[\"content-type\",\"x-gus-key\"],\"MaxAge\":3600}" >/dev/null
 aws lambda get-function-url-config --function-name $FN --query FunctionUrl --output text
