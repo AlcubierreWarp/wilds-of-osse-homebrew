@@ -207,7 +207,7 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
 .m-band-meta dt{font-weight:700;text-transform:uppercase;color:#7b1f24}
 .m-band-meta dd{margin:0}
 .m-band-meta .m-status{grid-column:1/-1;margin-top:.3em;font:500 1.3em/1.2 var(--f-marshal);letter-spacing:.08em;text-transform:uppercase;color:#7b1f24}
-.m-hazard{height:.85em;margin-bottom:1.1em;background:repeating-linear-gradient(-58deg,#6e1b20 0 1.2em,var(--paper) 1.2em 2.4em);border-bottom:1px solid #6e1b20}
+.m-hazard{height:.85em;margin-bottom:1.1em;border-bottom:1px solid #6e1b20;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='12' viewBox='0 0 30 12' preserveAspectRatio='none'%3E%3Cpath d='M0 12L8 0H17L9 12z' fill='%236e1b20'/%3E%3C/svg%3E") 0 0/2.5em 100% repeat-x}
 .m-meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.05em 1em;margin:0 0 1em;font-size:.92em}
 .m-meta dt{font-weight:700;text-transform:uppercase;color:#7b1f24}
 .m-meta dd{margin:0}
@@ -278,6 +278,11 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
 .doc-tools{display:flex;justify-content:flex-end;max-width:820px;margin:-4px auto 12px}
 .btn.small{padding:6px 12px;font-size:10.5px}
 #print-root{display:none}
+#pdf-root{position:fixed;left:-12000px;top:0;width:816px;pointer-events:none}
+#pdf-root .m-pages{display:block;max-width:none;width:816px;margin:0}
+#pdf-root .redact{padding:.05em 0;border-radius:0}
+#pdf-root .m-chap{outline:0;margin:0;padding:3px;border:1px solid #1f2d45;background:#1f2d45 content-box;width:calc(7.4em + 8px);height:calc(7.4em + 8px)}
+#pdf-root .m-page{width:816px;height:1056px;aspect-ratio:auto;overflow:hidden;box-shadow:none;margin:0}
 @media print{
   @page{size:letter;margin:0}
   html,body{background:#fff!important}
@@ -728,7 +733,7 @@ function mHeader(d, pg, idx){
   let status = "";
   const lead = pg.lead.filter(l => { const s = unstar(l).match(/^status:\s*(.+?)\.?$/i); if (s) status = s[1]; return !s; });
   const meta = d.kind === "protocol"
-    ? `${row("Trigger", String(d.date || "").replace(/^trigger:\s*/i, ""))}${row("Recipient", d.to)}${row("Author", d.from)}${status ? `<dd class="m-status">Status: ${esc(status)}</dd>` : ""}`
+    ? `${row("Trigger", String(d.date || "").replace(/^trigger:\s*/i, "").replace(/^./, c => c.toUpperCase()))}${row("Recipient", d.to)}${row("Author", d.from)}${status ? `<dd class="m-status">Status: ${esc(status)}</dd>` : ""}`
     : `${row("Type", k.label)}${row("From", d.from)}${row("To", d.to)}${row("Dated", d.date)}`;
   return h + `<div class="m-band"><div><div class="m-band-eye">${d.kind === "protocol" ? "⚠ " : ""}${esc(refA)}</div><h2 class="m-band-title">${esc(d.title || "Untitled")}</h2></div>
     <dl class="m-band-meta">${meta}</dl></div><div class="m-hazard" aria-hidden="true"></div>
@@ -760,7 +765,50 @@ function docHTML(d){
     <div class="stage">${tool ? `<div class="doc-tools">${tool}</div>` : ""}${marshalPages(shown, !isPdf)}</div></article></div>`;
 }
 
-/* Open PDF for files without an attached PDF: print the Marshal pages, one letter page each, so the browser can save a PDF. */
+/* Open PDF for files without an attached PDF: draw each Marshal page at letter size and download them as one PDF.
+   The two libraries load on first use. If they cannot load, the browser's print dialog is the fallback. */
+const PDF_LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+                  "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"];
+let pdfLibs;
+function loadPdfLibs(){
+  pdfLibs = pdfLibs || Promise.all(PDF_LIBS.map(src => new Promise((ok, no) => {
+    const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = no; document.head.append(el);
+  }))).catch(e => { pdfLibs = null; throw e; });
+  return pdfLibs;
+}
+async function downloadPdf(btn){
+  const d = S.sel && current()[S.sel];
+  if (!d || btn.dataset.busy) return;
+  btn.dataset.busy = "1"; const label = btn.textContent; btn.textContent = "Making PDF";
+  const root = document.createElement("div"); root.id = "pdf-root";
+  try {
+    await loadPdfLibs();
+    root.innerHTML = marshalPages(d, !!(d.asset && String(d.asset.type).startsWith("image/")));
+    document.body.append(root);
+    /* The PDF maker cannot draw a background across a line break, so each word of a bar becomes its own piece. */
+    root.querySelectorAll(".redact").forEach(r => {
+      r.outerHTML = r.textContent.split(/(\s+)/).filter(Boolean)
+        .map(w => `<span class="redact${/\s/.test(w) ? " gap" : ""}">${/\s/.test(w) ? " " : w}</span>`).join("");
+    });
+    await document.fonts.ready;
+    await Promise.all([...root.querySelectorAll("img")].map(img => img.decode().catch(() => {})));
+    const pdf = new window.jspdf.jsPDF({unit: "in", format: "letter", orientation: "portrait", compress: true});
+    const pages = [...root.querySelectorAll(".m-page")];
+    for (let i = 0; i < pages.length; i++) {
+      const canvas = await html2canvas(pages[i], {scale: 2, backgroundColor: "#f3ebdc", useCORS: true, logging: false});
+      if (i) pdf.addPage("letter", "portrait");
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 8.5, 11);
+    }
+    pdf.save(("Gus Handout - " + (d.title || "Document")).replace(/[\\/:*?"<>|]+/g, "") + ".pdf");
+  } catch (e) {
+    toast("The PDF maker did not load. Opening the print dialog instead.");
+    printDoc();
+  } finally {
+    root.remove(); btn.textContent = label; delete btn.dataset.busy;
+  }
+}
+
+/* Fallback: print the Marshal pages, one letter page each. */
 function printDoc(){
   const d = S.sel && current()[S.sel];
   if (!d) return;
@@ -872,7 +920,7 @@ document.addEventListener("click", e => {
     else { S.confirm = id; render(); clearTimeout(confirmTimer); confirmTimer = setTimeout(() => { S.confirm = null; render(); }, 4000); }
   }
   else if (a === "push" || a === "reveal" || a === "hide") act(a, id);
-  else if (a === "print") printDoc();
+  else if (a === "print") downloadPdf(b);
   else if (a === "lock") {
     store.del("gus-key-gm"); store.del("gus-key-player");
     decideView(); S.vault = {}; S.shelf = {}; S.sel = null; S.edit = null; lastView = ""; poll(); toast("Locked. This device needs its access link again.");

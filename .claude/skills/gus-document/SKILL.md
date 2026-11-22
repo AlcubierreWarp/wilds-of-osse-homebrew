@@ -50,4 +50,4 @@ The four documents already in the archive are the best examples. A game master c
 3. File it for real: `/usr/bin/python3 -I relay/gus/add_doc.py <file>`. It reads the game master key from the Keychain itself. It refuses to change a document Gus can already see unless Tom asked for that change, in which case add `--update-revealed`.
 4. Tell Tom what the document is, that it is sealed in his archive, and when it is meant to be handed over. Point out any new canon it creates.
 
-`--pdf file.pdf` attaches a PDF copy, which the page's Open PDF button then opens. Without one, Open PDF prints the Marshal pages so the browser can save them as a PDF.
+`--pdf file.pdf` attaches a PDF copy, which the page's Open PDF button then opens. Without one, Open PDF builds a PDF of the Marshal pages in the browser and downloads it.
