@@ -33,7 +33,7 @@ VAULT, PUBLIC = "vault.json", "public.json"
 DOC_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,59}$")
 ASSET_ID = re.compile(r"^[a-f0-9]{32}$")
 TYPES = {"image/png", "image/jpeg", "image/gif", "image/webp", "application/pdf"}
-KINDS = {"protocol", "letter", "annex", "log", "report", "image", "other"}
+KINDS = {"manual", "protocol", "letter", "annex", "log", "report", "image", "other"}
 TEXT_LIMITS = {
     "title": 200, "ref": 120, "classification": 120, "from": 200, "to": 200,
     "date": 120, "body": 60000, "note": 20000,

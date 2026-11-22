@@ -78,6 +78,6 @@ A device remembers its key after the first visit, and the key leaves the address
 | Reveal quietly | The file joins his list, marked New |
 | Take back | The file leaves his list |
 
-In the text, `||words||` is blacked out, and the player's copy never holds the words. Attachments can be images or PDFs up to 20 MB.
+A file with a PDF attached shows the PDF itself, page by page, inside Gus's frame, with an Open the PDF button and a text version underneath. A file without one is laid out as Marshal paper. In the text, `||words||` is blacked out, and the player's copy never holds the words. Attachments can be images or PDFs up to 20 MB.
 
 To test without AWS, start `relay/gus/mock.py` (the `gus-relay-mock` entry in `.claude/launch.json`) and open `http://localhost:8713/gus.html?relay=http://localhost:8714#gm=test-gm`.

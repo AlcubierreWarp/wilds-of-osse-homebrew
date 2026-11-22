@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Runic&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Runic&family=Cinzel:wght@500;600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Layout: a brass nameplate over a red velvet band; the file drawer on the left, the document window on the right; one column on phones. */
 :root{
@@ -20,6 +20,10 @@
   --f-body:"Spectral",Georgia,"Times New Roman",serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
   --f-rune:"Noto Sans Runic","Segoe UI Historic","Apple Symbols",sans-serif;
+  /* The documents themselves are Arcane Marshal paper: parchment, oxblood, typewriter. */
+  --paper:#f3ebdc; --paper-2:#ebdfca; --paper-ink:#2a2420; --oxblood:#6e1b20; --paper-rule:#b8a688;
+  --f-marshal:"Cinzel","Marcellus SC",Georgia,serif;
+  --f-type:"Courier Prime","Courier New",Courier,monospace;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -145,15 +149,48 @@ img{max-width:100%}
 .body hr{border:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-lo),transparent);margin:1.6em 0}
 .body strong{color:var(--gold-hi);font-weight:600}
 .redact{display:inline-block;background:#000;color:#000;border-radius:1px;letter-spacing:-.05em;box-shadow:0 0 0 1px #2c2c2c;line-height:1.1;user-select:none}
-.kind-letter .body{font-style:italic;font-size:19.5px}
-.kind-log .body{font-family:var(--f-mono);font-size:15.5px;line-height:1.65;color:#d5eef6}
-.kind-log .body strong{color:var(--arcane)}
 figure{margin:0 0 24px;padding:8px;border:1px solid var(--gold-lo);background:#0c0a08;border-radius:3px}
 figure img{display:block;margin:0 auto;border-radius:2px}
 figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px;text-align:center}
 .attach{margin:0 0 24px}
 .eof{margin-top:30px;text-align:center;font:500 10.5px/1.4 var(--f-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 .eof span{font-family:var(--f-rune);color:var(--arcane);letter-spacing:.4em;margin:0 10px}
+/* Marshal paper inside Gus's window */
+.stage{position:relative;padding:clamp(16px,3.2vw,34px) clamp(12px,3.2vw,34px) clamp(20px,3.2vw,34px)}
+.sheet{max-width:820px;margin:0 auto;background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:clamp(18px,4vw,40px);
+  box-shadow:0 0 0 6px var(--paper),0 0 0 7px var(--paper-rule),0 14px 34px rgba(0,0,0,.55);font:15.5px/1.62 var(--f-type)}
+.sh-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:600 11px/1.4 var(--f-marshal);letter-spacing:.16em;text-transform:uppercase;color:var(--oxblood);padding-bottom:10px;border-bottom:1px solid var(--paper-rule)}
+.sh-head{display:flex;align-items:center;gap:14px;margin:16px 0}
+.sh-head svg{flex:none;width:46px;height:46px}
+.sh-org{font:600 20px/1.1 var(--f-marshal);letter-spacing:.12em;color:#26324a}
+.sh-dir{font:500 11.5px/1.4 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;color:#8a7f70}
+.sh-band{background:var(--oxblood);color:var(--paper);padding:14px 18px;margin:0 0 6px}
+.sh-band .sh-ref{display:block;font:600 11px/1.4 var(--f-marshal);letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+.sh-band h2{margin:4px 0 0;font:600 clamp(21px,3.2vw,28px)/1.15 var(--f-marshal);letter-spacing:.05em;color:var(--paper);text-wrap:balance}
+.sh-hazard{height:8px;margin-bottom:18px;background:repeating-linear-gradient(-55deg,var(--oxblood) 0 14px,var(--paper) 14px 28px);opacity:.85}
+.sh-meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 16px;margin:0 0 20px;font-size:14px}
+.sh-meta dt{font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--oxblood)}
+.sh-meta dd{margin:0}
+.sheet .body{font-size:15.5px;line-height:1.62}
+.sheet .body h3{margin:1.4em 0 .4em;font:600 14px/1.3 var(--f-marshal);letter-spacing:.12em;text-transform:uppercase;color:var(--oxblood)}
+.sheet .body h3::before{content:none}
+.sheet .body strong{color:var(--oxblood);font-weight:700}
+.sheet .body li::marker{color:var(--oxblood)}
+.sheet .body blockquote{background:#fbf6ec;border:1px solid var(--paper-rule);box-shadow:0 2px 6px rgba(60,40,20,.12);color:var(--paper-ink);font-style:italic}
+.sheet .body hr{background:var(--paper-rule)}
+.sheet figure{background:var(--paper-2);border-color:var(--paper-rule)}
+.sheet figcaption{color:#6d6355}
+.sh-foot{margin-top:26px;padding-top:10px;border-top:1px solid var(--paper-rule);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:#6d6355}
+.sheet.kind-letter .body{font-style:italic}
+.pdfpages{display:flex;flex-direction:column;align-items:center;gap:18px;min-height:120px}
+.pdfpages canvas{display:block;width:100%;max-width:820px;height:auto;background:var(--paper);box-shadow:0 0 0 1px var(--paper-rule),0 14px 34px rgba(0,0,0,.55)}
+.pdfpages .state{padding:40px 0}
+.pdf-tools{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:18px}
+.textver{max-width:820px;margin:18px auto 0}
+.textver summary{cursor:pointer;list-style:none;text-align:center;font:500 11.5px/1.4 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);padding:8px}
+.textver summary::-webkit-details-marker{display:none}
+.textver summary:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
+.textver[open] summary{margin-bottom:16px}
 .rest{padding:clamp(36px,6vw,70px) 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
 .rest .lens{width:64px;height:64px}
 .rest h2{margin:6px 0 0;font:400 24px/1.2 var(--f-display);letter-spacing:.06em;color:var(--gold-hi)}
@@ -219,13 +256,17 @@ footer .btn{padding:4px 0}
 </div>
 <div class="incoming" id="incoming" hidden role="alert"></div>
 <div class="toast" id="toast" hidden role="status"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+</script>
 <script>
 "use strict";
 const RELAY = (location.hostname === "localhost" && new URLSearchParams(location.search).get("relay"))
   || "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws";
 const TYPES = ["image/png","image/jpeg","image/gif","image/webp","application/pdf"];
 const KIND = {
-  protocol:{label:"Protocol",rune:"ᛉ"}, letter:{label:"Letter",rune:"ᚹ"}, annex:{label:"Annex",rune:"ᚨ"},
+  manual:{label:"Field manual",rune:"ᛗ"}, protocol:{label:"Protocol",rune:"ᛉ"}, letter:{label:"Letter",rune:"ᚹ"}, annex:{label:"Annex",rune:"ᚨ"},
   log:{label:"System log",rune:"ᛜ"}, report:{label:"Report",rune:"ᚱ"}, image:{label:"Image",rune:"ᛟ"}, other:{label:"Document",rune:"ᛞ"}
 };
 const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
@@ -347,8 +388,9 @@ function inline(s){
 }
 function md(src){
   const lines = String(src || "").replace(/\r/g, "").split("\n");
-  let out = "", para = [], open = null, m;
-  const endP = () => { if (para.length) { out += "<p>" + para.map(inline).join("<br>") + "</p>"; para = []; } };
+  let out = "", para = [], quote = [], open = null, m;
+  const endQ = () => { if (quote.length) { out += "<blockquote>" + quote.map(inline).join("<br><br>") + "</blockquote>"; quote = []; } };
+  const endP = () => { endQ(); if (para.length) { out += "<p>" + para.map(inline).join("<br>") + "</p>"; para = []; } };
   const endL = () => { if (open) { out += `</${open}>`; open = null; } };
   const item = (tag, text) => { endP(); if (open !== tag) { endL(); out += `<${tag}>`; open = tag; } out += `<li>${inline(text)}</li>`; };
   for (const raw of lines) {
@@ -356,10 +398,10 @@ function md(src){
     if (!l.trim()) { endP(); endL(); }
     else if ((m = l.match(/^##\s+(.*)/))) { endP(); endL(); out += `<h3>${inline(m[1])}</h3>`; }
     else if (/^---+$/.test(l.trim())) { endP(); endL(); out += "<hr>"; }
-    else if ((m = l.match(/^>\s?(.*)/))) { endP(); endL(); out += `<blockquote>${inline(m[1])}</blockquote>`; }
+    else if ((m = l.match(/^>\s?(.*)/))) { if (para.length) endP(); endL(); quote.push(m[1]); }
     else if ((m = l.match(/^[-*]\s+(.*)/))) item("ul", m[1]);
     else if ((m = l.match(/^\d+[.)]\s+(.*)/))) item("ol", m[1]);
-    else { endL(); para.push(l); }
+    else { endQ(); endL(); para.push(l); }
   }
   endP(); endL();
   return out;
@@ -402,6 +444,7 @@ function render(){
 
   if (S.edit) return;
   lastView = paint($("#view"), viewHTML(), lastView);
+  mountPdf();
 }
 
 function rest(title, text){
@@ -452,20 +495,92 @@ function assetHTML(a){
   return `<p class="attach"><a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">Open ${esc(a.name || "attachment")}</a></p>`;
 }
 
-function docHTML(d){
+const SEAL = `<svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="#26324a" stroke-width="1.6"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="24" r="16.5" stroke-width="1"/>
+  <path d="M24 3v5M24 40v5M3 24h5M40 24h5M9.2 9.2l3.5 3.5M35.3 35.3l3.5 3.5M38.8 9.2l-3.5 3.5M12.7 35.3l-3.5 3.5" stroke-width="1.2"/>
+  <path d="M12 24c4-6 20-6 24 0-4 6-20 6-24 0z"/></g><circle cx="24" cy="24" r="4.2" fill="#26324a"/><circle cx="25.4" cy="22.8" r="1.2" fill="#f3ebdc"/></svg>`;
+
+function sheetHTML(d, withImage){
   const k = KIND[d.kind] || KIND.other;
   const row = (label, v) => v ? `<dt>${label}</dt><dd>${esc(v)}</dd>` : "";
-  return `<div class="frame"><article class="win kind-${esc(d.kind || "other")}">
-    <div class="titlebar"><span class="runes" aria-hidden="true">ᚠᚢᚦᚨᚱᚲᚷᚹᚺ</span><span class="tb">${esc(d.ref || k.label)}</span></div>
-    <div class="doc">
-      ${d.classification ? `<div class="stamp">${esc(d.classification)}</div>` : ""}
-      <h2>${esc(d.title || "Untitled")}</h2>
-      <dl class="hdr">${row("Type", k.label)}${row("From", d.from)}${row("To", d.to)}${row("Dated", d.date)}</dl>
-      ${assetHTML(d.asset)}
-      <div class="body">${md(d.body)}</div>
-      <div class="eof"><span aria-hidden="true">ᛟ</span>End of file<span aria-hidden="true">ᛟ</span></div>
-    </div></article></div>`;
+  return `<div class="sheet kind-${esc(d.kind || "other")}">
+    <div class="sh-top"><span>Construct eyes only</span><span>${esc(d.classification || "")}</span></div>
+    <div class="sh-head">${SEAL}<div><div class="sh-org">Arcane Marshals</div><div class="sh-dir">Marshal Intelligence · Construct Directorate</div></div></div>
+    <div class="sh-band"><span class="sh-ref">${esc(d.ref || k.label)}</span><h2>${esc(d.title || "Untitled")}</h2></div>
+    <div class="sh-hazard" aria-hidden="true"></div>
+    <dl class="sh-meta">${row("Type", k.label)}${row("From", d.from)}${row("To", d.to)}${row("Dated", d.date)}</dl>
+    ${withImage ? assetHTML(d.asset) : ""}
+    <div class="body">${md(d.body)}</div>
+    <div class="sh-foot"><span>Property of the Arcane Marshals</span><span>End of file</span></div>
+  </div>`;
 }
+
+function docHTML(d){
+  const k = KIND[d.kind] || KIND.other;
+  const a = d.asset;
+  const isPdf = a && a.type === "application/pdf" && /^[a-f0-9]{32}$/.test(a.id || "");
+  let inner;
+  if (isPdf) {
+    const link = S.links[a.id];
+    inner = `<div class="pdfpages" data-asset="${esc(a.id)}"><p class="state">Unfolding the document</p></div>
+      ${link ? `<div class="pdf-tools"><a class="btn" href="${esc(link.url)}" target="_blank" rel="noopener">Open the PDF</a></div>` : ""}
+      ${d.body ? `<details class="textver"><summary>Read it as text</summary>${sheetHTML(d, false)}</details>` : ""}`;
+  } else {
+    inner = sheetHTML(d, true);
+  }
+  return `<div class="frame"><article class="win">
+    <div class="titlebar"><span class="runes" aria-hidden="true">ᚠᚢᚦᚨᚱᚲᚷᚹᚺ</span><span class="tb">${esc(d.ref || k.label)}</span></div>
+    <div class="stage">${inner}</div></article></div>`;
+}
+
+/* PDFs render page by page with PDF.js, sized to the window and kept between repaints. */
+const pdfDocs = new Map(), pdfJobs = new Map();
+function renderPdf(aid, url, width){
+  const key = aid + "@" + width;
+  if (pdfJobs.has(key)) return pdfJobs.get(key);
+  const job = (async () => {
+    let docJob = pdfDocs.get(aid);
+    if (!docJob) {
+      docJob = pdfjsLib.getDocument({url, disableRange:true, disableStream:true, isEvalSupported:false}).promise;
+      pdfDocs.set(aid, docJob);
+    }
+    const doc = await docJob.catch(e => { pdfDocs.delete(aid); throw e; });
+    const dpr = Math.min(2.5, devicePixelRatio || 1), pages = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const vp = page.getViewport({scale: width / page.getViewport({scale:1}).width * dpr});
+      const c = document.createElement("canvas");
+      c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+      c.setAttribute("role", "img"); c.setAttribute("aria-label", `Page ${i} of ${doc.numPages}`);
+      await page.render({canvasContext: c.getContext("2d"), viewport: vp}).promise;
+      pages.push(c);
+    }
+    return pages;
+  })();
+  pdfJobs.set(key, job);
+  job.catch(() => pdfJobs.delete(key));
+  return job;
+}
+async function mountPdf(){
+  const box = document.querySelector(".pdfpages");
+  if (!box) return;
+  const aid = box.dataset.asset, link = S.links[aid];
+  if (!link || !box.clientWidth) return;
+  const width = Math.min(820, Math.ceil(box.clientWidth / 100) * 100);
+  const key = aid + "@" + width;
+  if (box.dataset.mounted === key) return;
+  box.dataset.mounted = key;
+  if (!window.pdfjsLib) { box.innerHTML = '<p class="state">The PDF viewer did not load. Use Open the PDF.</p>'; return; }
+  try {
+    const pages = await renderPdf(aid, link.url, width);
+    const now = document.querySelector(".pdfpages");
+    if (now && now.dataset.asset === aid && now.dataset.mounted === key) now.replaceChildren(...pages);
+  } catch(e) {
+    box.dataset.mounted = "";
+    box.innerHTML = '<p class="state">This PDF could not be shown here. Use Open the PDF.</p>';
+  }
+}
+let resizeTimer;
+addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(mountPdf, 250); });
 
 function openEditor(id){
   const d = id ? S.vault[id] : {kind:"report", order: list().length + 1};
