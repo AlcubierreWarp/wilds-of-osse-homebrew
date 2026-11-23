@@ -1,0 +1,86 @@
+# The Ossë vault
+
+The Ossë vault is the knowledge graph for the Wilds of Ossë campaign. It is an Obsidian vault in iCloud (`~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Ossë`). It records what has happened at the table and holds ideas for what might happen next. Tom is the DM and reads it in Obsidian. Claude keeps it up to date, working from this repo, which holds the vault's tools, rules and skills. Format version 2 (22 Nov 2026).
+
+**The vault is DM-only.** It holds secrets and plans the players must never see. This repo is public. Never copy vault content into the repo, a commit, an issue or any other public place. Examples in these docs are made up. The one exception is the vault's `Chronicle/` folder, which is written for the players and published by `tools/chronicle.py export`.
+
+| Doc | Read it when |
+| --- | --- |
+| this page | always: layers, lookup, layout, writing |
+| [notes.md](notes.md) | writing or changing an entity, link, secret, thread or session note |
+| [plans.md](plans.md) | writing a plan or reading why the build pruned one |
+| [maps.md](maps.md) | touching `Atlas/` or the Leaflet maps |
+| [vocabulary.md](vocabulary.md) | the standard term behind each type, property and link (generated) |
+
+## Look things up cheaply
+Run these first. They print compact text, so you rarely need to open the notes themselves.
+
+| Command | Gives |
+| --- | --- |
+| `python3 tools/osse/osse.py brief` | the last session, what is open going into the next, plans aimed at it, open threads |
+| `python3 tools/osse/osse.py card "Mira Holt"` | one entry: facts, Now, DM notes, strongest current links, recent log (`--full` for the whole note) |
+| `python3 tools/osse/osse.py find bell` | names, aliases and summaries (`--body` also searches note text) |
+| `python3 tools/osse/osse.py plans` | live plans by target (`--checks`: only the judgment calls) |
+| `python3 tools/osse/osse.py walk "Mira Holt" --at S7` | the full graph walk; see `tools/osse/graph.py` for `--history`, `--no-prep`, `--plans`, `--path A B` |
+
+Open a note only to edit it or when the card is not enough. `Index.md` (one line per note) is large: use `find` instead.
+
+**After any change**, run `python3 tools/osse/build.py`. It rebuilds the generated files in the vault (`Index.md`, `Plan board.md`, `Glossary.md`, `Map.canvas`, `.osse/graph.json`), prunes plans whose requirements failed, checks every type against `tools/osse/vocab.py`, and prints problems. Fix every problem before you finish. `--dry` writes nothing. Never edit the generated files by hand.
+
+## The three layers of truth
+
+| Layer | What it is | Marked by |
+| --- | --- | --- |
+| **Canon** | Came out in actual play, as a session summary or transcript records it | a session stamp: `S5`, `S5 →`, `S3 → S9`, `*(S5)*` |
+| **Prep** | Everything else Tom has decided: trackers, backstories, setting, secrets, NPCs not yet met | `prep` on a link, `*(prep)*` on a fact, `stage: prep` on a note |
+| **Draft** | An idea for the future. Never binding | plan notes only; `stage: draft` |
+
+**Canon has one source: actual play.** Notion trackers, backstories, session plans and DM notes are prep, however settled, until play shows them.
+
+**Precedence, highest first:**
+1. **Tom's ruling.** What Tom says happened at the table is canon, over the summary and transcript. His word about anything else is prep.
+2. **Canon.** A later session beats an earlier one. Play beats prep.
+3. **Prep.** Prep that canon contradicts is a **conflict**: show Tom both versions and ask. Never resolve it alone.
+4. **Draft.** Drafts never constrain anything. When play makes a plan impossible, the build prunes it.
+
+So: entity notes hold only canon and prep (a future idea goes in a plan that links to the entities), and a played plan is never copied into canon (canon is written from what happened; the plan is marked `played`).
+
+## Layout
+
+| Folder | `type` | Holds |
+| --- | --- | --- |
+| `Sessions/` | session | one note per played session: `S4 - The Drowned Bell` |
+| `Characters/` | pc, party | player characters, allied party members, and the hub `The Party` |
+| `People/` | npc | every named non-player character |
+| `Factions/` | faction | houses, guilds, gangs, orders, governments, peoples |
+| `Places/` | place | regions, cities, districts, buildings, ships used as places |
+| `Things/` | item | artifacts, weapons, documents, constructs, ships as objects |
+| `Lore/` | lore | history, religion, magic, customs, songs, in-world terms |
+| `Secrets/` | secret | one note per hidden truth the party could uncover |
+| `Threads/` | thread | open mysteries, quests, debts and promises the party knows about |
+| `Plans/` | plan | draft ideas for future sessions |
+| `Chronicle/` | chronicle | the players' chronicle; see the `chronicle` skill. Only what the table saw, in player words |
+| `Atlas/` | | Leaflet maps and their images; see [maps.md](maps.md) |
+
+Also in the vault: `Home.md` (dashboard), `Relationship types.md` (every allowed link type), `Bases/` (saved views), `Templates/` (blank shapes Tom inserts by hand; never index, link or fill them), `.osse/` (`graph.json` and two small scripts that forward to this repo's tools). Never touch `.obsidian/` unless Tom asks.
+
+A new folder needs at least three notes that fit no existing kind. Add it here, to `ORDER` in `tools/osse/build.py`, and to `TYPES` in `tools/osse/vocab.py` in the same change.
+
+## Standard terms
+Every type, kind, property and link type maps to a standard term in `tools/osse/vocab.py`, the same way Tom's Brain vault does. The world is treated as real: a person is `schema:Person`, a city `schema:City`, with no "fictional" tag. Order of preference: the most specific Schema.org term, then FOAF Relationship (`rel:`), XFN, SKOS or PROV-O, then an `osse:` term with a standard parent, only for magic (spells, gods, planes) and the game layer (sessions, layers, secrets, plans). Never invent another prefix. The build flags any type or link type with no term; add it to `vocab.py`, run `python3 tools/osse/vocab.py --check --md`, and commit. The vault stays separate from Brain.
+
+## Time is measured in sessions
+- Session stamps name played sessions only: `S1` onward, each with a note in `Sessions/`. There is no `S0`. Backstory is prep until it comes out in play; then it takes that session (`S5 →` reads "true, as far as the table knows, since S5").
+- The **current session** is the highest-numbered session note with `status: played`.
+- In-world dates are optional: a session's `in_world` property or a note line, never in place of a stamp.
+
+## Before a session
+Mark the plans Tom will use as `ready` and give them `target`. The build lists them on the board and on `Home.md`. The game master screen pages in `screen/` are built from the session plan (see the `session-screen` skill); the vault is where to look up who and what is involved.
+
+## After a session
+Follow the `post-session` skill in `.claude/skills/`.
+
+## Writing
+- Plain, direct Canadian English. No em dashes. No "it's not X, it's Y".
+- Terse. The vault jogs Tom's memory at the table; it does not retell sessions.
+- Write vault files with a short script; never re-type an existing file from tool output. Never delete or rename notes; fix them in place. If a name changes, keep the file and add the old name to `aliases`.
