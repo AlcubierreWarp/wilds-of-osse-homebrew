@@ -1,9 +1,28 @@
 ---
 name: paths
-description: Bring Tom's Paths ahead planning boards into the Ossë vault. Use when Tom asks to read, sync, formalize or "bring in" the board, the paths, his branches or the cards he added on the Paths ahead page.
+description: Draft onto Tom's Paths ahead planning boards from a brain dump, clean up what is on them, or bring them into the Ossë vault. Use when Tom brain dumps scenes, decisions, beats or a session framework, asks to build out, tidy or fix something on Paths ahead, or asks to read, sync, formalize or "bring in" the board, the paths, his branches or the cards he added.
 ---
 
-# Bring the Paths ahead boards into the vault
+# Work on the Paths ahead boards
+
+| Tom asks for | Do |
+| --- | --- |
+| A brain dump turned into cards, or something built out, tidied, linked or fixed on the page | **Draft on the boards** (below). Nothing goes into the vault |
+| The board brought into the vault | Steps 1 to 4 |
+
+## Draft on the boards
+1. **Read.** `python3 tools/osse/paths_sync.py board S14` (no session for all) prints what is there with its ids. `python3 tools/osse/osse.py brief`, then `card` for each person, place and secret involved. Read the live plans on the same subject (`osse.py plans`): place an existing plan rather than writing a card that repeats it.
+2. **Write a draft file** in the scratchpad, never in the repo. The format is at the top of `tools/osse/paths_draft.py`: `cards` (scenes hold their own), `place`, `links`, `edit`, `relabel`, `unlink`, `remove`, `order`.
+   - Tom's words and ideas lead. Build out what he gave; mark anything you add beyond it when you show the outline, and ask about gaps that change the story instead of filling them.
+   - Scenes set the stage (where, who is present). Beats are one exchange each. Every decision has two or three options, each a link labelled with the choice; two choices may lead to the same card. Bring branches back together (`docs/osse/branching.md`).
+   - Card text is a line or two in table-ready words, to run from. Titles are short and never repeat a plan's name. Never contradict canon; never write a secret as known to a player character who does not know it.
+   - A clean-up edits Tom's cards in place (`edit`, `relabel`) and keeps his meaning. Remove a card only when he agreed to it.
+3. **Preview.** `python3 tools/osse/paths_sync.py draft FILE` checks it and prints the outline. Fix what it lists. Show Tom the outline, phone-sized, with your additions and questions. Wait for his yes.
+4. **Write.** The same with `--write`. It refuses if Tom changed the boards since the preview: preview again and check that it still fits. An open page picks the draft up within 20 seconds. The cards read "Claude's draft" until Tom changes them, then "yours".
+5. **Undo.** `python3 tools/osse/paths_sync.py undraft` says what it would take off, keeping what Tom changed since; add `--write` to do it. The last 20 drafts are kept in the vault's `.osse/paths-drafts/`.
+6. Report what is on which boards, and what is still open. Bring nothing into the vault unless he asks.
+
+# Bring the boards into the vault
 
 Tom plans on the Paths ahead page (`vault/paths.html`): one tab per session; he places plans on a session's canvas, draws links, adds, edits and deletes cards, and drops plans. The page saves to the Gus relay; the vault does not change until this skill runs. Rules: `docs/osse/branching.md` and `docs/osse/plans.md`.
 

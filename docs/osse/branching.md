@@ -35,6 +35,7 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | **Session plan** | The first button above the boards. Per session, its scenes as small cards in running order: drag one by its ⠿ to move it, or onto another session's tab. + Scene (or Add a scene) starts a new one; + Players on a scene adds or removes players, and the scene appears on or leaves their boards to match; + Card adds a card inside. So a session can be built scenes first. Tap a scene to list its cards as a tree: each sits under the card whose arrow leads to it. Drag a card onto another to make it follow that one (onto a decision, it becomes an option and asks for the choice), between two to sit beside them, onto a scene to add it there, or back to "Not in a scene". Arrows and places on the canvas follow, and a card with others under it takes them along. Drag in plans not placed yet from the list on the right. Tap a card to open its panel. Name pills use the session screens' colours (filled: listed as present; outlined: on their board only); tap one to open the scene on that board | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
 | **Zoom** | + and − at the top right of the canvas, beside Fit and Key; also pinch or Command-scroll | |
 | **Tom's own cards** | New ideas drawn on the board | Become plan notes when Tom asks (the `paths` skill) |
+| **Claude's drafts** | Tom brain dumps in a session of this repo, or asks for a clean-up; Claude shows an outline, then puts scenes, cards and links on the boards. Cards say "Claude's draft" until Tom changes them, and a whole draft can be taken back off | Nothing until Tom asks (the `paths` skill) |
 | **Edits** | Tom changes a plan's kind, summary or idea on the board, or leaves Claude a note. The card says "edited · not in vault" | Written into the plan note when Tom asks; the plan keeps its name |
 | **Deleting** | The × on a card takes a plan back to the tray, or deletes Tom's own card. Drop this plan (in its panel) removes it from the board and the tray | A dropped plan gets `status: dropped` when Tom asks |
 
@@ -96,6 +97,7 @@ Each option leads to a plan note; several options may lead to the same one, one 
 
 ## Rules
 - The board never changes the vault. Tom's placing, linking and cards wait on the Gus relay (`paths.json`: one store of `items`, `cards`, `edits`, `edges` and `order`, plus each board as JSON Canvas 1.0 under `lanes`; game master only) until Tom asks Claude to bring them in (the `paths` skill).
+- The page looks for changes every 20 seconds and before every save, and merges them record by record, so a draft from a session and Tom's own changes (on any device) both survive. Where both changed the same thing, the page's change wins.
 - Nothing on the board is canon. The Now card is canon (it reads stamped lines and the sheet values the post-session sync records).
 - Keep branches short and bring them back together. Two or three options per decision, and a bottleneck within a few sessions, beat a wide tree.
 - Every secret a card needs should have at least three ways it could come out.

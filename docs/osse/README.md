@@ -69,7 +69,7 @@ So: entity notes hold only canon and prep (a future idea goes in a plan that lin
 | `Chronicle/` | chronicle | the players' chronicle; see the `chronicle` skill. Only what the table saw, in player words |
 | `Atlas/` | | Leaflet maps and their images; see [maps.md](maps.md) |
 
-Also in the vault: `Home.md` (dashboard), `Relationship types.md` (every allowed link type), `Bases/` (saved views), `Templates/` (blank shapes Tom inserts by hand; never index, link or fill them), `.osse/` (`graph.json` and two small scripts that forward to this repo's tools). Never touch `.obsidian/` unless Tom asks.
+Also in the vault: `Home.md` (dashboard), `Relationship types.md` (every allowed link type), `Bases/` (saved views), `Templates/` (blank shapes Tom inserts by hand; never index, link or fill them), `.osse/` (`graph.json`, two small scripts that forward to this repo's tools, and `paths-drafts/`, the undo copies of drafts on Paths ahead). Never touch `.obsidian/` unless Tom asks.
 
 A new folder needs at least three notes that fit no existing kind. Add it here, to `ORDER` in `tools/osse/build.py`, and to `TYPES` in `tools/osse/vocab.py` in the same change.
 

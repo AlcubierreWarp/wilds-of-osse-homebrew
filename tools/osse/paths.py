@@ -651,7 +651,7 @@ function runCard(id, i) {
   return `<div class="rc${!mine && cut[id.slice(2)] ? " cut" : ""}" data-uid="${esc(id)}">` +
     `<span class="rg" title="Drag to move it in the running order">⠿</span><span class="rn">${i + 1}</span>` +
     `<div class="rb"><div class="rt"><b>${esc(titleOf(id))}</b>${!mine && o.status === "ready" ? '<span class="ch ready">ready</span>' : ""}` +
-    `${mine ? '<span class="ch ed">yours · not in vault</span>' : o.edited ? '<span class="ch ed">edited</span>' : ""}</div>` +
+    `${mine ? `<span class="ch ed">${whose(o)}</span>` : o.edited ? '<span class="ch ed">edited</span>' : ""}</div>` +
     `<div class="rw">${o.where ? "At " + esc(o.where) : "<i>Where not set</i>"}${others.length ? " · with " + others.map(esc).join(", ") : ""}</div>` +
     `<div class="pcs">${pills(id)}</div></div>` +
     `<button class="rx" aria-expanded="${op}" title="Show or hide what happens in this scene">${op ? "▾" : "▸"} ${tr.ms.length}</button>` +
@@ -790,7 +790,7 @@ function putPlan(id, t) {   // an unplaced plan joins session t, on the boards i
   const p = P[id.slice(2)], homes = p.lanes.length ? [...p.lanes] : [D.lanes[0].key];
   doc.items[id] = {s: t, homes, born: homes[0], at: {}, ...(isScene(id) ? {w: SCW, h: SCH} : {})};
 }
-function dropInto(id, spot, block) {   // put a card (and what follows it) into a scene, joined and placed the way it was dropped
+function dropInto(id, spot, block, quiet) {   // put a card (and what follows it) into a scene, joined and placed the way it was dropped
   const sid = spot.sid, from = it(id) ? sceneOf(id) : null, old = from ? treeOf(from) : null;
   if (!it(id)) putPlan(id, sessOf(sid));
   withLane(lanesOf(sid)[0], () => { ensureAt(sessOf(sid)); measure([sid, ...membersOf(sid), ...block]); });
@@ -827,10 +827,30 @@ function dropInto(id, spot, block) {   // put a card (and what follows it) into 
   });
   const ms = membersOf(sid), needW = Math.max(...ms.map(m => it(m).rx + CARDW)) + 22, needH = bottom(ms) + 22;
   if (needW > (o.w || SCW) || needH > (o.h || SCH)) growScene(sid, needW, needH);
+  if (quiet) return;
   opened.add(sid);
   const want = spot.parent || "", got = treeOf(sid).par[id] || "";
   changed(); drawRun();
   if (want !== got && got) toast(`The vault already says “${titleOf(id)}” follows “${titleOf(got)}”, so it stays under it. Ask Claude to change that in the plan.`);
+}
+function layNew() {   // cards a session drafted into scenes get their places here, where their real sizes are known
+  const fresh = Object.keys(doc.items).filter(i => it(i).lay); if (!fresh.length) return false;
+  const by = {};
+  fresh.forEach(i => { delete it(i).lay; const sc = live(i) && sceneOf(i); if (sc) (by[sc] ||= []).push(i); });
+  for (const [sid, ms] of Object.entries(by)) {
+    const tr = treeOf(sid), list = (tr.kids[""] || []).flatMap(tr.under).filter(m => ms.includes(m)), o = it(sid);
+    if (list.length < tr.ms.length) { list.forEach(m => { delete it(m).scene; }); list.forEach(m => dropInto(m, {sid}, [m], true)); continue; }   // beside Tom's own cards
+    withLane(lanesOf(sid)[0], () => measure([sid, ...list]));
+    const COL = CARDW + 148; let w = 0;   // room between columns for the choices
+    const put = (m, d, y) => {
+      const x = it(m); x.rx = 22 + d * COL; x.ry = snap(y + 10); w = Math.max(w, x.rx + CARDW);
+      return Math.max(x.ry + (hs[m] || 110) + 22, (tr.kids[m] || []).reduce((yy, k) => put(k, d + 1, yy), x.ry));
+    };
+    const bottom = (tr.kids[""] || []).reduce((yy, m) => put(m, 0, yy), (hsh[sid] || 96) + 22);
+    const ow = o.w || SCW, oh = o.h || SCH; o.w = Math.max(SCW, snap(w + 32)); o.h = Math.max(264, snap(bottom + 10));
+    makeRoom(sid, ow, oh);
+  }
+  return true;
 }
 function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 6500); }
 function goto(k, t, id) {   // a scene on one character's board
@@ -918,6 +938,7 @@ function nowCard(n, kind) {
     (rows.length ? `<dl>${rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("")}</dl>` : "") +
     (n.recent && n.recent.length ? `<div class="k"><span>${head}</span></div><ul>${n.recent.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : "");
 }
+const whose = c => c.draft === "new" ? "Claude’s draft" : c.draft === "edit" ? "tidied by Claude" : "yours · not in vault";
 function titleOf(id) { if (id.startsWith("p:")) return id.slice(2); const c = doc.cards[id.slice(2)]; return c ? (c.title || "untitled card") : id; }
 function startCard(tab, idx) {
   const ln = D.lanes.find(x => x.key === lane);
@@ -944,7 +965,7 @@ function cardHtml(id) {
   let inner, cls;
   if (mine) {
     const c = doc.cards[id.slice(2)];
-    inner = `<div class="k"><span>${esc(KINDS[c.kind] || "Note")}</span><span>yours · not in vault</span></div><div class="t">${esc(c.title || "Untitled")}</div>` + extras(c) +
+    inner = `<div class="k"><span>${esc(KINDS[c.kind] || "Note")}</span><span>${whose(c)}</span></div><div class="t">${esc(c.title || "Untitled")}</div>` + extras(c) +
       (c.text ? `<div class="s">${esc(c.text.length > 220 ? c.text.slice(0, 220) + "…" : c.text)}</div>` : "") + (c.kind === "decision" ? optsHtml(id) : "");
     cls = `mine k-${c.kind}`;
   } else {
@@ -1465,7 +1486,7 @@ function cardEditor(id) {
     `<div class="acts"><button data-done>Done</button><button class="del" data-del>Delete card</button></div>`);
   const t = d.querySelector("#ce-t"), x = d.querySelector("#ce-x"), k = d.querySelector("#ce-k");
   const w = d.querySelector("#ce-w");
-  const sync = () => { c.title = t.value.trim(); c.text = x.value.trim(); c.kind = k.value; if (w) c.where = w.value.trim(); d.querySelector("#ce-kd").textContent = KDESC[c.kind]; changed(); };
+  const sync = () => { delete c.draft; c.title = t.value.trim(); c.text = x.value.trim(); c.kind = k.value; if (w) c.where = w.value.trim(); d.querySelector("#ce-kd").textContent = KDESC[c.kind]; changed(); };
   t.oninput = sync; x.oninput = sync; t.onchange = () => { sync(); draw(); };
   t.onkeydown = ev => { if (ev.key === "Enter") { sync(); closeDrawer(); draw(); } };
   optsBind(d, "c:" + id);
@@ -1581,22 +1602,72 @@ function pack() {
   const lanes = {}; D.lanes.forEach(l => { lanes[l.key] = toCanvas(l.key); });
   return {format: "osse-paths-3: one store (sessions, items, cards, edits, edges, order); lanes are the same boards as JSON Canvas 1.0", after: CUR, ...doc, lanes};
 }
-let timer = null, dirty = false, unread = false;
+/* Saving. The relay holds one copy, and another device or a session with Claude may have saved since this page read it:
+   every save first looks, and merges record by record what changed there with what changed here (here wins on the same thing). */
+const PARTS = ["sessions", "items", "cards", "edits", "edges", "order", "seeded"];
+let timer = null, dirty = false, unread = false, rev = null, base = null, ticks = 0, busy = null, held = false;
+const copyOf = x => JSON.parse(JSON.stringify(x)), same = (a, b) => canon(a) === canon(b), isMap = x => !!x && typeof x === "object" && !Array.isArray(x);
+const canon = x => JSON.stringify(x, (k, v) => isMap(v) ? Object.fromEntries(Object.keys(v).sort().map(q => [q, v[q]])) : v) ?? "";
+const partsOf = d => { const o = {}; PARTS.forEach(f => { o[f] = copyOf(d[f] ?? (["sessions", "edges", "seeded"].includes(f) ? [] : {})); }); o.edges = Object.fromEntries(o.edges.map(e => [e.id, e])); return o; };
+function merge3(b, m, t) {
+  if (same(m, b)) return t;
+  if (same(t, b) || same(m, t)) return m;
+  if (isMap(m) && isMap(t)) { const o = {}; for (const k of new Set([...Object.keys(m), ...Object.keys(t)])) { const v = merge3(isMap(b) ? b[k] : undefined, m[k], t[k]); if (v !== undefined) o[k] = v; } return o; }
+  return Array.isArray(m) && Array.isArray(t) ? m.concat(t.filter(x => !m.some(y => same(x, y)) && !(Array.isArray(b) && b.some(y => same(x, y))))) : m;
+}
+function into(old, now) {   // update in place, so an open panel keeps working on the same card
+  for (const k of Object.keys(old)) if (!(k in now)) delete old[k];
+  for (const [k, v] of Object.entries(now)) if (isMap(old[k]) && isMap(v)) into(old[k], v); else old[k] = v;
+}
+function absorb(got) {   // take in what was saved elsewhere; true when it changes what this page holds
+  if (!got || !got.items) return false;
+  const theirs = partsOf(got), mine = partsOf(doc), out = merge3(base || theirs, mine, theirs);
+  base = theirs; rev = got.saved_at;
+  if (same(out, mine)) return false;
+  const had = new Map(doc.edges.map(e => [e.id, e]));
+  PARTS.forEach(f => { if (f === "edges") doc.edges = Object.values(out.edges).map(e => { const o = had.get(e.id); if (!o) return e; into(o, e); return o; }); else if (isMap(doc[f])) into(doc[f], out[f]); else doc[f] = out[f]; });
+  sortSessions();
+  if (layNew()) changed();
+  recut();
+  return true;
+}
+const peek = async () => { const r = await fetch(RELAY + "/paths", {headers: {"x-gus-key": KEY}, cache: "no-store"}); if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status); return r.json(); };
+function showNew() { const y = $("#run").scrollTop; draw(); if (runMode) $("#run").scrollTop = y; if (shown && !$("#drawer").hidden && !live(shown) && !P[shown.slice(2)]) closeDrawer(); }
 function status(t, bad) { const el = $("#save"); el.textContent = t; el.classList.toggle("bad", !!bad); }
 function changed() {
-  dirty = true; store.set("osse-paths-local", JSON.stringify(pack()));
+  dirty = true; ticks++; store.set("osse-paths-local", JSON.stringify(pack()));
   if (unread) { status("Not saving: the relay could not be read when this page opened. Reload before you change more.", true); return; }
   status(KEY ? "Saving…" : "Saved on this device only");
-  clearTimeout(timer); if (KEY) timer = setTimeout(() => save(), 800);
+  later();
 }
+function later(ms = 800) { clearTimeout(timer); if (KEY) timer = setTimeout(() => save(), ms); }
 async function save(leaving) {
-  try {
-    const body = JSON.stringify(pack());   // keepalive only when leaving: browsers allow 64 KB of it in all, then refuse
-    const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body, keepalive: leaving === true && new Blob([body]).size < 60000});
-    if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status);
-    dirty = false; status("Saved");
-  } catch (e) { status("Not saved: " + e.message + ". This device keeps a copy.", true); }
+  if (leaving !== true) {
+    if (held) { later(); return; }          // not in the middle of a drag
+    if (busy) { later(300); return; }
+  }
+  const work = (async () => {
+    try {
+      if (leaving !== true) { const got = await peek(); if (held) { later(); return; } if (got.items && got.saved_at !== rev && absorb(got)) showNew(); }
+      const at = ticks, sent = pack(), body = JSON.stringify(sent);   // keepalive only when leaving: browsers allow 64 KB of it in all, then refuse
+      const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body, keepalive: leaving === true && new Blob([body]).size < 60000});
+      if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status);
+      rev = (await r.json()).saved_at; base = partsOf(JSON.parse(body));
+      if (ticks === at) { dirty = false; status("Saved"); clearTimeout(timer); }
+    } catch (e) { status("Not saved: " + e.message + ". This device keeps a copy.", true); }
+  })();
+  busy = work; await work; if (busy === work) busy = null;
 }
+async function look() {   // anything new from another device or a session with Claude?
+  if (!KEY || unread || dirty || busy || held || document.visibilityState === "hidden") return;
+  if (document.activeElement && document.activeElement.matches("#drawer input, #drawer textarea, #drawer select")) return;
+  const work = (async () => { try { const got = await peek(); if (dirty || held || !got.items || got.saved_at === rev) return; if (absorb(got)) { showNew(); toast("Updated: the boards were changed somewhere else."); } } catch (e) {} })();
+  busy = work; await work; if (busy === work) busy = null;
+}
+setInterval(look, 20000);
+addEventListener("focus", look);
+addEventListener("pointerdown", () => { held = true; }, true);
+["pointerup", "pointercancel", "blur"].forEach(n => addEventListener(n, () => { held = false; }, true));
 async function load() {
   let got = null;
   if (KEY) {
@@ -1608,15 +1679,16 @@ async function load() {
   } else status("Unlock the game master section on the hub to save to the relay. Until then this device keeps your changes.");
   const some = g => g && (g.items || (g.lanes && Object.keys(g.lanes).length));
   if (!some(got)) { try { const loc = JSON.parse(store.get("osse-paths-local") || "null"); if (some(loc)) { got = loc; if (KEY && !unread) dirty = true; } } catch (e) {} }
-  if (got && got.items) for (const f of ["sessions", "items", "cards", "edits", "edges", "order", "seeded"]) { if (got[f]) doc[f] = got[f]; }
+  if (got && got.items) { if (!dirty) { base = partsOf(got); rev = got.saved_at; } for (const f of PARTS) { if (got[f]) doc[f] = got[f]; } }
   else if (some(got)) { migrate(got); dirty = true; }
   doc.sessions = (doc.sessions.length ? doc.sessions : defaults()).filter(t => t === "Later" || sessNum(t) > CUR || Object.values(doc.items).some(o => o.s === t));
   sortSessions();
   recut();
   D.lanes.forEach(l => { if (!doc.seeded.includes(l.key)) seed(l.key); });
+  if (layNew()) dirty = true;
   if (dirty && KEY && !unread) save();
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && dirty && KEY && !unread) save(true); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") { if (dirty && KEY && !unread) save(true); } else look(); });
 
 /* ---------- boards ---------- */
 function pick(key) {

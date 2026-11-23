@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Reads Tom's Paths ahead boards from the Gus relay so Claude can bring them into the vault (the `paths` skill).
+"""Reads Tom's Paths ahead boards from the Gus relay so Claude can bring them into the vault, and drafts onto them (the `paths` skill).
 The store holds one copy of everything (items, cards, edits, edges); `lanes` are the same boards as JSON Canvas.
   python3 tools/osse/paths_sync.py show [BOARD]        what Tom changed that the vault does not say yet, and each session's running order
+  python3 tools/osse/paths_sync.py board [SESSION ...] everything on the boards with its ids: scenes in order, their cards as a tree
+  python3 tools/osse/paths_sync.py draft FILE [--write]     check a draft and print its outline; --write puts it on the boards (tools/osse/paths_draft.py has the format)
+  python3 tools/osse/paths_sync.py undraft [WHEN] [--write] take a draft back off, keeping what Tom changed since; with no WHEN, the last one
   python3 tools/osse/paths_sync.py adopt CARD "Plan name"   swap one of Tom's cards for the plan written from it, on every board
   python3 tools/osse/paths_sync.py tidy                drop Tom's links the vault now says itself, and plans no longer live (run after build.py)
   python3 tools/osse/paths_sync.py settle              clear Tom's edits and drops once the vault holds them (run after build.py)
   python3 tools/osse/paths_sync.py export DIR          write each board as a .canvas file (JSON Canvas 1.0)
 Add --mock to use the local relay stand-in (relay/gus/mock.py, key test-gm).
 The game master key is read from the macOS Keychain inside this process and never printed. Writes only to the relay."""
-import json, os, re, subprocess, sys, urllib.request
+import copy, json, os, re, subprocess, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import build  # noqa: E402
+import paths_draft  # noqa: E402
 
 RELAY = "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws"
 MOCK = "--mock" in sys.argv
@@ -30,6 +34,13 @@ def call(method, body=None):
                                  headers={"x-gus-key": key(), "content-type": "application/json"})
     with urllib.request.urlopen(req, timeout=20) as r:
         return json.loads(r.read())
+
+
+def put(doc):
+    """Save the boards, unless Tom saved them after they were read."""
+    if doc.get("saved_at") and call("GET").get("saved_at") != doc["saved_at"]:
+        sys.exit("Tom changed the boards in the meantime: nothing was written. Run this again.")
+    call("PUT", doc)
 
 
 def graph():
@@ -145,7 +156,7 @@ def show(only=None):
                     if k not in d["lanes"] and k != "world" and not (b.is_scene(i) and k in b.cast(i)):
                         say(i, f"- [[{pid}]]: placed on {k}'s board but not tied to it → add for: [[{k}]]")
         else:
-            lines = [f'- NEW CARD {i} ({o.get("kind")}, {sess}): "{o.get("title") or "untitled"}"' + (f': {o["text"]}' if o.get("text") else "")]
+            lines = [f'- NEW CARD {i} ({o.get("kind")}, {sess}): "{o.get("title") or "untitled"}"' + {"new": " (drafted by Claude, not changed by Tom since)", "edit": " (Tom's card, last tidied by Claude)"}.get(o.get("draft"), "") + (f': {o["text"]}' if o.get("text") else "")]
             if b.is_scene(i) and len(ks) > 1:
                 lines.append(f'    on the boards of: {", ".join(ks)}')
             elif not sc and len(ks) > 1:
@@ -204,6 +215,84 @@ def show(only=None):
                 print(f"  {n}. {b.label(i)} ({', '.join(b.lanes(i))})")
 
 
+def known(b):
+    """The names a draft may use: boards, places and people."""
+    g, _ = graph()
+    boards = [*b.pcs, "The Party", "world"]
+    alias = {a: k for k, names in b.pcs.items() for a in names}
+    alias.update({k.split()[0].lower(): k for k in b.pcs}, **{"the party": "The Party", "party": "The Party", "world": "world", "around the party": "world"})
+    names = lambda ok: {x.lower() for n in g["nodes"] if ok(n["type"]) for x in [n["id"], *(n.get("aliases") or [])]}
+    return {"boards": boards, "alias": alias, "places": names(lambda t: t == "place"),
+            "people": names(lambda t: t in ("npc", "pc", "party", "faction")) | {"the party", "the whole party"}}
+
+
+def board(sessions):
+    doc = store()
+    data, cur = plan_facts(None)
+    print(f"Boards saved {doc.get('saved_at', '?')} (ms), vault after S{cur}. [c:…] is one of Tom's cards, [plan] a vault plan, [e…] a link.")
+    print(paths_draft.outline(doc, Board(doc, data, cur), sessions or None))
+
+
+def draft(path, write):
+    spec = json.load(open(path, encoding="utf-8"))
+    doc = store()
+    before = copy.deepcopy(doc)
+    data, cur = plan_facts(None)
+    b = Board(doc, data, cur)
+    bad, warn, ids = paths_draft.apply(spec, doc, b, known(b))
+    for w in dict.fromkeys(warn):
+        print("note:", w)
+    if bad:
+        sys.exit("\n".join(["Nothing written. Fix:", *(f"- {x}" for x in dict.fromkeys(bad))]))
+    b = Board(doc, data, cur)
+    was = before["items"]
+    mark = lambda i: "NEW " if i not in was else "CHANGED " if doc["cards"].get(i[2:]) != before.get("cards", {}).get(i[2:]) or doc["edits"].get(i[2:]) != before.get("edits", {}).get(i[2:]) \
+        else "MOVED " if (doc["items"][i].get("scene"), doc["items"][i]["s"]) != (was[i].get("scene"), was[i]["s"]) else ""
+    where = [s for s in doc["sessions"] if any(b.session(i) == s for i in doc["items"] if b.live(i) and (mark(i) or b.session(i) != before["items"][i]["s"]))]
+    if not write:
+        spec["base"] = doc.get("saved_at")
+        json.dump(spec, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print(paths_draft.outline(doc, b, where or None, mark, withids=False))
+        print("\nNot written. Show Tom this outline; when he agrees, run it again with --write.")
+        return
+    if "base" not in spec:
+        sys.exit("Preview it first (run without --write) and show Tom the outline.")
+    if spec["base"] != doc.get("saved_at"):
+        sys.exit("Tom changed the boards after the preview: nothing was written. Preview again, check it still fits, then write.")
+    put(doc)
+    when = paths_draft.record(MOCK, before, doc)
+    new = [i for i in doc["items"] if i not in was]
+    print(f"On the boards: {len(new)} new, in {', '.join(where) or 'no session'}. Undo with: undraft {when}")
+    for k, i in ids.items():
+        print(f"  {k} = {i}")
+
+
+def undraft(when, write):
+    d = paths_draft.folder(MOCK)
+    have = sorted(x[:-5] for x in os.listdir(d) if x.endswith(".json"))
+    if not have or (when and when not in have):
+        sys.exit("Drafts kept: " + (", ".join(have) or "none"))
+    when = when or have[-1]
+    rec = json.load(open(os.path.join(d, when + ".json"), encoding="utf-8"))
+    doc = store()
+    was = copy.deepcopy(doc)
+    merged = paths_draft.merge3(paths_draft.parts(rec["after"]), paths_draft.parts(doc), paths_draft.parts(rec["before"]))
+    paths_draft.put_parts(doc, merged)
+    paths_draft.prune(doc, was)
+    gone = [x for x in was["cards"] if x not in doc["cards"]]
+    kept = [x for x in rec["after"]["cards"] if x not in rec["before"]["cards"] and x in doc["cards"]]
+    t = lambda x: was["cards"][x].get("title") or "untitled"
+    print(f"Draft {when}: takes off {len(gone)} card(s): {', '.join(map(t, gone)) or 'none'}.")
+    if kept:
+        print(f"Keeps, because Tom changed them: {', '.join(map(t, kept))}.")
+    if not write:
+        print("Not written. Run it again with --write to do it.")
+        return
+    put(doc)
+    os.rename(os.path.join(d, when + ".json"), os.path.join(d, when + ".undone"))
+    print("Done.")
+
+
 def adopt(card, plan):
     doc = store()
     card = card if card.startswith("c:") else "c:" + card
@@ -236,7 +325,7 @@ def adopt(card, plan):
             e["fromNode"], e["toNode"] = swap(e["fromNode"]), swap(e["toNode"])
             if (e.get("osse") or {}).get("from"):
                 e["osse"]["from"] = swap(e["osse"]["from"])
-    call("PUT", doc)
+    put(doc)
     print(f"{card} is now [[{plan}]] on every board")
 
 
@@ -247,7 +336,7 @@ def settle():
     for cv in doc["lanes"].values():
         for node in cv.get("nodes", []):
             (node.get("osse") or {}).pop("edit", None)
-    call("PUT", doc)
+    put(doc)
     print(f"Cleared {n} edit(s) and drop(s); the boards now show the vault's text.")
 
 
@@ -272,7 +361,7 @@ def tidy():
     for cv in doc["lanes"].values():
         cv["nodes"] = [x for x in cv.get("nodes", []) if x["id"] not in gone]
         cv["edges"] = [e for e in cv.get("edges", []) if e["id"] in ids]
-    call("PUT", doc)
+    put(doc)
     print(f"Dropped {n} link(s) the vault now holds, and {len(gone)} plan(s) no longer live.")
 
 
@@ -286,11 +375,18 @@ def export(folder):
 
 
 if __name__ == "__main__":
-    a = [x for x in sys.argv[1:] if x != "--mock"]
+    a = [x for x in sys.argv[1:] if x not in ("--mock", "--write")]
+    WRITE = "--write" in sys.argv
     if not a or a[0] in ("-h", "--help"):
         print(__doc__); sys.exit()
     if a[0] == "show":
         show(a[1] if len(a) > 1 else None)
+    elif a[0] == "board":
+        board([x.upper() if x.lower() != "later" else "Later" for x in a[1:]])
+    elif a[0] == "draft" and len(a) == 2:
+        draft(a[1], WRITE)
+    elif a[0] == "undraft" and len(a) <= 2:
+        undraft(a[1] if len(a) > 1 else None, WRITE)
     elif a[0] == "adopt" and len(a) == 3:
         adopt(a[1], a[2])
     elif a[0] == "settle":

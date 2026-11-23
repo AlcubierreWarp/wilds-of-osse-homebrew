@@ -35,8 +35,8 @@ The campaign's truth lives in the Ossë Obsidian vault in iCloud, outside this r
 - After any vault change, `python3 tools/osse/build.py` and fix every problem it prints.
 - `vault/` holds a DM page for every vault note, rebuilt by `build.py`. It is a DM screen: link it only from the hub's game master section.
 - `codex/` is the players' version: only notes the table has met, only lines stamped with a played session. It is a player screen; it never links to `vault/`.
-- `vault/paths.html` (Paths ahead, from `tools/osse/paths.py`): Tom's planning board, one per character, with a tab per session and a tray of unplaced plans. He drags, links, adds, edits and deletes cards, and adds or deletes sessions; a scene shows on the board of every player character present, and everything has one copy; its Session plan adds scenes and players and puts a session's scenes in running order; a decision's options are the links out of it; it saves to the Gus relay (`paths.json`). `tools/osse/paths_sync.py` reads it. DM screen only.
-- `.claude/skills/paths/`: bring Tom's board changes into the vault. Follow it when he asks.
+- `vault/paths.html` (Paths ahead, from `tools/osse/paths.py`): Tom's planning board, one per character, with a tab per session and a tray of unplaced plans. He drags, links, adds, edits and deletes cards, and adds or deletes sessions; a scene shows on the board of every player character present, and everything has one copy; its Session plan adds scenes and players and puts a session's scenes in running order; a decision's options are the links out of it; it saves to the Gus relay (`paths.json`). `tools/osse/paths_sync.py` reads it and drafts onto it (`board`, `draft`, `undraft`). DM screen only.
+- `.claude/skills/paths/`: draft Tom's brain dumps and clean-ups onto the boards, and bring the boards into the vault. Follow it when he asks for either.
 - `vault/status.json` (also rebuilt by `build.py`) drives the hub's launchboard: the next session, its screen, and the checklist's automatic ticks.
 - The two boundaries (player screens vs DM screens, real-world secrets vs game secrets) are in `docs/osse/README.md`.
 
