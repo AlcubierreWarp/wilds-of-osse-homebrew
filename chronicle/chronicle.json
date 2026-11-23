@@ -1653,6 +1653,204 @@
      "text": "The pocketful of unfinished rune blanks **Belaskro** scooped from the **Vantry Runeworks** factory floor (carried over from last session). One blank was used this session: **Princess Timbit** delivered it to Marquis **Corvane** through the shield bubble's fist-sized hole, and it siphoned the entire shield spell back into itself, dissolving the barrier and freeing Corvane. The rune's ability to absorb active magical energy from an existing shield suggests significant (and possibly unintended) utility. Remaining blanks are still in Belaskro's possession."
     }
    ]
+  },
+  {
+   "n": 13,
+   "title": "A Crown of Knives",
+   "summary": [
+    "The session opened in the immediate aftermath of the gala assassination, with the upstairs fight still raging and **Lt. Malachai Wrent** lying dead on the ballroom floor. **Gabriele**, sprinting past the wounded **Noémie Vayne**, reached Wrent's body and checked him: sightless eyes, dried foam at the lips, no sign of life. In tears, Gabriele clutched **Father Barichello**'s cross and commanded (not asked, commanded) God to intervene. Casting Revivify, he felt the cross burn a mark into his palm as holy energy surged through Wrent's chest. The lieutenant gasped back to life, disoriented and asking \"What the fuck happened?\" **GUS**, who had received a \"**Handler signal lost**\" alert moments earlier, was left unsure of his connection to his handler.",
+    "Upstairs, **Belaskro** and **Corvane Aerrowyn** dismantled the assassin targeting **Cassian**. Belaskro held position between the assassin and the bed while Cassian, still bedridden, hurled fire from his outstretched hand. Corvane burst into the room, used his \"Send Them\" ability to empower Belaskro's strikes, and closed to melee range with his Crested Warhammer. After a brutal exchange in which Cassian shoved Belaskro aside in frustration and everyone struggled to land hits, Corvane connected with hammer blows (27 bludgeoning and 6 necrotic from Hex) and caved the assassin's skull in, standing over the corpse in a blood-soaked rage. Belaskro noted the assassin wore a blue velvet robe, a royal page's uniform, and found an Oathmark tattoo behind the right ear that showed the royal house symbol under Detect Magic. Corvane explained that **Varenthal**'s servant-binding system ensures loyalty to the post, not the individual, so anyone in the royal household could have commanded the assassin. He asked to keep it quiet for now, citing \"larger political movements.\"",
+    "Downstairs, as the bodies of **Garrick Moravel** and **Aurelian Aldric** were laid on the stage, **Corvane** called for a holy man. **Gabriele** stepped forward, blessed water, and performed funeral rites: cleaning the faces of the dead with holy water, praying for their souls, and asking the crowd to remember the fallen. The gesture brought a hush over the shaken nobles. Corvane then gathered the party and gave them their tasks: **GUS** and **Belaskro** to investigate the attack, Gabriele to pursue the **House Dreveth** angle at the **Glowing Goat**. **Captain Dunmore** revealed that **Under-Steward Grey** had handed him an order under Corvane's seal withdrawing the guards to the gates, an order Corvane denied giving, and Grey's rooms were now empty. Roadblocks were ordered. **Princess Timbit**, questioned by Corvane, reported that **Sergeant Dray** had dismissed her security concerns before the gala, which Corvane marked for follow-up.",
+    "Earlier, as the last rounds of the fight wound down, **Princess Timbit** had named her price for freeing **Corvane** from the shield: an enchanted frigate. The Queen pointed out that the crown was in her debt, not bankrupt, and settled on the fastest sailboat they have, with cannons and a cat-mermaid figurehead, to be named the HMCS Ferdinand. Someone will be in touch.",
+    "The evening's most explosive moment came when **Corvane** publicly confronted **Queen Sabine Varenthal**. Holding up the blue royal page robe before the remaining nobles, he declared: \"Five children stood up in my house tonight to be cheered. **Garrick Moravel** and **Aurelian Aldric** will be carried out of it.\" He told the room his son was alive because of his nephew, that his son would never walk again, and that he would stand for him. He accused the crown directly, saying \"someone would rather there was nobody left standing\" before the tournament. The Queen, visibly shaken, admitted giving the toast but denied that the attack was hers. She insisted the crown was also a victim and promised the **Marshals** full cooperation. Corvane ordered her out of his house. As she left, she caught **Princess Timbit**'s eye: \"Princess Timbit, the crown remembers its debt.\"",
+    "Investigation threads began to diverge. **Belaskro** and **GUS** interviewed **Captain Dunmore**, learning **Grey** had been seen roughly 25 minutes before the attack and could now be halfway to the city gates. A staff list found in a case added five musicians to the evening, signed by order of Under-Steward Grey. GUS, now giving his name as \"Steven\", ordered roadblocks and asked to be told whether Grey was captured alive or dead, mentioning \"alternate questioning mechanisms\" if deceased. **Gabriele** sought out **Lt. Wrent** and healed him with Cure Wounds. Wrent, deeply moved that Gabriele had revived him rather than letting his bonds break with death, declared Gabriele a friend and relieved him of supervision, making him a free man in **Varenthal**. **Jared Dreveth** then approached Gabriele, explaining that **House Dreveth** had been set up to take the fall and would leave in the morning. He invited Gabriele to **Seranthis**, dismissively calling Varenthal \"swine.\" Gabriele declined for now, citing his duty to bring the guilty to justice, but accepted an address in the city and a contact in Seranthis: ask for **Shane Dawson** at the **Southern Gate**. Jared showed no recognition of **Father Barichello**'s name.",
+    "**Princess Timbit**, seeking intel, approached **Lady Odile** **Halvenne**, **Prince Elias**'s secret fiancée. Posing as a comforting therapy cat in Odile's lap, Timbit heard Odile fixate on Elias's safety, noting with relief that \"the shield went up first\" and \"he was never in danger.\" The shield had gone up a split second before the Queen's toast. Odile also dismissed the dead champions as no one who matters.",
+    "The session closed with the party split for the night. **Princess Timbit**'s uncle, **Ambassador Honey Cruller**, shaken by the attack, ordered her back to the **Kingdom of Meow** embassy at once, overruling her objections. Until there is a name, the embassy has not decided whether she will stay in **Ossë** or be sent home. He allowed **Gabriele** to go with her as bodyguard. **Belaskro** accepted **Corvane**'s offer of the guest suite at **Aerrowyn Manor**, an opulent room that made the frontier bounty hunter deeply uncomfortable. **GUS**, as \"Steven,\" stood in a corner of the manor to await orders. As the night deepened and servants moved past him, one figure paused and said, \"Fine weather for the season.\" GUS answered: \"Every season has weather.\""
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "changed",
+     "text": "**Gabriele** asked **Jared Dreveth** about **Barichello**'s whereabouts; Jared showed no recognition, which points the search away from the **Seranthis** nobility. Gabriele holds a Seranthis contact.",
+     "clues": [
+      "**Jared Dreveth** (**House Dreveth**) has never heard of **Father Barichello**"
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "**Under-Steward Grey** handed over an order under **Corvane**'s seal that withdrew the guards to the outer gates. Grey has fled, his rooms are empty, and a city-wide manhunt is under way.",
+     "clues": [
+      "Only **Corvane** and **Under-Steward Grey** can reach Corvane's seal",
+      "The staff list adding five musicians was signed by order of **Under-Steward Grey**",
+      "**Sergeant Dray** dismissed **Princess Timbit**'s security concerns before the gala",
+      "**Grey** was last seen about 25 minutes before the attack"
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "none",
+     "text": "No direct progress, though the sophistication of the attack (an Oathmarked royal page's robe, dimension door extractions, coordinated timing) suggests well-resourced backing.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "**Corvane** publicly accused the crown before the assembled nobles. The assassin in **Cassian**'s room wore a royal page uniform with an Oathmark tattoo keyed to the royal household. **Queen Sabine** denied ordering the attack and left shaken. **House Dreveth** is leaving the city in the morning, fearing they have been framed.",
+     "clues": [
+      "The assassin targeting **Cassian** bore a royal house Oathmark, tying him to the royal household",
+      "**Princess Timbit** read shock and panic in the Queen, and a glance up toward **Cassian**'s room: she seemed to know about upstairs but was surprised by the rest",
+      "**Lady Odile** noticed that the shield went up first, a split second before the Queen's toast"
+     ]
+    },
+    {
+     "id": "protect-the-tournament-champions",
+     "status": "changed",
+     "text": "The fighting is over. **Garrick Moravel** and **Aurelian Aldric** are dead. **Noémie Vayne** was stabilized by a **House Vayne** cleric. **Baroness Éclair Exquisite** woke briefly and is resting at the embassy. The tournament's future is in doubt.",
+     "clues": []
+    },
+    {
+     "id": "protect-lord-cassian-aerrowyn",
+     "status": "resolved",
+     "text": "**Belaskro** and **Corvane** killed the assassin in **Cassian**'s room. Cassian is alive but will never walk again, Corvane says. Guards are posted at his door.",
+     "clues": [
+      "The final ward crystal failed during the fight, but **Belaskro** held the assassin off the bed"
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Arcane Marshal",
+     "state": "Revived",
+     "new": false,
+     "text": "Killed by an assassin's poisoned blade, then brought back by **Gabriele**'s Revivify. Declared Gabriele a friend and relieved him of supervision, making him a free man."
+    },
+    {
+     "name": "Grey",
+     "title": "Under-Steward",
+     "faction": "House Aerrowyn",
+     "role": "Aerrowyn Manor staff",
+     "state": "Missing",
+     "new": true,
+     "text": "Handed the captain of the guard an order under **Corvane**'s seal withdrawing the guards; fled before the attack. His rooms are empty and a city-wide manhunt is ordered."
+    },
+    {
+     "name": "Dunmore",
+     "title": "Captain",
+     "faction": "House Aerrowyn",
+     "role": "Captain of the Aerrowyn Manor guard",
+     "state": "",
+     "new": true,
+     "text": "Received **Grey**'s order about 25 minutes before the attack. Cooperating with the investigation; fears he will lose his post over the security failure."
+    },
+    {
+     "name": "Yorwick Dray",
+     "title": "Sergeant",
+     "faction": "Arcane Marshals",
+     "role": "Arcane Marshal",
+     "state": "",
+     "new": false,
+     "text": "Dismissed **Princess Timbit**'s security concerns before the gala. He was at the gala as a guest, not part of the security, and **Corvane** wants to know why."
+    },
+    {
+     "name": "Jared Dreveth",
+     "title": "Lord",
+     "faction": "House Dreveth",
+     "role": "lord of the household",
+     "state": "",
+     "new": false,
+     "text": "Invited **Gabriele** to **Seranthis**, saying **House Dreveth** must leave in the morning to avoid being framed. Did not know **Father Barichello**'s name. Gave Gabriele an address and a contact: **Shane Dawson** at the **Southern Gate**."
+    },
+    {
+     "name": "Lady Odile",
+     "title": "",
+     "faction": "House Halvenne",
+     "role": "Prince Elias's secret fiancée",
+     "state": "",
+     "new": false,
+     "text": "Kept noting that the protective shield \"went up first\" before the attack; dismissive of the dead champions and fixated on **Elias**'s safety."
+    },
+    {
+     "name": "Sabine Varenthal",
+     "title": "Queen",
+     "faction": "House Varenthal",
+     "role": "Queen of Varenthal",
+     "state": "",
+     "new": false,
+     "text": "Publicly confronted by **Corvane** over the royal page's robe; admitted giving the toast but denied the attack. Ordered out of the manor; promised the **Marshals** full cooperation, and **Princess Timbit** a sailboat."
+    },
+    {
+     "name": "Honey Cruller",
+     "title": "Ambassador",
+     "faction": "House Puss",
+     "role": "Kingdom of Meow ambassador",
+     "state": "",
+     "new": false,
+     "text": "**Princess Timbit**'s uncle. Ordered her back to the embassy after the attack; the embassy will decide whether she stays in **Ossë**. Allowed **Gabriele** to go with her as bodyguard."
+    },
+    {
+     "name": "Éclair Exquisite",
+     "title": "Baroness",
+     "faction": "House Puss",
+     "role": "tournament champion",
+     "state": "",
+     "new": false,
+     "text": "Woke briefly after being stabilized, angry at **Princess Timbit** for saving her (\"I had it under control!\"). Resting at the embassy."
+    },
+    {
+     "name": "Corvane Aerrowyn",
+     "title": "Marquis",
+     "faction": "House Aerrowyn",
+     "role": "gala host; Cassian's father",
+     "state": "",
+     "new": false,
+     "text": "Killed the assassin in **Cassian**'s room. Publicly accused the crown and ordered the Queen out of his house. Gave the party their tasks and offered **Belaskro** the guest suite."
+    },
+    {
+     "name": "Noémie Vayne",
+     "title": "",
+     "faction": "House Vayne",
+     "role": "tournament champion",
+     "state": "",
+     "new": false,
+     "text": "Stabilized by a **House Vayne** cleric; no longer in immediate danger."
+    },
+    {
+     "name": "Shane Dawson",
+     "title": "",
+     "faction": "",
+     "role": "contact at the Southern Gate of Sundermark",
+     "state": "",
+     "new": true,
+     "text": "Named by **Jared Dreveth** as the person to ask for in **Seranthis**. Not yet met."
+    },
+    {
+     "name": "Unknown Contact",
+     "title": "",
+     "faction": "",
+     "role": "stranger at Aerrowyn Manor",
+     "state": "",
+     "new": true,
+     "text": "Approached **GUS** at the end of the night with the phrase \"Fine weather for the season.\" Identity unknown."
+    }
+   ],
+   "items": [
+    {
+     "name": "Blank Rune Tablets",
+     "homebrew": "Blank Rune Tablet",
+     "new": false,
+     "text": "No new items this session. The remaining blank rune tablets from the **Vantry Runeworks** are still in **Belaskro**'s possession."
+    }
+   ]
   }
  ]
 }
