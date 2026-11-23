@@ -1,0 +1,1658 @@
+{
+ "quests": [
+  {
+   "id": "find-father-barichello",
+   "name": "Find Father Barichello",
+   "aim": "Find Gabriele's missing mentor, last seen at the Poor-Quarter mission."
+  },
+  {
+   "id": "uncover-the-purpose-of-the-magical-box",
+   "name": "Uncover the Purpose of the Magical Box",
+   "aim": "Learn what the locked box recovered with Gabriele is, and why it carries such dangerous power."
+  },
+  {
+   "id": "escape-the-mission-siege",
+   "name": "Escape the Mission Siege",
+   "aim": "Get out of the Poor-Quarter mission alive while a gang holds it under siege."
+  },
+  {
+   "id": "investigate-the-pyreborn",
+   "name": "Investigate the Pyreborn",
+   "aim": "Learn who the Pyreborn are, and why their sun-and-moon mark matches the wagon that took Belaskro's family."
+  },
+  {
+   "id": "confront-the-seranthis-kidnappers",
+   "name": "Confront the Seranthis Kidnappers",
+   "aim": "Stop the Seranthis sailors behind the kidnappings at the docks."
+  },
+  {
+   "id": "investigate-the-unbowed",
+   "name": "Investigate the Unbowed",
+   "aim": "Find out who the Unbowed answer to and what they want among the dockworkers."
+  },
+  {
+   "id": "uncover-the-noble-house-conspiracy",
+   "name": "Uncover the Noble House Conspiracy",
+   "aim": "For the Arcane Marshals: find which noble house is directing the gangs, and what it plans for the Royal Tournament."
+  },
+  {
+   "id": "investigate-the-tournament-sabotage",
+   "name": "Investigate the Tournament Sabotage",
+   "aim": "Find who is turning the tournament's shield runes into weapons, and stop it before the Royal Tournament."
+  },
+  {
+   "id": "rescue-pell-marrow-s-family",
+   "name": "Rescue Pell Marrow's Family",
+   "aim": "Bring home the family of Pell Marrow, the missing Vantry Runeworks supervisor."
+  },
+  {
+   "id": "protect-the-tournament-champions",
+   "name": "Protect the Tournament Champions",
+   "aim": "Keep the Royal Tournament's champions alive, and find who wants them dead."
+  },
+  {
+   "id": "protect-lord-cassian-aerrowyn",
+   "name": "Protect Lord Cassian Aerrowyn",
+   "aim": "Keep Marquis Corvane Aerrowyn's son alive."
+  }
+ ],
+ "sessions": [
+  {
+   "n": 1,
+   "title": "Strangers in Ossë",
+   "summary": [
+    "The session opened with **Gabriele d'Avidicci**, a Catholic priest from 1500s Earth, aboard the ***Santa Marie*** bound for Crete on a mission from the Pope. Carrying a mysterious locked box and searching for his missing mentor **Father Barichello**, Gabriele faced a supernatural storm that struck the ship with lightning and threw him overboard into unconsciousness.",
+    "**Gabriele** awoke in a dungeon cell in the **Sanctuary** at **Althon's Gate**, capital of **House Varenthal**. A fellow prisoner named **Corwin Thatch** explained they were being held by the **Arcane Marshals**, mage-trained law enforcement Gabriele had never heard of. **Lt. Malachai Wrent** interrogated Gabriele using a truth-detection device, learning of the shipwreck, the box, and Gabriele's search for his colleague. Wrent revealed the box radiates enough magical power to level the entire city, but its purpose remains unknown. A similar magical signature has been detected in **Seranthis**. Though Wrent believed Gabriele's story, he couldn't risk letting him roam free, but he offered to let Gabriele accompany him on an investigation that might lead to **Father Barichello**. During a prayer for Corwin, Gabriele felt a surge of energy flow through him, unknowingly casting the *guidance* cantrip for the first time.",
+    "Meanwhile, frontier bounty hunter **Belaskro Tich** arrived at the **Sanctuary** to collect payment for hauling in the damaged remains of **GUS** (General Service Unit Seven), a brass warforged investigator construct. **Wrent** ordered emergency repairs and hired Belaskro as backup for the coming mission, sealing the deal with a handshake that left Belaskro stinging from a minor magical test. Over the next hour, five exhausted Arcane Marshal mages performed a costly repair ritual that brought GUS back online: damaged but functional, with deep scratches obscuring the serial number on his identification plate. Wrent renamed the construct \"Gus\" after the only legible letters remaining: G-U-S.",
+    "**Wrent** explained the mission: a missing persons report matching **Father Barichello**'s description had come from a religious mission in the poor quarter, an order serving the downtrodden. The party set out at dusk. At the mission, they met **Lux Aveline Corstane**, a priest in bright robes who vaguely recalled a man mentioning \"Christian\" two weeks prior, someone who looked like **Gabriele** and had not returned since. The Lux invited Gabriele inside to serve food while he searched for someone who knew more.",
+    "Inside the soup kitchen, **Gabriele** noticed a homeless man muttering prayers over a makeshift rosary with an unfamiliar carved symbol in place of a cross. **Gus** entered and cast *detect magic*, sensing an unusual magical signature somewhere in the right half of the building, different from the ambient magic of the mageocracy. When Gus questioned a nervous cleric brother, the man fled in panic. Outside, **Belaskro** and **Wrent** sensed trouble brewing: a hostile crowd led by a local crime boss surrounded the mission, demanding Wrent leave or face violence. The party barricaded the doors as Gus received a notification from his reconnaissance homunculus: *item found*."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "new",
+     "text": "**Gabriele**'s missing mentor was seen at the mission two weeks ago but has not returned. The party is following this lead while investigating the magical box.",
+     "clues": [
+      "**Lux Aveline Corstane** recalls a man matching **Barichello**'s description who mentioned being \"Christian\" two weeks ago.",
+      "A homeless man at the mission carries a makeshift rosary with an unfamiliar symbol.",
+      "**Gus**'s homunculus detected an item of interest in the mission building."
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "new",
+     "text": "A locked box recovered with **Gabriele** radiates catastrophic magical power. The **Arcane Marshals** cannot identify it, and a similar signature has been detected in **Seranthis**.",
+     "clues": [
+      "The box contains enough power to destroy **Althon's Gate**.",
+      "**Gabriele** was transporting it for the Pope but does not know its contents.",
+      "A matching magical energy signature exists in **Seranthis**."
+     ]
+    },
+    {
+     "id": "escape-the-mission-siege",
+     "status": "new",
+     "text": "The party is trapped in the poor quarter mission, surrounded by a hostile gang whose leader blames the **Arcane Marshals** for disrupting his criminal operations.",
+     "clues": [
+      "The gang leader is lying about letting them leave peacefully.",
+      "**Gus** detected an unusual magical signature in the mission."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Gruff, no-nonsense lieutenant",
+     "state": "",
+     "new": true,
+     "text": "Interrogated **Gabriele** with a truth-detection device, hired **Belaskro** as muscle, and ordered **Gus**'s emergency repair to investigate the magical box crisis."
+    },
+    {
+     "name": "Corwin Thatch",
+     "title": "",
+     "faction": "",
+     "role": "Prisoner at the Sanctuary",
+     "state": "",
+     "new": true,
+     "text": "Malnourished and twitchy. Received guidance from **Gabriele**'s accidental cantrip and expressed desire to turn his life around."
+    },
+    {
+     "name": "Ovett Kallisch",
+     "title": "Constable-Adept",
+     "faction": "Arcane Marshals",
+     "role": "Artificer",
+     "state": "",
+     "new": true,
+     "text": "Objected to paying **Belaskro** and repairing **Gus** but complied with **Wrent**'s orders; visibly exhausted after leading the repair ritual."
+    },
+    {
+     "name": "Lux Aveline Corstane",
+     "title": "",
+     "faction": "",
+     "role": "Priest at the poor quarter mission",
+     "state": "",
+     "new": true,
+     "text": "Recalled a \"Christian\" man matching **Father Barichello**'s description visiting two weeks ago; went to find someone with more information."
+    },
+    {
+     "name": "Gang Leader",
+     "title": "",
+     "faction": "",
+     "role": "Local criminal in the poor quarter",
+     "state": "",
+     "new": true,
+     "text": "Confronted the party outside the mission, blaming the **Arcane Marshals** for disrupting his operations; lying about offering safe passage."
+    }
+   ],
+   "items": [
+    {
+     "name": "Mysterious Locked Box",
+     "homebrew": "",
+     "new": true,
+     "text": "A dangerous magical artifact recovered with **Gabriele** from the shipwreck. Radiates enough power to level **Althon's Gate**; contents unknown. Currently held by the **Arcane Marshals** at the **Sanctuary**."
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "title": "Mission Under Fire",
+   "summary": [
+    "The session opened with the party trapped inside the mission in the poor quarter, surrounded by a hostile mob led by a gang leader who called himself **Bram**. While **Lieutenant Wrent** sent up a distress flare, **Gabriele** methodically searched the mission rooms for exits and clues about **Father Barichello**, finding a cache of rusty rapiers and a wooden shield. **Belaskro**, watching from the window, recognised a symbol on Bram's chest (a crescent moon encased in a sun) as the same mark that had been on the wagon that took his uncle and cousin to **Althon's Gate** when he was twelve.",
+    "The siege escalated when **Bram**'s thugs began piling hay and wood against the building to burn the party out. **Gus** leapt through a window and doused the kindling with caustic acid, buying precious time, but Bram countered with a firebolt that ignited the structure anyway. As flames spread and combat erupted, Gus and his steel defender fought in the street while **Belaskro** and **Lieutenant Wrent** provided covering fire from the windows. **Gabriele**, still searching for answers, discovered **Father Barichello**'s personal prayer book in the temple area, heavily annotated in the priest's own hand and marked up in ways Gabriele had never seen before. In the same room, Gus detected an unusual magical signature and retrieved a rosary from the altar, storing it in his evidence compartment.",
+    "With the fire consuming the building and **Bram**'s gang breaking through the front door, the party made their escape. Bram, shouting \"For the **Pyreborn**!\", shattered the barricaded entrance as **Gabriele** and **Belaskro** fought a desperate rearguard action. **Lieutenant Wrent** discovered the secret exit **Lux Corstane** had been protecting: a hidden passage behind a tapestry, opened by pressing a brick in the wall. The party fled through underground tunnels while Belaskro cast fog cloud to cover their retreat, emerging two streets over near a grand basilica.",
+    "Waiting at the basilica were **Lux Corstane** and a young woman named **Rosalia**, approximately thirty years old with sharp features. After confirming the party hadn't been followed, Lux introduced Rosalia as someone who had been helping at the mission, and someone who claimed to know what happened to the person they were looking for."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "changed",
+     "text": "**Gabriele**'s missing mentor was last seen at the mission two weeks ago. The party escaped with crucial evidence and a witness who claims to know his fate.",
+     "clues": [
+      "**Gabriele** recovered **Father Barichello**'s personal prayer book, heavily annotated in unfamiliar ways.",
+      "**Gus** retrieved a rosary radiating unusual magic from the temple altar.",
+      "**Rosalia** claims to know what happened to **Father Barichello**."
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "A locked box recovered with **Gabriele** radiates catastrophic magical power. The **Arcane Marshals** cannot identify it, and a similar signature has been detected in **Seranthis**.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "new",
+     "text": "**Bram** leads a gang called the **Pyreborn** operating in the poor quarter. Their symbol, a crescent moon encased in a sun, matches the mark on the wagon that took **Belaskro**'s uncle and cousin to **Althon's Gate** years ago.",
+     "clues": [
+      "**Bram** wears the crescent moon and sun symbol.",
+      "He rallied the mob by railing against the **Arcane Marshals** and noble houses.",
+      "The gang is willing to kill to drive out authority from the poor quarter."
+     ]
+    },
+    {
+     "id": "escape-the-mission-siege",
+     "status": "resolved",
+     "text": "The party successfully escaped through a secret tunnel as the building burned, evading **Bram**'s gang with the help of **Lux Corstane** and **Belaskro**'s fog cloud.",
+     "clues": []
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Lieutenant",
+     "state": "",
+     "new": false,
+     "text": "Sent a distress flare, discovered the secret exit, and led the evacuation through the tunnels."
+    },
+    {
+     "name": "Lux Aveline Corstane",
+     "title": "",
+     "faction": "",
+     "role": "Priest at the poor quarter mission",
+     "state": "",
+     "new": false,
+     "text": "Protected the secret escape route during the siege; evacuated civilians through hidden tunnels; introduced the party to **Rosalia** at the basilica."
+    },
+    {
+     "name": "Bram",
+     "title": "",
+     "faction": "The Pyreborn",
+     "role": "Gang leader",
+     "state": "",
+     "new": true,
+     "text": "Wears the crescent moon and sun symbol; uses fire magic; rallied the mob against the **Arcane Marshals**; set the mission ablaze and broke down the door shouting \"For the **Pyreborn**!\""
+    },
+    {
+     "name": "Rosalia",
+     "title": "",
+     "faction": "",
+     "role": "Works with the mission",
+     "state": "",
+     "new": true,
+     "text": "Young woman (approximately 30) with sharp features; claims to know what happened to **Father Barichello**."
+    }
+   ],
+   "items": [
+    {
+     "name": "Rusty Rapier",
+     "homebrew": "",
+     "new": true,
+     "text": "Serviceable sword found in mission storage; wielded by **Gabriele**."
+    },
+    {
+     "name": "Wooden Shield",
+     "homebrew": "",
+     "new": true,
+     "text": "Rough but functional practice shield found in a mission bedroom; carried by **Gabriele**."
+    },
+    {
+     "name": "Father Barichello's Prayer Book",
+     "homebrew": "Father Barichello's Bible",
+     "new": true,
+     "text": "Personal prayer book belonging to **Gabriele**'s mentor, heavily annotated in **Barichello**'s handwriting in unfamiliar ways; found in the temple pews; carried by Gabriele."
+    },
+    {
+     "name": "Rosary with Unusual Magic",
+     "homebrew": "Father Barichello's Rosary",
+     "new": true,
+     "text": "Rosary radiating an unrecognised magical signature, distinct from **Varenthal**'s ambient mageocracy magic; found on the temple altar; stored in **Gus**'s evidence compartment."
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "title": "The Glowing Goat",
+   "summary": [
+    "The session opened with **Belaskro** stepping through the escape tunnel, triggering a vivid flashback to his childhood in **Shadowvale** thirty-two years ago. Standing on the porch at age twelve beside his sister **Sloane**, he watched his Uncle **Corvane** and Aunt **Maribel** prepare to leave for **Althon's Gate** after Corvane won a tournament and gained noble status. Maribel gave Belaskro and Sloane matching rings, a moon and a sun, explaining that the symbol painted on the wagon represented the bond between families, just as it would now represent the bond between the siblings. The memory revealed that Maribel later died in childbirth bearing a son named **Cassian**, and that Belaskro has never sought out his uncle despite frequently visiting the same city.",
+    "Returning to the present, the party emerged from the tunnel to find **Lux Corstane** and **Rosalia** waiting at a nearby temple. Rosalia explained that approximately two weeks ago, four or five men with **Seranthis** accents grabbed **Father Barichello** while he was helping feed the poor and dragged him toward the dockyards. She identified **The Glowing Goat** tavern as a place where at least one of the kidnappers frequents. **Lieutenant Wrent** provided crucial context about Seranthis: a rival kingdom born from a bitter split 250 years ago, known for taking indigenous **Oss'kai** women by force as brides during the sundering. **Gabriele** examined the rosary **Gus** had recovered, confirmed it belonged to Father Barichello, and wore it as a promise to return it to his mentor. He also began studying the prayer book, discovering that Barichello's annotations corresponded to actual magical effects, including the \"**Tolling the Dead**\" spell Gabriele had unknowingly cast in the previous battle. Before departing to report to his captain, Wrent privately instructed Gus to keep watch over Gabriele but only detain him for actions clearly against the mission or citizen safety. Wrent also negotiated with **Belaskro** to extend the contract for an additional two gold.",
+    "The party retrieved **Gus**'s steel defender from a nearby Arcane Marshal outpost and made their way to the dockyards. At **The Glowing Goat**, they split up to gather intelligence. **Gabriele** questioned the bartender while **Belaskro** eavesdropped and Gus maintained unwavering surveillance on Gabriele. The bartender confirmed that **Seranthis** patrons frequented the tavern and shared the dark history of the \"**Sundermark Brides**.\" Belaskro identified three Seranthis sailors in the back corner and overheard them discussing a completed kidnapping, an incoming caravan, and waiting for payment. He marked the apparent leader, **Dask**, with Hunter's Mark to track him later. When Gabriele attempted to leave the tavern to confer privately with his companions, Gus's literal interpretation of his orders led to Gabriele being handcuffed and fined for public urination, a situation only resolved when Belaskro paid the fifteen silver piece fine.",
+    "The party decided to follow the three **Seranthis** sailors rather than confront them in the crowded tavern. Despite their caution, **Gus**'s conspicuous brass frame made stealth impossible in the open dockyard. **Dask** spotted them and led his companions in a tactical retreat, doubling back to confront the party in a narrow side street. When **Gabriele** demanded they return \"the man you have taken,\" the Seranthis sailors refused and combat erupted."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "changed",
+     "text": "**Gabriele**'s missing mentor was kidnapped by **Seranthis** agents two weeks ago and dragged toward the dockyards. The party has identified three suspects who discussed the kidnapping and are waiting for a caravan.",
+     "clues": [
+      "**Rosalia** witnessed the kidnapping by four or five men with **Seranthis** accents.",
+      "The kidnappers dragged **Barichello** toward the dockyards.",
+      "**Dask**, **Ivo**, and a third sailor discussed completing a job and waiting for payment from an incoming caravan.",
+      "**Barichello's prayer book** contains spell annotations that correspond to real magical effects."
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "A locked box recovered with **Gabriele** radiates catastrophic magical power. The **Arcane Marshals** cannot identify it, and a similar signature has been detected in **Seranthis**.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "**Bram** leads a gang called the **Pyreborn** operating in the poor quarter. Their symbol, a crescent moon encased in a sun, matches the mark on the wagon that took **Belaskro**'s uncle and cousin to **Althon's Gate** years ago.",
+     "clues": [
+      "**Belaskro**'s childhood memory revealed the symbol represents the union of his Uncle **Corvane**'s family (sun) and Aunt **Maribel**'s family (moon).",
+      "**Corvane** became **Lord Cassian Aerrowyn**'s father after winning a tournament.",
+      "**Maribel** died in childbirth."
+     ]
+    },
+    {
+     "id": "confront-the-seranthis-kidnappers",
+     "status": "new",
+     "text": "The party has cornered **Dask**, **Ivo**, and a third **Seranthis** sailor in a dockyard alley. Combat has begun.",
+     "clues": [
+      "The sailors are dock workers who blend in with the local population.",
+      "**Dask** appears to be the leader.",
+      "They are nervous about being caught."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Rosalia Whitlock",
+     "title": "",
+     "faction": "",
+     "role": "Poor quarter mission volunteer",
+     "state": "",
+     "new": false,
+     "text": "Witnessed **Father Barichello**'s kidnapping two weeks ago by men with **Seranthis** accents; directed the party to **The Glowing Goat**; blessed the party before they departed."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Lieutenant",
+     "state": "",
+     "new": false,
+     "text": "Briefed the party on **Seranthis** history; assigned **Gus** to watch **Gabriele**; departed to report to his captain."
+    },
+    {
+     "name": "Lux Aveline Corstane",
+     "title": "",
+     "faction": "",
+     "role": "Temple priest",
+     "state": "",
+     "new": false,
+     "text": "Ushered the party to safety; warned them not to return because of the trouble they have brought."
+    },
+    {
+     "name": "Dask Corrin",
+     "title": "",
+     "faction": "",
+     "role": "Seranthis sailor, leader of the kidnapping crew",
+     "state": "",
+     "new": true,
+     "text": "Wiry and calculating; discussed waiting for the caravan payment."
+    },
+    {
+     "name": "Ivo",
+     "title": "",
+     "faction": "",
+     "role": "Seranthis sailor",
+     "state": "",
+     "new": true,
+     "text": "Nervous about being caught; discussed completing the kidnapping job."
+    },
+    {
+     "name": "Yorwick Dray",
+     "title": "Sergeant",
+     "faction": "Arcane Marshals",
+     "role": "Sergeant at the dockyard outpost",
+     "state": "",
+     "new": true,
+     "text": "Stout man with a handlebar moustache stationed at the dockyard outpost; arranged for **Gus**'s steel defender to meet the party at the docks."
+    }
+   ],
+   "items": [
+    {
+     "name": "Father Barichello's Rosary",
+     "homebrew": "Father Barichello's Rosary",
+     "new": false,
+     "text": "No new items were obtained this session. **Gabriele** confirmed the rosary **Gus** recovered last session belonged to **Father Barichello** and now wears it as a promise to return it to his mentor. It grants a +1 bonus to initiative."
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "title": "Interrogations and Conspiracies",
+   "summary": [
+    "Combat erupted in the dockyard alley as the party confronted the three **Seranthis** sailors. **Gus** led with shocking grasp against **Dask**, while **Belaskro**'s crossbow struck true, though one wild shot punctured a beer keg, creating hazardous terrain. **Krill**, the third sailor, proved less committed to the fight and fled over barrels to escape. The party focused fire on the remaining two: **Gabriele** summoned a spectral cavalryman (Saint Peter on horseback) as his spiritual weapon, slashing at the sailors' backs, while attempting to grapple Dask with a natural 20 tackle that left the leader prone and pinned. Gus's acid splash burned **Ivo**'s eyes, leaving him screaming and helpless. Belaskro finished the fight by whipping Dask's legs out from under him, knocking him unconscious against the cobblestones.",
+    "The interrogation that followed tested the party's methods. **Ivo** initially refused to cooperate, defiant even when threatened. **Gabriele** healed his acid burns with cure wounds, only to have **Gus** spray acid in his eyes again at Gabriele's prompting: a calculated act of torture that eventually broke the sailor's resistance. Under duress, Ivo confirmed that they had kidnapped **Father Barichello** approximately two weeks ago and handed him to a merchant caravan bound for **Seranthis**. Payment was still pending, expected to arrive with another caravan from the south. Searching **Dask**'s pockets, the party discovered a letter from someone named **Ilna**, signed with initials \"DV\" and sealed with a raised fist. The letter revealed that the kidnapping was orchestrated to provide \"seed money\" for a larger operation aimed at keeping the poor quarter \"hungry\" and \"angry,\" using the **Sundermark Brides** song to direct blame at the noble houses. The letter mentioned the **Old Tallow Yard** as a handoff point.",
+    "**Gus**'s steel defender hauled both captured sailors to the Arcane Marshal station while the exhausted party returned to **The Glowing Goat** for the night. **Gabriele** collapsed into immediate sleep, while Gus powered down in the tavern's main room, his unblinking brass form inadvertently becoming the establishment's overnight security, much to the bartender's entrepreneurial delight. The party took a much-needed long rest after a gruelling day that had started in a jail cell and included two pitched battles.",
+    "The next morning, the party sought out **Lieutenant Wrent** and instead found themselves summoned to meet the Arcane Marshal Captain at the **Sanctuary**. The imposing captain laid out a grim picture: the city was a powder keg with the **Royal Tournament** approaching in one month, noble houses manoeuvring against each other, and two gangs, the **Pyreborn** and the **Unbowed**, creating coordinated unrest in the dockyards and poor quarter. The captain believed one of **Varenthal**'s noble houses was directing the Pyreborn and had connections to **Seranthis**, but lacked actionable intelligence to prove it. His official requests for resources had been blocked by the very noble houses he suspected. Desperate, he offered the party 25 gold immediately and 30 more upon delivery of actionable intelligence to investigate off the books. He confirmed the Pyreborn attacked the party at the mission and that both gangs were using the **Sundermark Brides** song to stoke anti-noble sentiment. The captain suspected the conspiracy aimed at disrupting the Royal Tournament (the mageraft competition that would confirm the crown prince) but couldn't determine how. **Gabriele** attempted to negotiate access to classified documents in lieu of payment but was firmly refused; the captain's loyalty to the city and distrust of unknown civilians won out, even with a persuasive appeal. The party accepted the contract, taking the gold and the mission to uncover which noble house was betraying Varenthal."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "changed",
+     "text": "The kidnapped priest was handed to a **Seranthis**-bound caravan two weeks ago and is likely already in **Sundermark** or arriving soon. The party is now two weeks behind him.",
+     "clues": [
+      "**Ivo** confirmed **Father Barichello** was kidnapped and delivered to a caravan heading to **Seranthis**.",
+      "Payment was to come from another caravan from **Seranthis**.",
+      "The letter reveals the kidnapping provided \"seed money\" for a larger conspiracy.",
+      "The handoff occurred at the **Old Tallow Yard** before the caravan turned south for **Sundermark**.",
+      "The conspiracy is signed by someone with initials \"DV\" and involves a person named **Ilna**."
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "A locked box recovered with **Gabriele** radiates catastrophic magical power. The **Arcane Marshals** cannot identify it, and a similar signature has been detected in **Seranthis**.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "The Arcane Marshal Captain confirmed the **Pyreborn** are the gang that attacked the party at the mission and are being directed by one of **Varenthal**'s noble houses. Their symbol matches **Belaskro**'s uncle's family crest.",
+     "clues": [
+      "**The Pyreborn** are confirmed to be controlled by a noble house within **Varenthal**.",
+      "The captain suspects but cannot prove which house.",
+      "**The Pyreborn** are connected to the **Unbowed** gang operating in the dockyards.",
+      "Both gangs are using the **Sundermark Brides** song to create unrest and direct blame at the noble houses."
+     ]
+    },
+    {
+     "id": "investigate-the-unbowed",
+     "status": "new",
+     "text": "A second gang causing chaos among dockworkers and the working class. The **Arcane Marshals** suspect they are connected to the **Pyreborn** and receiving direction from within **Varenthal** with ties to **Seranthis**.",
+     "clues": [
+      "**The Unbowed** operate in the dockyards and among the working class.",
+      "The letter from **Ilna** instructs keeping the quarter \"hungry\" and \"angry\" while blaming the houses.",
+      "The conspiracy involves someone with initials \"DV\".",
+      "**Dask**, **Ivo**, and **Krill** were **Unbowed** operatives working the kidnapping job."
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "new",
+     "text": "The Arcane Marshal Captain has hired the party to discover which **Varenthal** noble house is directing the **Pyreborn** and **Unbowed**, and determine their connection to **Seranthis** and plans regarding the upcoming **Royal Tournament**.",
+     "clues": [
+      "One noble house in **Varenthal** is involved, but its identity is unknown.",
+      "The conspiracy has ties to **Seranthis**.",
+      "**The Royal Tournament** is one month away and selects the crown prince through mageraft competition.",
+      "The captain's official resource requests have been blocked, suggesting corruption at high levels.",
+      "The timing of the unrest coincides suspiciously with the tournament.",
+      "A fist raised in defiance is the seal used by the conspirators."
+     ]
+    },
+    {
+     "id": "confront-the-seranthis-kidnappers",
+     "status": "resolved",
+     "text": "Two of three sailors captured; **Krill Nye** escaped. **Dask Corrin** and **Ivo** are in Arcane Marshal custody.",
+     "clues": [
+      "Combat resolved.",
+      "Interrogation successful.",
+      "Letter recovered."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Dask Corrin",
+     "title": "",
+     "faction": "The Unbowed",
+     "role": "Leader of the kidnapping crew",
+     "state": "In custody",
+     "new": false,
+     "text": "Captured unconscious and delivered to Arcane Marshal custody."
+    },
+    {
+     "name": "Ivo",
+     "title": "",
+     "faction": "The Unbowed",
+     "role": "Seranthis sailor",
+     "state": "In custody",
+     "new": false,
+     "text": "Tortured and interrogated; confirmed **Father Barichello**'s kidnapping and delivery to the caravan; now in custody and potentially turned informant."
+    },
+    {
+     "name": "Krill Nye",
+     "title": "",
+     "faction": "The Unbowed",
+     "role": "Sailor",
+     "state": "At large",
+     "new": false,
+     "text": "Large and unintelligent; fled combat over barrels and escaped with a crossbow bolt injury; his description was provided to the **Arcane Marshals**."
+    },
+    {
+     "name": "Ilna Vesk",
+     "title": "",
+     "faction": "The Unbowed",
+     "role": "Directs the Unbowed",
+     "state": "",
+     "new": false,
+     "text": "Name signed on the conspiracy letter; instructed **Dask** on the kidnapping and the broader strategy of keeping the poor quarter angry."
+    },
+    {
+     "name": "Elowen Rhys",
+     "title": "Marshal-Captain",
+     "faction": "Arcane Marshals",
+     "role": "Arcane Marshal Captain",
+     "state": "",
+     "new": true,
+     "text": "Lifetime appointee; gruff and dedicated; responsible for **Royal Tournament** security. Believes the city is a powder keg with noble houses involved in a conspiracy; hired the party off the books for 25 gold now and 30 upon delivering actionable intelligence."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Lieutenant",
+     "state": "",
+     "new": false,
+     "text": "Present at the captain's briefing; tasked with \"educating\" **Gus** on appropriate discretion."
+    },
+    {
+     "name": "Yorwick Dray",
+     "title": "Sergeant",
+     "faction": "Arcane Marshals",
+     "role": "Sergeant at the dockyard outpost",
+     "state": "",
+     "new": false,
+     "text": "Facilitated communication with the **Sanctuary**; accepted the captured prisoners."
+    }
+   ],
+   "items": [
+    {
+     "name": "Letter from Ilna to Dask",
+     "homebrew": "",
+     "new": true,
+     "text": "Conspiracy letter recovered from **Dask**'s jacket. It details kidnapping instructions, payment arrangements, and a broader strategy to destabilize the poor quarter; it mentions the **Old Tallow Yard**, payment from a **Seranthis** caravan, and keeping unrest directed at the noble houses. Signed by **Ilna** with initials \"DV\" and sealed with a raised fist; the party keeps it."
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "title": "Unholy Alliances",
+   "summary": [
+    "**Lieutenant Wrent** briefed the party on their off-the-books assignment, confirming the payment was black money with no official record. If captured, the **Arcane Marshals** would disavow them entirely. He asked about a second gang fighting the **Pyreborn** for territory: the **Unbowed**. The party recognised the name from the letter's raised fist seal. Wrent cautioned **Gus** about operating under the radar, framing it as practice for potential undercover work, a specialty designation Gus seemed to understand as a possible promotion.",
+    "The party split. **Gus** and **Belaskro** headed to the **Old Tallow Yard** to intercept the payment mentioned in the letter, while **Gabriele** accompanied **Lieutenant Wrent** to interrogate **Dask**. At the Tallow Yard, a failed stealth attempt (Belaskro knocked over a rickety fence section) alerted the proprietor. Gus's homunculus discovered someone hiding among the wagons: **Krill Nye**, the sailor who had fled the previous fight. Gus arrested both Krill and the proprietor for harbouring a fugitive, though he released Krill without manacles after the sailor agreed to lead them to his boss in exchange for freedom.",
+    "The interrogation in the **Sanctuary** dungeons tested unconventional tactics. **Lieutenant Wrent** played bad cop with brutal efficiency, while **Gabriele** attempted good cop. **Dask**, however, saw through the priest's bluff about a \"three strikes\" execution policy, recognising Gabriele as the more frightening interrogator after witnessing the torture of **Ivo**. Wrent and Gabriele reversed roles: Wrent offered a deal while Gabriele hinted at God's forgiveness in exchange for cooperation. Under pressure and shown the incriminating letter, Dask revealed that **Ilna Vesk** leads the **Unbowed** in **Varenthal**, and that **Dreeshen Vale** (initials DV) commands the movement from **Seranthis**. Gabriele suggested releasing Dask to follow him to Ilna, staging a violent outburst complete with kicking, torch-wielding threats amplified by thaumaturgy, and genuine punches that forced Wrent to physically restrain him. The ruse worked: Wrent released Dask, citing ruined prosecution, and the pair successfully tailed him through the streets.",
+    "Both threads converged at the **Fair Maiden** tavern in the dockyards. **Krill** led **Gus** and **Belaskro** inside, where a drag performer lip-synced on stage; Belaskro's keen perception caught the deception. The performer, introducing herself as **Lady Macbeth** (Ilna Vesk), led the group to a cellar office. When pressed about **Father Barichello**, Ilna refused to speak in front of \"arcane creatures,\" demanding Gus leave. Belaskro refused, declaring Gus a person and insisting he stay. His raised voice alerted **Gabriele** and **Wrent**, who were listening at the cellar doors. They burst in just as tensions peaked. Ilna drew a hidden crossbow and fired at Lieutenant Wrent, but her aim failed catastrophically. Gabriele, having readied a guiding bolt in case of violence, unleashed 18 points of radiant damage that knocked Ilna to the ground and disarmed her.",
+    "Defeated and bloodied, **Ilna** confirmed she had sent **Father Barichello** to **Seranthis** with **Dreeshen Vale**'s people in exchange for funding and equipment for the **Unbowed**'s cause: educating the working class and opposing noble oppression. She knew nothing of where in Seranthis the priest was taken. **Gus**'s records search revealed that Dreeshen Vale's surname connects to **Lady Vale**, a noble on the **King's Council** of Seranthis. Ilna expressed contempt for the **Pyreborn**, calling them scum who hurt the poor as readily as the nobles, and claimed the Unbowed had no involvement in the tournament sabotage, since they lacked the resources for such an operation. She offered intelligence on the Pyreborn: their leader is **Bram Kell**, they operate from a hovel in the poor quarter about ten minutes east of the mission, and they outnumber the Unbowed ten to one. She recommended catching Bram away from his gang rather than assaulting their stronghold directly. **Lieutenant Wrent** chose not to arrest Ilna, honouring his promise that the conversation was off the books and recognising that bringing her in would expose the entire black operation.",
+    "Outside, the party and **Wrent** discussed their options: investigate the **Pyreborn**, investigate the noble houses, or examine the tournament sabotage directly by posing as arena staff during practice sessions. Wrent confirmed he had wanted to raid the Pyreborn for years, but requests were consistently denied by the **King's Council**, further evidence of noble house protection. The party settled on investigating the Pyreborn as their next move. As the group prepared to leave the **Fair Maiden**, **Gabriele** slipped back inside, spotted **Dask** in a dark corner watching the stage, and sent him a drink. When Dask panicked and tried to flee, Gabriele intercepted him outside, healing his interrogation injuries with a touch, pressing a gold coin into his hand, and telling him this was the beginning of a relationship. **The Unbowed** and the marshals now had an agreement built on \"good faith.\""
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "changed",
+     "text": "**Ilna Vesk** confirmed the priest was handed to **Dreeshen Vale**'s people and taken to **Seranthis** two weeks ago for payment. His exact location in Seranthis remains unknown. The party is two weeks behind and lacks specific leads within the city.",
+     "clues": [
+      "**Ilna** sent **Father Barichello** to **Dreeshen Vale**'s operatives in exchange for money and equipment.",
+      "**Dreeshen Vale** is based in **Seranthis**.",
+      "The surname **Vale** connects to **Lady Vale**, a noble on the **King's Council** of **Seranthis**.",
+      "**Ilna** does not know where in **Seranthis** he was taken."
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "The party now has actionable intelligence: location, leadership, and an offer of continued information from **Ilna Vesk**.",
+     "clues": [
+      "**The Pyreborn** operate from a hovel in the poor quarter, approximately ten minutes east of the mission.",
+      "Their leader is **Bram Kell**.",
+      "They outnumber the **Unbowed** ten to one.",
+      "**Ilna Vesk** despises them and is willing to provide information.",
+      "The **Arcane Marshals**' raid requests have been blocked by the **King's Council**, suggesting noble house protection at the highest levels."
+     ]
+    },
+    {
+     "id": "investigate-the-unbowed",
+     "status": "resolved",
+     "text": "Quest effectively resolved through alliance rather than opposition. **Ilna Vesk** leads the **Unbowed** in **Varenthal**; **Dreeshen Vale** commands the broader movement from **Seranthis**. The organization focuses on worker education and opposing noble oppression, not tournament sabotage.",
+     "clues": [
+      "**Ilna Vesk** (also known as Lady Macbeth) leads the **Unbowed** in **Varenthal** and performs drag at the **Fair Maiden** tavern.",
+      "**Dreeshen Vale** founded the movement and directs it from **Seranthis**.",
+      "He is connected to **Lady Vale** of the **Seranthis** **King's Council**.",
+      "**The Unbowed** claim they lack resources for tournament sabotage and are not involved.",
+      "**Ilna** agreed to provide intelligence on the **Pyreborn** in exchange for keeping her organization off the books.",
+      "**Gabriele** established a confidential informant relationship with **Dask Corrin**."
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Investigation continues. Connection confirmed between **Seranthis** nobility (**Lady Vale**) and the **Unbowed** through **Dreeshen Vale**, but the **Varenthal** noble house directing the **Pyreborn** remains unidentified.",
+     "clues": [
+      "**Dreeshen Vale**'s surname links him to **Lady Vale**, an advisor to the King of **Seranthis**.",
+      "This confirms **Seranthis** noble involvement in **Varenthal**'s unrest.",
+      "**Lieutenant Wrent**'s raid requests against the **Pyreborn** have been repeatedly denied by the **King's Council** despite substantial evidence, indicating high-level corruption.",
+      "The party has multiple investigation paths: direct **Pyreborn** investigation, noble house investigation, or infiltrating tournament practice sessions as arena staff."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Ilna Vesk",
+     "title": "",
+     "faction": "Unbowed",
+     "role": "Leader of the Unbowed in Varenthal; drag performer at the Fair Maiden (stage name Lady Macbeth)",
+     "state": "",
+     "new": false,
+     "text": "Confirmed sending **Father Barichello** to **Seranthis** via **Dreeshen Vale**'s operatives in exchange for funding; shot a crossbow at **Lieutenant Wrent** and was knocked down by **Gabriele**'s guiding bolt; agreed to provide intelligence on the **Pyreborn** in exchange for remaining off the books."
+    },
+    {
+     "name": "Dreeshen Vale",
+     "title": "",
+     "faction": "Unbowed",
+     "role": "Founder and leader of the Unbowed movement",
+     "state": "",
+     "new": false,
+     "text": "Based in **Seranthis**; surname connects him to **Lady Vale** of the Seranthis **King's Council**; received **Father Barichello** from **Ilna**'s operatives; a former noble who turned against his class."
+    },
+    {
+     "name": "Vale",
+     "title": "Lady",
+     "faction": "King's Council of Seranthis",
+     "role": "Noble on the King's Council of Seranthis",
+     "state": "",
+     "new": false,
+     "text": "Her connection to **Dreeshen Vale** was confirmed through his surname."
+    },
+    {
+     "name": "Bram Kell",
+     "title": "",
+     "faction": "Pyreborn",
+     "role": "Leader of the Pyreborn",
+     "state": "",
+     "new": false,
+     "text": "Operates from a hovel in the poor quarter, ten minutes east of the mission."
+    },
+    {
+     "name": "Krill Nye",
+     "title": "",
+     "faction": "Unbowed",
+     "role": "Sailor",
+     "state": "",
+     "new": false,
+     "text": "Captured at the **Old Tallow Yard**; agreed to lead the party to **Ilna** in exchange for freedom; appeared loyal to Ilna and seemed infatuated with her stage persona."
+    },
+    {
+     "name": "Dask Corrin",
+     "title": "",
+     "faction": "Unbowed",
+     "role": "Confidential informant",
+     "state": "",
+     "new": false,
+     "text": "Released from custody as part of an interrogation ruse and followed to the **Fair Maiden**; **Gabriele** established him as a confidential informant with a gold coin and promises of good faith between the **Unbowed** and the marshals."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Runs the party's off-the-books assignment",
+     "state": "",
+     "new": false,
+     "text": "Led the interrogation of **Dask**; promised the party's conversation with **Ilna** would remain off the books and chose not to arrest Ilna to honour that promise; confirmed raid requests against the **Pyreborn** have been blocked by the **King's Council**."
+    }
+   ],
+   "items": []
+  },
+  {
+   "n": 6,
+   "title": "The Vantry Investigation",
+   "summary": [
+    "The morning after establishing their alliance with the **Unbowed**, **Lieutenant Wrent** summoned the party to discuss next steps in the tournament sabotage investigation. Their discussion was interrupted by urgent news: another explosion at the **Silverglass Annex**, occurring just twenty minutes prior. Wrent explained that exploding shield runes had become the primary mechanism of injury in the tournament attacks, and dispatched the party to investigate the fresh crime scene.",
+    "At the **Silverglass Annex** duelling grounds, a colosseum-like arena familiar to **Gabriele** from his time in **Rome**, the party split to cover more ground. **Gus** investigated the field using detect magic and discovered six broken rune tablets scattered across the pristine stone floor. Five bore the maker's mark of \"**Kilnworks** R Us,\" but the sixth was stamped with \"**Vantry Runeworks**\" and radiated not only shield magic but illusion magic as well. Meanwhile, **Belaskro** interviewed a janitor who had witnessed the explosion. The twenty-year veteran described how the shield rune appeared to function normally at first, allowing a bird to pass through when it should have been impermeable, before collapsing inward in a flash of bright light that severely burned the two victims without damaging the grounds. **Lieutenant Wrent** discovered a receipt in the coach's locker showing he had purchased five runes, but not from Vantry, leaving the source of the sixth rune a mystery.",
+    "The investigation led directly to **Vantry Runeworks** in the adjacent **Kilnworks District**, a massive factory-warehouse where magical rune tablets were mass-produced. The party split their approach: **Gus** and **Lieutenant Wrent** entered through the front, while **Gabriele** and **Belaskro** attempted to infiltrate through the workers' entrance at the rear. Inside, Gabriele was struck by a floating pallet of runes (the factory used autonomous magical conveyors), and his resulting crash scattered blank tablets across the floor, alerting the entire facility. Gabriele used thaumaturgy to create phantom whispers calling for help for \"the new guy,\" attempting to deflect suspicion, then fled to a tavern across the street with Belaskro.",
+    "At the front entrance, **Gus** practised his developing spycraft skills under **Lieutenant Wrent**'s coaching, successfully persuading **Guildmaster Ordell Vantry** to bring them to his office for questioning. **Vantry** revealed that his warehouse had been suffering mysterious thefts (approximately ten percent of his stock over two months) with no signs of break-ins or damage. The stolen items were blank rune tablets, not yet imbued with magic, making the thefts particularly puzzling. When Vantry examined the recovered Vantry rune from the explosion, he confirmed it was one of his blanks, but it showed no magical signature from his employees. It had never been finished at his facility. When Vantry summoned his floor supervisor for questioning, a gnome worker who **Gabriele** had overheard muttering bitterly about \"one more month\" and keeping his family safe, the supervisor mysteriously vanished. Lieutenant Wrent spotted a blank rune tablet by the wall where the supervisor had disappeared, suspecting illusion magic had concealed an escape route.",
+    "Outside the factory, the reunited party debated their next move. **Lieutenant Wrent** theorized the supervisor remained hidden inside using illusion magic and suggested a nighttime return, but **Gabriele** proposed an immediate diversion: starting a controlled fire to evacuate the workers while **Gus** investigated the suspicious wall. Despite Gus's warning that any deaths would constitute a capital offence, the plan moved forward. Gabriele used thaumaturgy to fling open an office window, then successfully threw a lit torch through it to start the fire. As flames took hold and the party prepared to re-enter under cover of the evacuation, Lieutenant Wrent found a blank rune near the wall and declared, \"This has now just become interesting.\""
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "none",
+     "text": "No progress this session. The priest remains in **Seranthis**, two weeks ahead, with no specific leads within the city.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "new",
+     "text": "Active investigation of exploding shield runes. Evidence points to a sophisticated operation involving theft of blank runes from **Vantry Runeworks**, external magical modification, and insertion into the tournament supply chain.",
+     "clues": [
+      "The shield rune from the **Silverglass Annex** attack bore the **Vantry Runeworks** maker's mark but contained illusion magic in addition to shield magic.",
+      "The rune was never finished at **Vantry**'s facility: it lacks employee magical signatures.",
+      "The janitor described the shield appearing functional but permeable (a bird flew through) before collapsing inward and burning the victims without damaging the surroundings.",
+      "The coach purchased five runes (not from **Vantry**), but six rune fragments were found at the scene.",
+      "**Vantry Runeworks** has lost approximately 10% of its stock (blank, unfinished rune tablets) over two months to mysterious thefts with no break-ins.",
+      "A blank rune found near the wall where the floor supervisor vanished suggests illusion magic concealing an escape route or hidden space.",
+      "**Vantry**'s floor supervisor is a gnome who was overheard saying he needs to endure \"one more month\" and keep his family safe, expressing resentment toward Ordell."
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "none",
+     "text": "No progress this session. The party has actionable intelligence from **Ilna Vesk** but has not yet pursued it.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Investigation continues through the tournament sabotage angle. The connection between the **Vantry** thefts and the tournament attacks suggests an organized operation.",
+     "clues": [
+      "A sophisticated operation involving theft, external magical modification, and supply chain infiltration points to resources beyond street gangs like the **Pyreborn** or **Unbowed**.",
+      "The **Vantry** thefts (two months) predate the escalation of the tournament attacks."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Ordell Vantry",
+     "title": "Guildmaster",
+     "faction": "Vantry Runeworks",
+     "role": "Owner of Vantry Runeworks",
+     "state": "",
+     "new": true,
+     "text": "Owner of the largest rune production facility in **Althon's Gate**; reported ongoing thefts of blank rune tablets from his warehouse with no signs of break-ins; confirmed the explosive rune was a **Vantry blank** but never finished at his facility; access to the warehouse is limited to himself, the lead supervisor, and the quartermaster."
+    },
+    {
+     "name": "Ovett Kallisch",
+     "title": "Constable-Adept",
+     "faction": "Arcane Marshals",
+     "role": "Arcane Marshal who repaired Gus previously",
+     "state": "",
+     "new": false,
+     "text": "Led the lockdown and evidence collection at the **Silverglass Annex**."
+    },
+    {
+     "name": "Ander Voss",
+     "title": "Ser",
+     "faction": "",
+     "role": "Tournament coach",
+     "state": "Injured",
+     "new": true,
+     "text": "His locker contained a receipt for five runes (not from **Vantry**); severely burned in the **Silverglass Annex** explosion."
+    },
+    {
+     "name": "Ellard Fenn",
+     "title": "",
+     "faction": "",
+     "role": "Janitor at the Silverglass Annex",
+     "state": "",
+     "new": true,
+     "text": "Janitor for over twenty years; witnessed the shield rune explosion and described it collapsing inward after appearing permeable; lives in a hut on the grounds."
+    },
+    {
+     "name": "Vantry Floor Supervisor (gnome, name unknown)",
+     "title": "",
+     "faction": "Vantry Runeworks",
+     "role": "Floor supervisor",
+     "state": "Missing",
+     "new": true,
+     "text": "Disgruntled floor supervisor overheard muttering about enduring \"one more month\" and keeping his family safe while resenting Ordell; mysteriously vanished when summoned for questioning, likely using illusion magic; suspected of involvement in the rune thefts."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Runs the party's off-the-books assignment",
+     "state": "",
+     "new": false,
+     "text": "Coached **Gus** on spycraft and discretion during the investigation; revealed that Marshal Intelligence has ways of disguising constructs for undercover work."
+    }
+   ],
+   "items": [
+    {
+     "name": "Broken Rune Tablets",
+     "homebrew": "",
+     "new": true,
+     "text": "Six broken rune tablets collected from the **Silverglass Annex** crime scene (five from **Kilnworks** R Us, one from **Vantry Runeworks** with illusion magic); held by **Gus** as evidence."
+    },
+    {
+     "name": "Blank Rune Tablets",
+     "homebrew": "Blank Rune Tablet",
+     "new": true,
+     "text": "Several blank, unfinished rune tablets picked up by **Belaskro** from the scattered pile at **Vantry Runeworks**."
+    },
+    {
+     "name": "Receipt",
+     "homebrew": "",
+     "new": true,
+     "text": "Receipt found in **Ser Ander Voss**'s locker showing the purchase of five runes (not from **Vantry**); held by **Lieutenant Wrent**."
+    },
+    {
+     "name": "Blank Rune (from wall)",
+     "homebrew": "Blank Rune Tablet",
+     "new": true,
+     "text": "Blank rune tablet found by **Lieutenant Wrent** near the wall where the floor supervisor disappeared; evidence of an illusion magic escape route."
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "title": "Forged in Fire",
+   "summary": [
+    "Following the secret passage beneath **Vantry Runeworks**, the party descended a spiral staircase hundreds of feet into a hidden underground workshop. There they discovered an illegal rune-crafting operation: six workers and a gnome supervisor using stolen blank tablets to create sabotaged shield runes identical to those used in the tournament attacks. The workers were clearly under duress, and the gnome, overheard earlier muttering about enduring \"one more month\" to keep his family safe, confirmed their families were being held hostage to ensure compliance.",
+    "The party's investigation was interrupted by an unexpected arrival: **Princess Timbit of House Puss**, a talking Persian cat and member of visiting nobility. Princess Timbit had come to investigate the tournament sabotage independently after her sister-cousin, Baroness **Éclair**, entered the **Royal Tournament**. **Lieutenant Wrent**, recognising the noble house, awkwardly explained the **Arcane Marshals**' investigation while requesting discretion, since the inquiry was unwelcome among **Varenthal**'s noble houses. After Wrent departed to manage the fire emergency above, Princess Timbit joined the party's confrontation with the workshop crew.",
+    "When **Gabriele** announced the inspection, the workers immediately moved to destroy evidence, throwing torches onto the rune-crafting machines and attempting to flee. Combat erupted. The gnome supervisor, desperate to prevent his captors from alerting those holding his family, immediately surrendered and later tackled one fleeing worker to the ground. The party fought to subdue the workers while fire spread through the underground chamber. **Gus** deployed caustic acid that melted through the workers' defences. **Princess Timbit**'s wildfire magic and poison attacks proved devastatingly effective. Gabriele threw himself onto one burning machine to smother the flames, suffering burns but successfully preventing its destruction. His spiritual weapon, a spectral horseman of Saint Peter, pursued fleeing enemies up the stairwell.",
+    "The battle turned desperate when **Gus** was struck down by a mace blow to the head, collapsing unconscious on the stairs. Meanwhile, **Belaskro**'s whip caught one fleeing worker by the ankle, and the dying man, his face melting from acid, gasped a cryptic revelation: he recognised Belaskro, mistaking him for someone else. \"You look just like him,\" the worker said, asking if \"he\" had sent Belaskro, before identifying this mysterious figure as \"the leader of the **Pyreborn**.\"",
+    "The party defeated or killed all the **Pyreborn** workers. Searching the bodies, **Princess Timbit** discovered that most carried no identification, a deliberate effort to remain anonymous, but one wore a gold signet ring bearing the symbol of the Pyreborn: a sun with a moon inside it. She recognised it as a mark of high rank within the gang, likely a lieutenant or leader. The party also secured two finished sabotaged runes and several blank tablets as evidence.",
+    "The party's situation grew dire as flames from both the underground workshop and the warehouse above merged into an uncontrolled conflagration. Dragging the unconscious **Gus** up the stairs, **Gabriele** and **Belaskro** emerged into an alleyway to discover catastrophe: the \"controlled\" distraction fire Gabriele had started had consumed **Vantry Runeworks** entirely and was spreading to adjacent buildings in the **Kilnworks District**. The evening sky glowed with smoke and ash as **Lieutenant Wrent** directed desperate firefighting efforts amid the chaos. The small tactical fire had escalated into a district-wide emergency."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "none",
+     "text": "No progress this session. The priest remains in **Seranthis**, two weeks ahead, with no specific leads.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "Major breakthrough: the party discovered the illegal workshop producing sabotaged shield runes and confirmed the **Pyreborn**'s involvement through forced labour and a lieutenant's signet ring.",
+     "clues": [
+      "The underground workshop beneath **Vantry Runeworks** contains rune-crafting equipment producing sabotaged shield runes.",
+      "The gnome supervisor was forced to produce runes under threat to his captive family and told to endure \"one more month\".",
+      "Approximately 50 completed sabotaged runes and 100 blanks were in progress at the time of the raid.",
+      "A **Pyreborn signet ring** (a sun with a moon inside) was found on one worker, indicating a lieutenant or high rank.",
+      "A dying worker recognised **Belaskro**, mistaking him for \"the leader of the **Pyreborn**\".",
+      "Six workers were killed or captured.",
+      "The evidence suggests a sophisticated operation with resources beyond a typical street gang."
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "Significant progress: the **Pyreborn**'s direct involvement in the tournament sabotage is confirmed through the forced labour operation and a lieutenant's presence. A mysterious connection between **Belaskro**'s appearance and the Pyreborn leader has come to light.",
+     "clues": [
+      "A **Pyreborn** lieutenant was among the workshop crew (identified by the signet ring).",
+      "**The Pyreborn** are holding the workers' families hostage to force rune production.",
+      "A dying **Pyreborn** member recognised **Belaskro**, believing he resembled \"the leader of the Pyreborn\".",
+      "The timeline of \"one more month\" suggests a planned conclusion to the sabotage campaign."
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Investigation continues. **Lieutenant Wrent**'s warning that \"this avenue of inquiry is not one generally welcomed in **Varenthal**\" and his concerns about \"undue influence from the **King's Council**\" suggest noble house involvement or obstruction.",
+     "clues": [
+      "The **Arcane Marshals** face pressure from **Varenthal**'s **King's Council** regarding the investigation.",
+      "Noble houses practise intrigue that complicates law enforcement.",
+      "The scale of the operation (holding multiple families hostage, corrupting supply chains, coordinating across the city) suggests resources beyond street gangs."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Timbit",
+     "title": "Princess",
+     "faction": "House Puss",
+     "role": "Visiting nobility; talking Persian cat",
+     "state": "",
+     "new": true,
+     "text": "Investigating the tournament sabotage to protect her sister-cousin Baroness **Éclair**, a tournament competitor; joined the party's raid on the underground workshop; showed powerful wildfire and healing magic in combat."
+    },
+    {
+     "name": "Éclair",
+     "title": "Baroness",
+     "faction": "",
+     "role": "Royal Tournament competitor; Princess Timbit's sister-cousin",
+     "state": "",
+     "new": true,
+     "text": "Competing in the **Royal Tournament**; has not been harmed in the attacks so far."
+    },
+    {
+     "name": "Vantry Workshop Supervisor (gnome)",
+     "title": "",
+     "faction": "Vantry Runeworks",
+     "role": "Floor supervisor",
+     "state": "",
+     "new": true,
+     "text": "Forced to take part in the illegal rune production under threat to his family; surrendered immediately when confronted; tackled a fleeing worker to keep the families from being harmed; revealed the families are held hostage with one month remaining in forced service."
+    },
+    {
+     "name": "Pyreborn Lieutenant",
+     "title": "",
+     "faction": "Pyreborn",
+     "role": "Lieutenant",
+     "state": "Deceased",
+     "new": true,
+     "text": "One of six workers in the underground workshop; wore a gold signet ring with the **Pyreborn** symbol (sun and moon); died from acid damage; recognised **Belaskro** and mistook him for the Pyreborn's leader."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Runs the party's off-the-books assignment",
+     "state": "",
+     "new": false,
+     "text": "Managed the emergency response to the spreading fire at **Vantry Runeworks**; recognised **Princess Timbit**'s noble status and requested discretion about the investigation; warned that the inquiry faces resistance from the noble houses and the **King's Council**."
+    }
+   ],
+   "items": [
+    {
+     "name": "Pyreborn Signet Ring",
+     "homebrew": "Sun and Moon Signet Ring",
+     "new": true,
+     "text": "Gold ring bearing the sun-and-moon symbol, a mark of a lieutenant or high rank within the **Pyreborn**; recovered from a dead workshop worker and magically resized to fit **Princess Timbit**'s paw."
+    },
+    {
+     "name": "Completed Sabotaged Shield Runes",
+     "homebrew": "",
+     "new": true,
+     "text": "Two finished runes bearing the **Vantry Runeworks** maker's mark, created in the underground workshop; held by **Princess Timbit** as evidence."
+    },
+    {
+     "name": "Blank Rune Tablets",
+     "homebrew": "Blank Rune Tablet",
+     "new": false,
+     "text": "Several blank tablets from the underground workshop; more evidence of the illegal operation."
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "title": "A Royal Response",
+   "summary": [
+    "The party emerged from the underground workshop to find the **Kilnworks District** ablaze. **Gabriele**'s tactical distraction fire had consumed **Vantry Runeworks** entirely and spread to neighbouring buildings. **Lieutenant Wrent** organized desperate bucket brigades, enlisting the party and local citizens in a frantic effort to contain the inferno. Despite their efforts, the fire spread to additional buildings before the professional fire brigade arrived: uniformed mages in red robes who summoned a massive river of water from the ocean itself. The magical feat came at a cost. One mage combusted from within during the casting, and the survivors collapsed from exhaustion. The party witnessed sabotaged shield runes activating as they burned, their protective barriers malfunctioning and allowing fire and debris to pass through freely before the rune-inscribed building imploded catastrophically.",
+    "**Queen Sabine** arrived at the scene with unusual haste, her sudden appearance raising suspicions. She delivered a polished speech promising royal investment to rebuild the district and strengthen the tournament industry, though her words felt calculated. During her address, the Queen's gaze fell upon **Belaskro**'s uncle, **Marquis Corvane Aerrowyn**, standing in the crowd, and her speech faltered momentarily in visible surprise. Corvane, whom **Gabriele** and **Gus** observed with a natural twenty perception roll, stared back at the Queen with unmistakable, deep-seated hatred. After the Queen departed, Corvane summoned Belaskro for a tense family reunion. The Marquis revealed he knew of Belaskro's investigation and warned him to stop, claiming the work was dangerous and that he couldn't protect his nephew if things went too far. He offered Belaskro employment and extended a dinner invitation for the following evening to meet his son **Cassian**, a **Royal Tournament** competitor recently injured in the sabotage attacks. The conversation ended with veiled warnings about the fire's cause and Corvane's guardsman escorting Belaskro back to the party.",
+    "**Lieutenant Wrent** asked the party to escort **Pell Marrow**, the gnome workshop supervisor, to the **Sanctuary** for interrogation. The gnome revealed that the **Pyreborn** held his wife and son hostage in a safe house called **The Drover's Rest** on the city's southeastern side, forcing his cooperation with the illegal rune operation. He described the location in detail: a carriage house with two or three guards in the main building, more guards in the stables across the courtyard, a large dog, and a magical green light that turned red when someone whistled, apparently a signal system between the two groups of guards. Pell explained he'd been told his family would be killed if he sought help from the **Arcane Marshals** or if anyone came asking questions. **Gus** drafted a carefully worded letter to the local Arcane Marshal dispatch station, informing them that a \"criminal's family\" was being held at a Pyreborn safe house and that a rescue operation \"would not impede\" the ongoing investigation. It was a diplomatic way of suggesting action without directly ordering it.",
+    "The party retired to a dockside tavern with Pell in tow. In the crowded tap room, **Gabriele** engaged a local patron in conversation about the Queen's suspiciously quick arrival at the fire scene. The patron expressed deep cynicism about **Varenthal**'s nobility, suggesting they cared only for power and self-interest, and speculated that the Queen's promise to rebuild served the tournament's needs rather than the common people. The conversation turned to rune magic, with the patron lamenting that nobles hoarded the technology for combat when it could be used to improve ordinary lives, imagining runes for unlimited fish or other practical purposes. The party learned that **Althon's Gate**'s ruling class rarely appeared in public, making the Queen's swift presence all the more unusual. After the tavern crowd sang \"**The Sundermark Brides**\", a ballad suggesting local anti-**Seranthis** sentiment, the party prepared for sleep.",
+    "The next morning, tensions erupted when **Gabriele** announced his intention to investigate the **Pyreborn** safe house immediately, unwilling to wait for the **Arcane Marshals** or let Pell's family remain in danger. **Gus** insisted they follow proper procedure and trust the letter sent to dispatch, leading to a heated argument. When Gabriele attempted to leave alone, Gus tried to physically restrain him, triggering a chase through the morning streets. Gus cast grease to slow Gabriele's escape and deployed his steel defender to intercept. Despite Gabriele's use of thaumaturgy to slam doors and attempts to lose pursuit in crowded marketplaces, the steel defender's superior speed and a critical perception roll allowed it to track him through the crowds. After a dramatic pursuit involving failed grapples, defensive spells, and innocent bystanders caught in the chaos, the steel defender finally caught Gabriele's robes and dragged him back. Gus placed Gabriele in arcane handcuffs (for the second time in their partnership) to ensure compliance with his supervision duties, leaving the party's next move uncertain as onlookers gathered to watch the spectacle of a bound priest gesturing Italian profanities at a warforged."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "none",
+     "text": "No progress this session. The priest remains in **Seranthis** with no new leads.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "Investigation continues. The party saw sabotaged shield runes malfunction catastrophically during the fire at a neighbouring rune factory, a sign that the tampered runes may come from more than one source.",
+     "clues": [
+      "**Sabotaged shield runes** activated when exposed to fire and created visible barriers that let fire, smoke, and debris pass through, confirming they fail their protective function.",
+      "The affected building imploded after the shields activated."
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "Significant progress: **Pell Marrow** revealed the location and security details of a **Pyreborn** safe house holding hostages.",
+     "clues": [
+      "**The Pyreborn** safe house is **The Drover's Rest** (a carriage house) on the southeastern side of **Althon's Gate**.",
+      "2–3 guards in the main house, more guards in the stables across the courtyard, and a large dog on the premises.",
+      "A green magical light turns red when someone whistles: a signal system between the guard posts.",
+      "**The Pyreborn** are holding **Pell Marrow**'s wife and son hostage, possibly along with other families.",
+      "The hostages are threatened with death if the marshals approach or anyone asks questions.",
+      "The \"one more month\" timeline from the previous session suggests the operation is nearing completion as the tournament begins."
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Major development: **Marquis Corvane Aerrowyn** directly warned **Belaskro** to stop investigating and showed clear animosity toward **Queen Sabine**.",
+     "clues": [
+      "**Marquis Corvane Aerrowyn** (**Belaskro**'s uncle, a high noble who won his status through the **Royal Tournament**) knows about the party's investigation.",
+      "He warned **Belaskro** it is dangerous and offered him other employment.",
+      "**Queen Sabine** appeared startled and caught off guard when she saw **Corvane** at the fire scene.",
+      "**Corvane** looked at the Queen with deep, visible hatred.",
+      "**Corvane**'s son **Cassian Aerrowyn** is a **Royal Tournament** competitor who was injured in the sabotage attacks.",
+      "The Queen's unusually quick arrival at the disaster scene raised suspicions among common citizens.",
+      "Locals say nobles rarely appear in public, which makes the Queen's presence unusual."
+     ]
+    },
+    {
+     "id": "rescue-pell-marrow-s-family",
+     "status": "new",
+     "text": "The party debated whether to mount an immediate rescue or trust the **Arcane Marshals** to respond to **Gus**'s letter; **Gabriele**'s attempt to act alone led to conflict within the party.",
+     "clues": [
+      "**Pell Marrow** visits the safe house daily to watch for a chance to rescue them.",
+      "**The Pyreborn** don't know Pell survived the workshop raid (all witnesses were killed).",
+      "A letter was sent to the local Arcane Marshal dispatch station telling them of the rescue opportunity without directly ordering action."
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Sabine",
+     "title": "Queen",
+     "faction": "Kingdom of Varenthal",
+     "role": "Ruling monarch of Varenthal",
+     "state": "",
+     "new": true,
+     "text": "Made a rare public appearance at the **Kilnworks** fire scene; promised royal investment to rebuild the district and support the tournament industry; appeared startled when she saw **Marquis Corvane Aerrowyn**; departed quickly after a brief speech."
+    },
+    {
+     "name": "Corvane Aerrowyn",
+     "title": "Marquis",
+     "faction": "House Aerrowyn",
+     "role": "Belaskro's uncle; high noble who won his status through a Royal Tournament victory",
+     "state": "",
+     "new": true,
+     "text": "Knows about the party's investigation and warned **Belaskro** to stop; looked at **Queen Sabine** with deep hatred; invited Belaskro to dinner to meet his son **Cassian**; offered Belaskro employment instead of the investigation."
+    },
+    {
+     "name": "Cassian Aerrowyn",
+     "title": "Lord",
+     "faction": "House Aerrowyn",
+     "role": "Royal Tournament competitor; Marquis Corvane's son",
+     "state": "Injured",
+     "new": true,
+     "text": "Described as one of the top battle mages in **Althon's Gate**; recently injured in the tournament sabotage attacks; recovering ahead of the tournament."
+    },
+    {
+     "name": "Pell Marrow",
+     "title": "",
+     "faction": "",
+     "role": "Gnome workshop supervisor",
+     "state": "",
+     "new": false,
+     "text": "Revealed the **Pyreborn** hold his wife and son at **The Drover's Rest** safe house and gave a detailed security layout of the place; went with the party to the tavern; doubts the **Arcane Marshals** can protect his family."
+    },
+    {
+     "name": "Ovett Kallisch",
+     "title": "Constable-Adept",
+     "faction": "Arcane Marshals",
+     "role": "Arcane Marshal engineer who previously repaired Gus",
+     "state": "",
+     "new": false,
+     "text": "Used lay on hands to restore 5 hit points to **Gus** after the fire brigade work."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "Runs the party's off-the-books assignment",
+     "state": "",
+     "new": false,
+     "text": "Coordinated the firefighting and civilian bucket brigades; exhausted once the fire was finally contained; asked the party to escort **Pell Marrow** to the **Sanctuary** for interrogation."
+    },
+    {
+     "name": "Timbit",
+     "title": "Princess",
+     "faction": "House Puss",
+     "role": "Visiting nobility; talking Persian cat",
+     "state": "",
+     "new": false,
+     "text": "Helped the party fight the fire and stayed with them at the tavern."
+    },
+    {
+     "name": "Graydon Lightfoot",
+     "title": "",
+     "faction": "",
+     "role": "Wood elf civilian",
+     "state": "",
+     "new": true,
+     "text": "Made a rude comment to **Gus** during the firefighting; briefly detained for an identification check; released with a warning after showing a market receipt as identification."
+    }
+   ],
+   "items": []
+  },
+  {
+   "n": 9,
+   "title": "Sermons of Fire and Brimstone",
+   "summary": [
+    "The morning began with tension as **Gus** marched a handcuffed **Gabriele** into a local Arcane Marshal station, flanked by **Belaskro** and **Princess Timbit**. **Sergeant Yorwick Dray** looked up from his morning tea to witness the spectacle: a priest in arcane restraints, a talking cat claiming Gabriele as her personal bodyguard, and a warforged construct grimly enforcing supervision orders. Princess Timbit's imperious persuasion (invoking her full title as GCBWR Princess Timbit the Queen Anne Chonk) convinced the sergeant to remove Gabriele's handcuffs, though Gus responded by tying a fifty-foot rope between the priest and his steel defender. The absurd standoff ended when **Lieutenant Wrent** stormed in, exhausted from the fire investigation, with grim news: the **King's Council** had ordered all **Arcane Marshals** to focus solely on the **Kilnworks** fire, leaving the tournament sabotage investigation unsupported.",
+    "**Wrent**'s solution was pragmatic deputization. He formally deputized **Belaskro Tich** as a constable with full authority to continue the investigation as a contractor, and he assigned Belaskro as **Gus**'s \"conscience\" to help the warforged learn nuance in judgment. Wrent accepted **Princess Timbit** into the team, noting her noble status might open doors the **Marshals** couldn't. He also revealed that **Marquis Corvane Aerrowyn**, Belaskro's uncle, had arranged a gala that evening to raise funds for rebuilding the **Kilnworks**, and that Belaskro had received a formal invitation. With their marching orders clear and **Pell Marrow** still desperate to save his family, the party set out for **The Drover's Rest**.",
+    "The rescue plan took shape as the party approached the safe house. **Princess Timbit** cast Speak with Animals and befriended the guard dog, an aging, mistreated hound named **Gabe** who had been chained in the courtyard. The princess negotiated his loyalty with promises of proper treatment, warm shelter, and unlimited rat corpses to eat. Meanwhile, **Gabriele** positioned himself across the street and launched into a fire-and-brimstone street sermon, condemning sin and animal abuse to draw attention away from the operation. **Belaskro** picked the lock on Gabe's chain, and Princess Timbit established a telepathic link with the dog through Beast Bond. Gabe revealed that four guards held the main house, with Pell's wife Alma in the common area and his young son **Denn** locked in the cellar.",
+    "The infiltration went smoothly until **Belaskro** accidentally dislodged a pile of logs while trying to barricade the courtyard gate, and the cascade of wood alerted the **Pyreborn** inside. Combat erupted as thugs poured from the building. **Gabriele**'s street preaching had attracted a small crowd, including one fanatic convert who leaped into the fray with a makeshift weapon, though the Pyreborn lieutenant **Nessa Ruhl** cut him down brutally. **Gus**'s homunculus and steel defender engaged the thugs in brutal close combat, crushing throats and delivering force blasts. **Princess Timbit** clawed a guard to death with magically enhanced strikes, turning to show him her backside in a final feline insult as he bled out. Belaskro shot another guard with his crossbow while retrieving **Denn** from the cellar. When the carnage subsided, Nessa Ruhl surrendered, and Gus's steel defender hoisted her over its shoulder in handcuffs. The party reunited Pell's family, adopted **Gabe** the dog, looted a handful of gold from the bodies, and prepared to escort their prisoners and rescued civilians back to the marshal station, knowing that evening's gala awaited them."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "none",
+     "text": "No progress this session. The priest remains in **Seranthis** with no new leads.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "Investigation continues off-books as **Arcane Marshals** are redirected to fire investigation; party deputized to continue work as contractors.",
+     "clues": [
+      "**King's Council** ordered all **Arcane Marshals** to focus exclusively on **Kilnworks** fire investigation",
+      "**Lieutenant Wrent** deputized **Belaskro** as constable to continue tournament investigation independently",
+      "**Marquis Corvane Aerrowyn** hosting gala this evening to raise funds for **Kilnworks** rebuilding"
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "Major progress: party successfully raided **Pyreborn** safe house, rescued hostages, and captured Pyreborn lieutenant.",
+     "clues": [
+      "**Nessa Ruhl** captured alive and brought into custody",
+      "**Pyreborn** safe house at **The Drover's Rest** confirmed to hold hostages",
+      "Four **Pyreborn** operatives eliminated in raid",
+      "**Pyreborn** using coercion and hostage-taking to force cooperation with illegal operations"
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Invitation to **Marquis Aerrowyn**'s gala confirmed; opportunity to investigate noble connections.",
+     "clues": [
+      "Gala at **Marquis Aerrowyn**'s estate scheduled for this evening",
+      "**Belaskro** received formal invitation",
+      "**Arcane Marshals** providing security",
+      "All noble houses invited"
+     ]
+    },
+    {
+     "id": "rescue-pell-marrow-s-family",
+     "status": "resolved",
+     "text": "Successfully rescued **Alma Marrow** and her son **Denn** from **Pyreborn** captivity at **The Drover's Rest**.",
+     "clues": [
+      "**Alma Marrow** and **Denn** rescued safely",
+      "Family reunited with **Pell Marrow**",
+      "**Denn** held in cellar for approximately one month",
+      "Both hostages in poor health but alive"
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Yorwick Dray",
+     "title": "Sergeant",
+     "faction": "Arcane Marshals",
+     "role": "sergeant at the local station",
+     "state": "",
+     "new": false,
+     "text": "Received **Gus**'s letter about the hostage situation; summoned **Lieutenant Wrent**; released **Gabriele** from handcuffs at **Princess Timbit**'s persuasion."
+    },
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "",
+     "state": "",
+     "new": false,
+     "text": "Exhausted from the fire investigation; informed the party that the **King's Council** ordered all marshals to focus on the fire; deputized **Belaskro Tich** as constable with full authority; assigned Belaskro as **Gus**'s \"conscience\"; accepted **Princess Timbit** onto the team; revealed **Marquis Aerrowyn**'s gala invitation."
+    },
+    {
+     "name": "Nessa Ruhl",
+     "title": "",
+     "faction": "Pyreborn",
+     "role": "Pyreborn lieutenant",
+     "state": "Captured",
+     "new": true,
+     "text": "Fiery red hair; wore robes emblazoned with the **Pyreborn** symbol; led the safe house guards; killed **Gabriele**'s street-preacher convert; surrendered when outmatched; captured alive by **Gus** and taken into custody."
+    },
+    {
+     "name": "Alma Marrow",
+     "title": "",
+     "faction": "",
+     "role": "Pell Marrow's wife",
+     "state": "",
+     "new": true,
+     "text": "Held hostage at **The Drover's Rest** for approximately one month; fought back during the rescue with an improvised kettle weapon; reunited with her husband and son."
+    },
+    {
+     "name": "Denn Marrow",
+     "title": "",
+     "faction": "",
+     "role": "Pell Marrow's young son",
+     "state": "",
+     "new": true,
+     "text": "Gnome child held in the cellar for approximately one month; suffering from poor health due to confinement; frightened during the rescue; reunited with his family."
+    },
+    {
+     "name": "Gabe",
+     "title": "",
+     "faction": "",
+     "role": "aging guard dog, now the party's companion",
+     "state": "",
+     "new": true,
+     "text": "Previously chained in the courtyard of **The Drover's Rest**; mistreated and poorly fed by the **Pyreborn**; befriended by **Princess Timbit**; freed from his chains; joined the party after promises of better treatment and rat corpses to eat."
+    },
+    {
+     "name": "Street Fanatic",
+     "title": "",
+     "faction": "",
+     "role": "local citizen converted by Gabriele's preaching",
+     "state": "Deceased",
+     "new": true,
+     "text": "Attacked the **Pyreborn** thugs with an improvised shoehorn weapon; killed by **Nessa Ruhl** during combat."
+    }
+   ],
+   "items": []
+  },
+  {
+   "n": 10,
+   "title": "The Aerrowyn Gala",
+   "summary": [
+    "The afternoon began with preparation and rest at **Sergeant Dray**'s outpost. While **Gabriele** and **Princess Timbit** took a short rest, **Gus** recharged at the Arcane Marshal charging station, and **Belaskro** ventured into the city to find appropriate attire for the evening's gala. He discovered **Tip's Top Tailors**, where the flamboyant proprietor **Tip** offered him three options: an ostentatious gold-embroidered robe, a plain but well-fitted black velvet robe, or a burnt-orange disaster. Belaskro chose the plain black robe and asked Tip to enhance it, trusting the tailor's judgment. The result was passable (rainbow-corded floral embroidery in a grandmother's-sewing-kit style), but Belaskro accepted it and paid fifteen gold.",
+    "Back at the outpost, **Gabriele** and **Princess Timbit** raided the lost and found for gala-appropriate accessories. Gabriele claimed a fraying velvet cape and attempted to coordinate a full outfit with the sergeant's help, while Princess Timbit discovered an obsidian necklace and earring set that complemented her white fur. Before departing, **Alma Marrow** returned to present the party with torn ledger pages she had stolen from **Nessa Ruhl**'s workbook: pages bearing names, dates, payments, and the sun-and-moon crest of the **Pyreborn**. Princess Timbit then attempted to interrogate Nessa, who was suspended in a cage outside the station. Disguising herself as a Pyreborn operative by flashing the ring she had taken earlier, Princess Timbit successfully convinced Nessa she was a double agent sent by someone named **Bram**. Nessa revealed that the Pyreborn's sabotage of the runes was part of \"the plan\" and that their ultimate goal was for \"the boss\" to control the city. When Princess Timbit attempted to use Charm Person to extract more information, Nessa resisted and realized the deception, ending the interrogation. The party departed for the tailor shop.",
+    "At **Tip's Top Tailors**, the party retrieved **Belaskro**'s modified robe and acquired additional accessories. **Gabriele** found a perfect set of formal clerical robes, black with white cording, that made him look regal, and negotiated the price down from fifteen to twelve gold through intimidation. **Gus** requested modifications to a cape, offering clearance fabrics as a \"donation\" to the **Arcane Marshals** and leaving the tailor with an IOU for ten gold. The increasingly exasperated **Tip** rushed the work to be rid of his difficult customers, particularly after Gabriele used Thaumaturgy to create embarrassing flatulence sounds. **Princess Timbit** purchased a Dirty Shirley at the bar with gold, ensuring she had refreshments for the event. As the party departed (Gabriele adding one final magical fart and slamming the door), Tip shouted that Gabriele was banned from returning.",
+    "The party arrived at the **Aerrowyn estate** to find a grand affair with carriages depositing the city's elite: noble houses, merchant guilds, and **Althon's Gate**'s most powerful figures. After some persuasive manoeuvring at the door (**Princess Timbit** invoked her full title and **House Puss**, **Gabriele** cited recent **Pyreborn** threats to justify **Gus**'s attendance), the entire party gained entry. Inside the ballroom, **Marquis Corvane Aerrowyn** delivered a stirring speech about the **Kilnworks** fire, emphasizing the critical importance of magical runes to the kingdom's defence and urging generous donations. He opened with a pledge of ten thousand gold from **House Aerrowyn**. After his speech, Corvane approached **Belaskro** and invited him upstairs to meet his cousin **Cassian** while the others mingled. During the walk, Corvane revealed that his wife **Maribel** had died in childbirth nineteen years ago and that Cassian had been raised without a mother's influence, resulting in a somewhat coddled nobleman. Corvane also disclosed that the **King's Council** had dismissed the rune sabotage investigation as mere quality control issues, though he noted that evidence of intentional tampering might warrant further inquiry. Upstairs, Belaskro met Cassian Aerrowyn, a fit, blonde eighteen-year-old recovering from his tournament injuries, who expressed eagerness to meet his frontier relatives and made a mildly insulting comment about Belaskro's \"common\" appearance. After a brief visit, Corvane and Belaskro returned to the ballroom.",
+    "Meanwhile, **Gabriele** surveyed the ballroom's power players while **Princess Timbit** identified the noble houses in attendance: the courtier **House Aldric**, the military **House Moravel**, the matchmaking **House Halvenne** (whose daughter **Lady Odile** was the current belle of the court), the conscientious **House Vayne**, the diplomatic **House Puss**, and the untrusted **Seranthis** ambassadors of **House Dreveth**. As **Belaskro** returned from meeting **Cassian**, Princess Timbit prepared to approach her family's table at House Puss, and the session concluded with the party poised to navigate the social and investigative opportunities of the gala."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "none",
+     "text": "No progress this session. The priest remains in **Seranthis** with no new leads.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "**Corvane** revealed the **King's Council**'s official position dismissing rune issues as quality control; investigation continues as contracted work.",
+     "clues": [
+      "**Marquis Corvane Aerrowyn** disclosed that the **King's Council** considers the rune failures to be quality control issues rather than sabotage, though he acknowledged that evidence of intentional tampering would change that assessment",
+      "**Corvane** is a member of the **King's Council** and appears to downplay the investigation's importance"
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "**Princess Timbit**'s interrogation of **Nessa Ruhl** yielded critical intelligence about **Pyreborn** leadership and goals.",
+     "clues": [
+      "**Nessa Ruhl** revealed the **Pyreborn** are led by someone named \"**Bram**\" (or possibly \"Ram\")",
+      "Their ultimate goal is for \"the boss\" to control **Althon's Gate**",
+      "The rune sabotage was part of a larger plan to ensure runes \"kept coming\"",
+      "Ledger pages recovered from **Alma Marrow** contain names, dates, payments, and the **Pyreborn** sun-and-moon crest"
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Party successfully infiltrated the gala and identified all major noble houses in attendance; **Belaskro** learned of his aunt's death and **Corvane**'s **King's Council** role.",
+     "clues": [
+      "**Marquis Corvane Aerrowyn**'s wife **Maribel** (née Sorne) died in childbirth approximately 19 years ago",
+      "**Corvane** sits on the **King's Council** and has been directing marshals away from the tournament sabotage investigation",
+      "Noble houses present at the gala include **Aerrowyn**, **Aldric**, **Moravel**, **Halvenne**, **Vayne**, **Puss**, and **Dreveth**",
+      "**Lady Odile** of **House Halvenne** is currently the most eligible noblewoman in court"
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Tip",
+     "title": "",
+     "faction": "",
+     "role": "proprietor of Tip's Top Tailors",
+     "state": "",
+     "new": true,
+     "text": "Flamboyant, approximately 30 years old with theatrical mannerisms; provided gala outfits for **Belaskro** and **Gabriele**; grew increasingly exasperated with the party's antics; banned Gabriele from his shop."
+    },
+    {
+     "name": "Corvane Aerrowyn",
+     "title": "Marquis",
+     "faction": "House Aerrowyn",
+     "role": "Belaskro's uncle; King's Council member",
+     "state": "",
+     "new": false,
+     "text": "Tournament champion who rose from frontier nobility; hosted the gala and pledged 10,000 gold to **Kilnworks** rebuilding; invited **Belaskro** to meet **Cassian**; revealed his wife **Maribel** died in childbirth 19 years ago; disclosed the **King's Council**'s position dismissing rune sabotage as quality control issues."
+    },
+    {
+     "name": "Cassian Aerrowyn",
+     "title": "Lord",
+     "faction": "House Aerrowyn",
+     "role": "Belaskro's cousin; House Aerrowyn's intended tournament champion",
+     "state": "Injured",
+     "new": true,
+     "text": "Blonde, fit 18-year-old recovering from tournament injuries; raised without a mother in a noble court environment; eager to meet his frontier relatives but made a mildly insulting comment about **Belaskro**'s common appearance."
+    },
+    {
+     "name": "Nessa Ruhl",
+     "title": "",
+     "faction": "Pyreborn",
+     "role": "Pyreborn lieutenant",
+     "state": "Imprisoned",
+     "new": false,
+     "text": "Interrogated by **Princess Timbit**; initially deceived into believing Princess Timbit was a **Pyreborn** operative; revealed the organization is led by \"**Bram**\" with the goal of controlling the city; resisted Charm Person and ended the interrogation."
+    },
+    {
+     "name": "Alma Marrow",
+     "title": "",
+     "faction": "",
+     "role": "Pell Marrow's wife",
+     "state": "",
+     "new": false,
+     "text": "Returned to the marshal station to deliver stolen ledger pages from **Nessa Ruhl**'s workbook containing **Pyreborn** financial records."
+    },
+    {
+     "name": "Bartender",
+     "title": "",
+     "faction": "",
+     "role": "bartender at the Aerrowyn gala",
+     "state": "",
+     "new": true,
+     "text": "Young-looking man who claimed to be 80 years old, cursed to never age; prepared a martini, a gin and tonic, and a Dirty Shirley for the party."
+    },
+    {
+     "name": "Odile",
+     "title": "Lady",
+     "faction": "House Halvenne",
+     "role": "daughter of House Halvenne; belle of the court",
+     "state": "",
+     "new": true,
+     "text": "Teenage daughter of **House Halvenne**; identified as the current belle of the court and the most eligible noblewoman for marriage."
+    }
+   ],
+   "items": []
+  },
+  {
+   "n": 11,
+   "title": "To the Champions of Varenthal",
+   "summary": [
+    "The session opened inside the **Aerrowyn Manor** gala, with **Belaskro** rejoining the group after his upstairs meeting with **Cassian** as **Princess Timbit** and **Ambassador Honey Cruller** concluded their private exchange at the **House Puss** table. The Ambassador shared his read of the room: two noble factions were quietly forming. One supported **Marquis Corvane Aerrowyn** and the meritocratic ideal of the tournament; the other, loyal to the Crown, viewed the tournament as a threat to its hold on power. He asked Princess Timbit to use her position as a neutral outsider to spy on the pro-Crown faction, and confessed that his own whiskers itched every time he passed one particular house, the same one Princess Timbit promptly declared she would befriend.",
+    "Before dinner was served, the full party approached **House Halvenne** together. **Lady Odile**, already acquainted with **Princess Timbit** through shared hobbies, greeted the group warmly, though her brother Rowan's constant attention at the event clearly annoyed her. In a moment of whispered confidence, Lady Odile revealed that she is quietly promised to **Prince Elias Varenthal**; the betrothal is contingent on his successfully defending his crown prince position in the tournament, and is not yet public. **GUS** filed this information away with some internal debate about whether the Ambassador's earlier comments constituted treasonous intelligence.",
+    "Returning to their seats, the party found **Sergeant Yorwick Dray** sporting a black eye: brigands had attacked the outpost shortly after the party left, beaten him, and freed **Nessa Ruhl** from her cage outside. The woman had asked the brigands if \"the plan was still on,\" and they confirmed it before threatening Dray and departing. An insight roll confirmed Dray was telling the truth. Separately, **GUS** was pulled aside by a shadowy figure already seen at the Arcane Marshal briefing, who went by the cover name \"**Steven**.\" He unlocked an encrypted file in GUS's memory banks revealing a secret Arcane Marshal intelligence service focused on external threats, specifically **Seranthis** interference in the tournament and the kingdom's inner workings. GUS shared what had been overheard from **Ambassador Honey Cruller** regarding foreign interest in the tournament's outcome. \"Steven\" directed GUS to review the annexes of the newly unlocked file, which contained spycraft guidance authored by another construct also called Steven.",
+    "During the dinner break between courses, the party split up to work the remaining houses. **Princess Timbit** had **Gus** dispatch his scarab homunculus to guard the untouched food and drinks at their table, warning the group not to eat or drink anything on their return. Gus and **Belaskro** approached **House Vayne**, where they met **Noémie**, the young, restless House Vayne tournament champion, who bonded enthusiastically with Belaskro over frontier monster-hunting and the **Oss'kai**. She revealed admiration for **Corvane Aerrowyn**'s pro-tournament ideals and her own alignment with that faction, toasting \"Vive la **Varenthal**!\" before plying Belaskro with shots (leaving him mildly tipsy). Meanwhile, Princess Timbit and **Gabriele** visited **House Dreveth**. Princess Timbit charmed the injured tournament challenger **Tasmin Dreveth** in her wheelchair (the two bonded over mutual disdain for the **Baroness Éclair Exquisite**), while Gabriele slipped away to introduce himself to the lord and lady of the house. In a calculated move, he let **Father Barichello's rosary** visibly fall during his bow and watched for any reaction: on a 19 insight, the House Dreveth nobles showed absolutely no recognition of it, suggesting **Father Barichello**'s disappearance is not a House Dreveth government matter.",
+    "As dessert was served and the party reconvened, **Marquis Corvane Aerrowyn** announced donations from **House Dreveth** (8,000 gold) and **House Vayne** (12,000 gold) toward the **Kilnworks** rebuilding. **Queen Sabine Varenthal** then took the dais and delivered a solemn address: confirming that counterfeit shield runes had been deliberately distributed among tournament challengers, publicly implicating foreign adversaries (with a barely concealed glance toward House Dreveth), and announcing that the **Royal Tournament** would be *postponed for two months* to allow for emergency Kilnworks rebuilding and rune certification. She also declared a moratorium on all live combat training. The room murmured with concern as the full gravity of the rune shortage became clear. **Gabriele**, his military instincts firing, had already slipped toward the House Dreveth table under cover of the Queen's speech. Then, as the Queen called the champions to stand and raised a toast, a cry of \"Father!\" rang out from somewhere in the manor, and the musicians on the balcony above tore off their cloaks, teleported into the crowd, and raised daggers to strike down the assembled tournament champions. The session ended on that cliffhanger."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "changed",
+     "text": "**Gabriele** deliberately displayed **Father Barichello's rosary** to the **House Dreveth** lord and lady; no recognition was observed, suggesting House Dreveth leadership is not directly involved in his disappearance.",
+     "clues": [
+      "**House Dreveth** nobles showed zero recognition of **Father Barichello's rosary** (insight 19)",
+      "The priest's disappearance to **Seranthis** does not appear to be a government-sanctioned **House Dreveth** operation"
+     ]
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "**Queen Sabine** publicly confirmed counterfeit runes were deliberately planted among challengers; the tournament has been postponed two months and live combat training suspended. Investigation context expanded dramatically.",
+     "clues": [
+      "**Queen Sabine** declared the counterfeit runes a plot by foreign adversaries and (implicitly) accused **House Dreveth** in front of the entire gala",
+      "Emergency **Kilnworks** rebuilding is now the kingdom's top priority",
+      "Rune stockpiles are reportedly near critical levels"
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "changed",
+     "text": "**Nessa Ruhl** was freed from custody by brigands mid-session; she confirmed \"the plan\" is still on before being taken away. The sabotage conspiracy is actively in motion.",
+     "clues": [
+      "Brigands freed **Nessa Ruhl** from **Sergeant Dray**'s outpost after the party left",
+      "Nessa asked the brigands whether \"the plan was still on\" and they confirmed it",
+      "**Sergeant Dray** was threatened and warned not to follow"
+     ]
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "Political fault lines at the gala are now clear: a pro-tournament, pro-**Corvane** faction against a pro-Crown faction. The assassination attempt at session's end suggests the conspiracy is entering a violent phase.",
+     "clues": [
+      "**Ambassador Honey Cruller** confirmed two noble factions are forming",
+      "**House Vayne** (via **Noémie**) is aligned with **Corvane** and the meritocratic tournament ideal",
+      "**Lady Odile** of **House Halvenne** is secretly betrothed to **Prince Elias Varenthal**, contingent on his winning",
+      "**GUS** made contact with an Arcane Marshal secret intelligence operative (\"**Steven**\") investigating **Seranthis** interference",
+      "Disguised assassins among the musicians attempted to kill the tournament champions at the end of the evening"
+     ]
+    },
+    {
+     "id": "protect-the-tournament-champions",
+     "status": "new",
+     "text": "Disguised assailants teleported from the musicians' balcony and raised daggers against the assembled champions as the session ended. All major champions appear to be in the room.",
+     "clues": [
+      "Assassins were disguised as musicians and activated simultaneously on a signal",
+      "The attack was timed precisely to the Queen's toast",
+      "The session ended before any outcomes were determined"
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Honey Cruller",
+     "title": "Ambassador",
+     "faction": "House Puss",
+     "role": "Kingdom of Meow ambassador",
+     "state": "",
+     "new": false,
+     "text": "Shared intelligence about two forming noble factions (pro-Crown and pro-**Corvane**) and asked **Princess Timbit** to spy on the pro-Crown side; his whiskers itch near one unidentified house."
+    },
+    {
+     "name": "Odile",
+     "title": "Lady",
+     "faction": "House Halvenne",
+     "role": "socialite",
+     "state": "",
+     "new": false,
+     "text": "Revealed she is secretly promised to **Prince Elias Varenthal**, contingent on his defending the crown in the tournament."
+    },
+    {
+     "name": "Yorwick Dray",
+     "title": "Sergeant",
+     "faction": "Arcane Marshals",
+     "role": "outpost sergeant",
+     "state": "",
+     "new": false,
+     "text": "Confirmed honest by an insight roll; reported that brigands attacked the outpost after the party left, freed **Nessa Ruhl**, and warned him off pursuit; overheard Nessa confirm \"the plan\" was still on."
+    },
+    {
+     "name": "Steven",
+     "title": "",
+     "faction": "Arcane Marshals",
+     "role": "Secret Intelligence Service operative (cover name)",
+     "state": "",
+     "new": true,
+     "text": "Unlocked an encrypted file in **GUS**'s memory banks revealing a covert spy program focused on **Seranthis** interference; received GUS's intelligence about the **Kingdom of Meow**'s interest in the tournament outcome."
+    },
+    {
+     "name": "Noémie Vayne",
+     "title": "",
+     "faction": "House Vayne",
+     "role": "tournament champion",
+     "state": "",
+     "new": true,
+     "text": "Energetic and adventure-hungry; expressed admiration for **Corvane Aerrowyn**'s pro-tournament stance; bonded with **Belaskro** over frontier stories and the **Oss'kai**."
+    },
+    {
+     "name": "Tasmin Dreveth",
+     "title": "",
+     "faction": "House Dreveth",
+     "role": "injured tournament challenger",
+     "state": "Injured",
+     "new": true,
+     "text": "In a wheelchair from the **Silverglass Annex** incident; bonded with **Princess Timbit** over shared disdain for **Baroness Éclair Exquisite**; does not appear to be a political actor."
+    },
+    {
+     "name": "Jared Dreveth",
+     "title": "Lord",
+     "faction": "House Dreveth",
+     "role": "lord of the household",
+     "state": "",
+     "new": true,
+     "text": "Engaged **Gabriele** in a philosophical conversation about faith and power; showed zero recognition of **Father Barichello's rosary**."
+    },
+    {
+     "name": "Sabine Varenthal",
+     "title": "Queen",
+     "faction": "House Varenthal",
+     "role": "Queen of Varenthal",
+     "state": "",
+     "new": false,
+     "text": "Publicly confirmed the counterfeit rune plot and implicated foreign adversaries; announced the two-month tournament postponement and live combat moratorium; pledged Crown rune reserves will stay sealed and not benefit any competitor, including **Prince Elias**."
+    },
+    {
+     "name": "Corvane Aerrowyn",
+     "title": "Marquis",
+     "faction": "House Aerrowyn",
+     "role": "gala host",
+     "state": "",
+     "new": false,
+     "text": "Hosted the gala; announced **House Dreveth**'s 8,000 gold and **House Vayne**'s 12,000 gold donations; returned to his seat before the assassination attempt."
+    }
+   ],
+   "items": []
+  },
+  {
+   "n": 12,
+   "title": "The Night the Bells Tolled",
+   "summary": [
+    "The session opened in the chaos left by Session 11's cliffhanger: the disguised musicians had already Misty Stepped into the gala hall and the **Knives**' first strikes landed before the party could act. By the end of round zero, three champions were down: **Baroness Éclair Exquisite** (**House Puss**), **Garrick Moravel** (**House Moravel**), and **Aurelian Aldric** (**House Aldric**), all felled by a mere nick of a poisoned blade. **Noémie Vayne** took a shoulder wound but survived the first volley, and **Rowan Halvenne** physically shoved his assassin prone. Simultaneously, a cry of *\"Father!\"* rang out from the stairwell leading up to the wing where **Lord Cassian Aerrowyn** was laid up, a chilling reminder that the attack was coordinated on two fronts. With initiative set (**Princess Timbit** 20, **Belaskro** 9, **GUS** 8, **Gabriele** 1), the crowd became difficult terrain but offered half-cover, and the party split to address both threats.",
+    "**Princess Timbit**'s first act was to cast Goodberry and paw a supply of healing berries to **Belaskro** (who had come into the fight below full HP) before beginning a table-hopping dash across the room toward **Éclair** and **House Puss**. Belaskro, recognising from **Marquis Corvane Aerrowyn**'s frantic shouts that something urgent was happening upstairs, sprinted for the stairwell, using every round to close the distance to **Cassian**'s room. **GUS** applied Shocking Grasp against a prone assassin near **House Halvenne** and immediately dispatched his small homunculus to retrieve his **Steel Defender battle suit** from outside the manor. **Gabriele**, guided by gut instinct, shielded **Jared Dreveth**, the **House Dreveth** lord, by pulling him under a table and summoning St. Peter (Spiritual Weapon) adjacent to the **House Vayne** assassin targeting **Noémie**, landing six damage on the first attack. Gabriele's read: because the House Dreveth table had no assassin behind it, someone else was staging the blame.",
+    "The middle rounds were brutal. **Ambassador Honey Cruller** leapt onto the face of the assassin threatening **Éclair**, buying her time. The **House Moravel** assassin, its own target finished, turned on **Lt. Malachai Wrent** (who had charged across the room in dress uniform to defend the fallen **Garrick Moravel**) and nicked him with its poisoned blade. **Noémie Vayne** fought off successive attacks but eventually succumbed to the poison, falling foamy-mouthed to the floor. The **House Aldric** assassin dimension-doored out the moment **Aurelian Aldric** was dead; **GUS**'s Steel Defender arrived from the front gate, charging through the crowd and driving its force-rend into the **House Vayne** assassin. Meanwhile, a tense countdown unfolded: an unseen bell tolled each round, and each toll cracked another protective ward around **Cassian**'s room upstairs. **Corvane**, trapped behind a royal page's shield bubble on the dais, pounded at it in frustration and yelled *\"Faster! There's only five left!\"* as the bells rang.",
+    "The turning point came through remarkable teamwork. **Gabriele**, holding the blank rune tablet **Belaskro** had scooped from the **Vantry Runeworks** factory floor, faced an agonizing choice: aid **Lt. Wrent** or get the rune to **Corvane**. He chose the rune, tossing it to **Princess Timbit** with instructions to deliver it to the dais. Princess Timbit, now beside **Éclair**, tucked the rune in her primordial pouch and raced to Corvane's shield. Reaching through the fist-sized hole with an athletics roll aided by Corvane's desperate outstretched fingers, she pushed the blank tablet inside. The moment it made contact with the shield's magical energy, the rune siphoned the entire shield spell back into itself, dissolving the bubble and freeing Corvane. **Queen Sabine Varenthal**, watching from behind the dais, declared: *\"Whoever you are, the crown is in your debt.\"* Princess Timbit replied with her full title. With the shield down and the other assassins gone, the two remaining crossbow-wielding marksmen dimension-doored out of the gallery.",
+    "The evening's gravest blow came as the last floor assassin delivered a killing strike through **Lt. Malachai Wrent**'s heart. **GUS**, across the room, heard three words sound silently in his operating system: *\"Handler Vitals: Disconnected.\"* He turned in time to see Wrent (four decades an Arcane Marshal, now on his knees and foaming) look toward him and raise a hand as if to say *don't worry, I've got this.* Then he was gone. **Princess Timbit** had meanwhile used a level-2 spell slot to cast Lesser Restoration on **Éclair**, stabilizing her cousin in unconsciousness. Upstairs, **Belaskro** had reached **Cassian**'s room: six crystals arrayed around the chamber were holding an assassin in a blue robe at bay, though five of the six were nearly burnt out. His arrival, announced with a shouted *\"Cassian, get the f... out of the bed!\"*, caught the assassin off guard. Belaskro body-checked the assassin away from the bed, cast Hunter's Mark, and held position. The assassin sneered: *\"You're not on the contract. Leave, and I'll forget you.\"* **Corvane Aerrowyn**, visibly furious, was last seen storming up the stairs toward that very room as the session closed."
+   ],
+   "quests": [
+    {
+     "id": "find-father-barichello",
+     "status": "none",
+     "text": "No new progress; **Gabriele** protected **Jared Dreveth** in the hope of cultivating him as a future contact and source of information about the priest's disappearance.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-purpose-of-the-magical-box",
+     "status": "none",
+     "text": "No progress this session.",
+     "clues": []
+    },
+    {
+     "id": "investigate-the-tournament-sabotage",
+     "status": "changed",
+     "text": "**The Knives** struck at the gala, killing at least two champions and poisoning others with blades that require only a nick to fell their targets. The rune shortage and counterfeit sabotage are now directly tied to this assassination plot.",
+     "clues": [
+      "Champions were targeted specifically and simultaneously on a signal (the Queen's toast)",
+      "Each assassin carried out kills or extracted via dimension door, suggesting a disciplined and well-resourced operation",
+      "The **House Dreveth** table was *not* targeted; **Gabriele** noted this means they may be being set up as a scapegoat"
+     ]
+    },
+    {
+     "id": "investigate-the-pyreborn",
+     "status": "none",
+     "text": "The coordinated nature of the attack is consistent with the active conspiracy confirmed last session, when **Nessa Ruhl**'s brigands said \"the plan is still on.\" No direct **Pyreborn** evidence surfaced, but the **Knives**' operation may be connected.",
+     "clues": []
+    },
+    {
+     "id": "uncover-the-noble-house-conspiracy",
+     "status": "changed",
+     "text": "The assassination attempt moved the conspiracy from political manoeuvring into outright violence. Champions from Houses **Moravel** and **Aldric** are dead; **Éclair Exquisite** and **Noémie Vayne** are down. The attack's precision and exit strategy (dimension door extraction) point to serious external backing.",
+     "clues": [
+      "Assassins dimension-doored out once their targets were eliminated or the situation turned against them: a coordinated extraction protocol",
+      "**Corvane Aerrowyn** was pinned behind a royal shield and could not act, suggesting either the assassins anticipated this or someone knew the shield would be deployed",
+      "Five tolling bells corresponded to ward failures around **Cassian**'s room, implying a parallel timed assault"
+     ]
+    },
+    {
+     "id": "protect-the-tournament-champions",
+     "status": "changed",
+     "text": "Ongoing and dramatically worsened. **Garrick Moravel** and **Aurelian Aldric** are confirmed dead. **Éclair Exquisite** is stabilized but unconscious. **Noémie Vayne** is down and her status is unresolved. **Rowan Halvenne** survived.",
+     "clues": [
+      "**Princess Timbit**'s Lesser Restoration cleared **Éclair**'s poison condition, confirming the blades inflict a magical **Kissed**/poison effect",
+      "The assassin targeting **Cassian** was held in place by a warding-crystal array in his room, all but one crystal now burnt out"
+     ]
+    },
+    {
+     "id": "protect-lord-cassian-aerrowyn",
+     "status": "new",
+     "text": "A blue-robed assassin was found in **Cassian**'s room, held at bay by a nearly depleted crystal ward array. **Belaskro** is now in the room between Cassian and the assassin; **Corvane** is on his way. The final ward crystal is failing.",
+     "clues": [
+      "Six crystals formed the ward; five are burnt out",
+      "The assassin told **Belaskro** he was \"not on the contract,\" implying **Cassian** specifically was the target",
+      "**Corvane**'s frantic countdown (\"there's only five!\") likely referred to the ward crystals"
+     ]
+    }
+   ],
+   "npcs": [
+    {
+     "name": "Malachai Wrent",
+     "title": "Lieutenant",
+     "faction": "Arcane Marshals",
+     "role": "GUS's handler",
+     "state": "Deceased",
+     "new": false,
+     "text": "Attended the gala in dress uniform; charged across the room to defend **Garrick Moravel** and was poisoned, then killed by the last remaining floor assassin. **GUS**'s Handler Link disconnected on his death."
+    },
+    {
+     "name": "Honey Cruller",
+     "title": "Ambassador",
+     "faction": "House Puss",
+     "role": "Kingdom of Meow ambassador",
+     "state": "",
+     "new": false,
+     "text": "Leapt onto the face of **Éclair**'s assassin to prevent a killing blow, buying time until **Princess Timbit** arrived."
+    },
+    {
+     "name": "Éclair Exquisite",
+     "title": "Baroness",
+     "faction": "House Puss",
+     "role": "tournament champion",
+     "state": "Unconscious",
+     "new": false,
+     "text": "Struck by a poisoned blade in round zero; stabilized by **Princess Timbit**'s Lesser Restoration; still unconscious."
+    },
+    {
+     "name": "Noémie Vayne",
+     "title": "",
+     "faction": "House Vayne",
+     "role": "tournament champion",
+     "state": "Unconscious",
+     "new": false,
+     "text": "Fended off multiple attacks before being struck a final time; fell unconscious and foamy-mouthed; fate unresolved at session end."
+    },
+    {
+     "name": "Garrick Moravel",
+     "title": "",
+     "faction": "House Moravel",
+     "role": "tournament champion",
+     "state": "Deceased",
+     "new": false,
+     "text": "Killed by his assassin in round two when no one was able to reach him in time."
+    },
+    {
+     "name": "Aurelian Aldric",
+     "title": "",
+     "faction": "House Aldric",
+     "role": "tournament champion",
+     "state": "Deceased",
+     "new": false,
+     "text": "Killed by his assassin."
+    },
+    {
+     "name": "Rowan Halvenne",
+     "title": "",
+     "faction": "House Halvenne",
+     "role": "tournament champion",
+     "state": "",
+     "new": false,
+     "text": "Physically shoved his assassin prone in round zero, keeping himself alive throughout the combat."
+    },
+    {
+     "name": "Jared Dreveth",
+     "title": "Lord",
+     "faction": "House Dreveth",
+     "role": "lord of the household",
+     "state": "",
+     "new": false,
+     "text": "Protected by **Gabriele**, who pulled him under a table; followed instructions without resistance; Gabriele views him as a potential future contact for the **Father Barichello** inquiry."
+    },
+    {
+     "name": "Corvane Aerrowyn",
+     "title": "Marquis",
+     "faction": "House Aerrowyn",
+     "role": "gala host; Cassian's father",
+     "state": "",
+     "new": false,
+     "text": "Trapped behind a royal shield on the dais, pounding at it in frustration; freed when **Princess Timbit** delivered the blank rune tablet; storming upstairs toward **Cassian**'s room as the session ended."
+    },
+    {
+     "name": "Sabine Varenthal",
+     "title": "Queen",
+     "faction": "House Varenthal",
+     "role": "Queen of Varenthal",
+     "state": "",
+     "new": false,
+     "text": "Sheltered on the dais during the combat; declared the crown indebted to **Princess Timbit** after the rune tablet manoeuvre freed **Corvane**."
+    },
+    {
+     "name": "The Assassin in Cassian's Room",
+     "title": "",
+     "faction": "",
+     "role": "blue-robed assassin",
+     "state": "",
+     "new": true,
+     "text": "Had been held by the crystal wards; surprised by **Belaskro**'s arrival; warned Belaskro he was \"not on the contract\" and that he would be forgotten if he stepped aside; attacked twice and missed."
+    }
+   ],
+   "items": [
+    {
+     "name": "Blank Rune Tablets",
+     "homebrew": "Blank Rune Tablet",
+     "new": false,
+     "text": "The pocketful of unfinished rune blanks **Belaskro** scooped from the **Vantry Runeworks** factory floor (carried over from last session). One blank was used this session: **Princess Timbit** delivered it to Marquis **Corvane** through the shield bubble's fist-sized hole, and it siphoned the entire shield spell back into itself, dissolving the barrier and freeing Corvane. The rune's ability to absorb active magical energy from an existing shield suggests significant (and possibly unintended) utility. Remaining blanks are still in Belaskro's possession."
+    }
+   ]
+  }
+ ]
+}
