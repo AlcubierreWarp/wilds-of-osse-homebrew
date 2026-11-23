@@ -3,6 +3,7 @@
   python3 tools/osse/paths_sync.py show [BOARD]        what Tom changed that the vault does not say yet
   python3 tools/osse/paths_sync.py adopt BOARD CARD "Plan name"   swap one of Tom's cards for the plan written from it
   python3 tools/osse/paths_sync.py tidy                drop Tom's links the vault now says itself (run after build.py)
+  python3 tools/osse/paths_sync.py settle [BOARD]      clear Tom's edits and drops once the vault holds them (run after build.py)
   python3 tools/osse/paths_sync.py export DIR          write each board as a .canvas file (JSON Canvas 1.0)
 Add --mock to use the local relay stand-in (relay/gus/mock.py, key test-gm).
 The game master key is read from the macOS Keychain inside this process and never printed. Writes only to the relay."""
@@ -44,8 +45,8 @@ def plan_facts(nodes):
 
 
 def label(nid, board, data):
-    if nid == "now":
-        return "Now"
+    if nid == "now" or nid.startswith("start"):
+        return f"the start of {nid[6:]}" if nid.startswith("start:") else "Now"
     if nid.startswith("p:"):
         return f"plan [[{nid[2:]}]]"
     c = board["cards"].get(nid)
@@ -55,14 +56,18 @@ def label(nid, board, data):
 def boards(doc):
     out = {}
     for name, cv in (doc.get("lanes") or {}).items():
-        b = {"placed": {}, "cards": {}, "edges": []}
+        b = {"placed": {}, "cards": {}, "edges": [], "edits": {}}
         for n in cv.get("nodes", []):
             o = n.get("osse") or {}
             if o.get("plan"):
-                b["placed"][o["plan"]] = o.get("column", "")
+                if o.get("edit"):
+                    b["edits"][o["plan"]] = o["edit"]
+                if not o.get("tray"):
+                    b["placed"][o["plan"]] = o.get("session") or o.get("column", "")
             elif o.get("card"):
-                b["cards"][n["id"]] = {"kind": o.get("kind", "note"), "title": o.get("title", ""), "body": o.get("body", ""), "column": o.get("column", "")}
-        b["edges"] = [{"id": e["id"], "from": e["fromNode"], "to": e["toNode"], "label": e.get("label", "")}
+                b["cards"][n["id"]] = {"kind": o.get("kind", "note"), "title": o.get("title", ""), "body": o.get("body", ""),
+                                       "column": o.get("session") or o.get("column", "")}
+        b["edges"] = [{"id": e["id"], "from": (e.get("osse") or {}).get("from") or e["fromNode"], "to": e["toNode"], "label": e.get("label", "")}
                       for e in cv.get("edges", []) if (e.get("osse") or {}).get("own")]
         out[name] = b
     return out
@@ -100,7 +105,21 @@ def show(only=None):
                 lines.append(f"- [[{pid}]]: placed in {col}; vault target is {d['target'] or 'empty'} → set target: {want or '(empty)'}")
             if name not in d["lanes"] and name != "world":
                 lines.append(f"- [[{pid}]]: placed on this board but not tied to it → add for: [[{name}]]")
+        for pid, ed in b["edits"].items():
+            if pid not in data:
+                continue
+            if ed.get("drop"):
+                lines.append(f"- DROP [[{pid}]]: Tom dropped it → status: dropped, log line")
+            changes = [f'{k}: "{ed[k]}"' for k in ("kind", "summary") if k in ed]
+            if "idea" in ed:
+                changes.append("idea (rewrite ## Idea, linking names as [[ ]]):\n      " + ed["idea"].replace("\n", "\n      "))
+            if ed.get("note"):
+                changes.append(f'note to Claude: "{ed["note"]}"')
+            if changes:
+                lines.append(f"- EDITED [[{pid}]]: " + "; ".join(changes))
         for pid, d in data.items():
+            if b["edits"].get(pid, {}).get("drop"):
+                continue
             if name in d["lanes"] and pid not in b["placed"] and re.fullmatch(r"S\d+", d["target"] or "") and int(d["target"][1:]) > cur:
                 lines.append(f"- [[{pid}]]: vault targets {d['target']}, but Tom left it in the tray → ask before clearing the target")
         for cid, c in b["cards"].items():
@@ -129,8 +148,10 @@ def adopt(board, card, plan):
             if not os.path.exists(os.path.join(build.VAULT, path)):
                 sys.exit(f"No plan note {path} in the vault: write it and run build.py first")
             nid = "p:" + plan
+            o = n.get("osse") or {}
+            keep = {k: o[k] for k in ("session", "lx", "ly", "column") if k in o}
             n.clear(); n.update({"id": nid, "type": "file", "file": path, "x": n.get("x", 0), "y": n.get("y", 0),
-                                 "width": 250, "height": 140, "osse": {"plan": plan}})
+                                 "width": 250, "height": 140, "osse": {"plan": plan, **keep}})
     if not nid:
         sys.exit(f"No card {card} on board {board}")
     for e in cv.get("edges", []):
@@ -138,6 +159,28 @@ def adopt(board, card, plan):
         e["toNode"] = nid if e["toNode"] == card else e["toNode"]
     call("PUT", doc)
     print(f"{card} on {board} is now [[{plan}]]")
+
+
+def settle(board=None):
+    """Clear Tom's edits and drops once the vault holds them (run after build.py)."""
+    doc = call("GET")
+    data, _ = plan_facts(None)
+    cleared = 0
+    for name, cv in doc.get("lanes", {}).items():
+        if board and board != name:
+            continue
+        keep = []
+        for n in cv.get("nodes", []):
+            o = n.get("osse") or {}
+            if o.get("edit"):
+                cleared += 1
+                o.pop("edit")
+                if o.get("tray"):
+                    continue
+            keep.append(n)
+        cv["nodes"] = keep
+    call("PUT", doc)
+    print(f"Cleared {cleared} edit(s) and drop(s); the board now shows the vault's text.")
 
 
 def tidy():
@@ -173,6 +216,8 @@ if __name__ == "__main__":
         show(a[1] if len(a) > 1 else None)
     elif a[0] == "adopt" and len(a) == 4:
         adopt(a[1], a[2], a[3])
+    elif a[0] == "settle":
+        settle(a[1] if len(a) > 1 else None)
     elif a[0] == "tidy":
         tidy()
     elif a[0] == "export" and len(a) == 2:

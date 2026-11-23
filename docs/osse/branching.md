@@ -19,13 +19,16 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 
 | Part | What it is | In the vault |
 | --- | --- | --- |
+| **Start cards** | The first session tab starts from **Now**. Each later tab starts from "After S14", listing what is planned for the session before. A link from an earlier session comes in through the start card, dotted | Now is canon; the later start cards are only the board's plan |
 | **Now** | Where the character stands at the end of the last played session: location, status, hit points, spell slots, what happened to them lately | The character note: `location`, `state`, `conditions`, `hp`, `hp_max`, `hp_temp`, `slots`, `sheet_at`; the `## Now` lines stamped with the latest session |
-| **Session columns** | S14, S15, S16… then Later. A card's column is the session Tom would run it in | `target: S15`; Later means no target |
+| **Session tabs** | One tab and canvas per session: S14, S15, S16… then Later. Tom plans one session at a time; cards can lead to each other within a session. + Session adds the next one; the × on the open tab deletes it (its plans go back to the tray, his cards move to Later, later sessions move up one). Drag a card onto a tab to move it | `target: S15`; Later means no target |
 | **Tray** | Live plans for this board not placed yet. At first, every plan with no session target | Live plans; placing one sets its `target` when Tom asks Claude to bring the board in |
 | **Cards** | Live plans, by kind (below) | Plan notes |
 | **Links** | Solid: the vault already joins them. Dashed red: Tom's, not in the vault yet | `plan: [[X]]` in the later plan's Requires, or a decision's `## Options` |
 | **Secret chips** | A secret a card needs hidden or revealed. Tap to try a what-if | `hidden:` / `revealed:` requirements |
 | **Tom's own cards** | New ideas drawn on the board | Become plan notes when Tom asks (the `paths` skill) |
+| **Edits** | Tom changes a plan's kind, summary or idea on the board, or leaves Claude a note. The card says "edited · not in vault" | Written into the plan note when Tom asks; the plan keeps its name |
+| **Deleting** | The × on a card takes a plan back to the tray, or deletes Tom's own card. Drop this plan (in its panel) removes it from the board and the tray | A dropped plan gets `status: dropped` when Tom asks |
 
 ## Plan kinds
 

@@ -5,14 +5,16 @@ description: Bring Tom's Paths ahead planning boards into the Ossë vault. Use w
 
 # Bring the Paths ahead boards into the vault
 
-Tom plans on the Paths ahead page (`vault/paths.html`): he places plans into session columns, draws links and adds cards. The page saves to the Gus relay; the vault does not change until this skill runs. Rules: `docs/osse/branching.md` and `docs/osse/plans.md`.
+Tom plans on the Paths ahead page (`vault/paths.html`): one tab per session; he places plans on a session's canvas, draws links, adds, edits and deletes cards, and drops plans. The page saves to the Gus relay; the vault does not change until this skill runs. Rules: `docs/osse/branching.md` and `docs/osse/plans.md`.
 
 ## Step 1: Read
 `python3 tools/osse/paths_sync.py show` (add a board name to see one). It prints, per board:
-- **set target**: a plan moved to another session column, or placed from the tray. `Later` means an empty target.
+- **set target**: a plan moved to another session tab, or placed from the tray. `Later` means an empty target.
 - **add for**: a plan placed on a board it is not tied to.
 - **left in the tray**: a plan whose vault target Tom did not place. Ask before clearing that target.
-- **NEW CARD**: Tom's card, with its kind, column, text and links.
+- **NEW CARD**: Tom's card, with its kind, session, text and links.
+- **EDITED**: Tom changed a plan's kind, summary or idea, or left a note to Claude.
+- **DROP**: Tom dropped a plan.
 - **NEW LINK**: Tom's link between two vault plans, with its label.
 
 ## Step 2: Turn it into vault changes
@@ -23,6 +25,9 @@ Tom plans on the Paths ahead page (`vault/paths.html`): he places plans into ses
   - from Now: no requirement; it only means "from where they stand".
   - any other label: work out what must be true and write it as a requirement (`hidden:`, `alive:`, `met:`…), or `check:` when no rule can test it.
 - Add the `## Requires` lines the idea needs (secrets hidden, people alive) and `## Links` for what it would change.
+- An EDITED plan: write the new `kind:` and `summary:` as given. Rewrite `## Idea` from his text, turning names back into `[[links]]`; keep any links he removed only if the idea still needs them. Do what his note asks. If it asks for a new name, never rename the file: add the new name to `aliases` and ask Tom. Add a log line, `- S<cur>: idea revised on Paths ahead.`
+- A DROP: set `status: dropped` and add a log line. Never delete the note.
+- A link from the start of a session (`the start of S15`): no requirement; it means "from where they stand at the start of that session".
 - Never write canon. Never copy a plan into an entity note.
 
 ## Step 3: Propose, then write
@@ -31,6 +36,7 @@ Show Tom the new and changed plans, phone-sized, grouped by board. On approval: 
 ## Step 4: Swap cards for plans, tidy, publish
 - For each card that became a plan: `python3 tools/osse/paths_sync.py adopt BOARD CARD_ID "Plan name"`. The card keeps its place on the board.
 - `python3 tools/osse/paths_sync.py tidy` drops Tom's links that the vault now holds.
+- `python3 tools/osse/paths_sync.py settle` clears the edits and drops the vault now holds, so the cards show the vault's text again.
 - Commit `vault/` and push, so the page shows the new plans.
 - Report what changed, and any plan the build pruned.
 
