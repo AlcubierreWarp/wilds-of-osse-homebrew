@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Reads Tom's Paths ahead boards from the Gus relay so Claude can bring them into the vault (the `paths` skill).
-  python3 tools/osse/paths_sync.py show [BOARD]        what Tom changed that the vault does not say yet
+  python3 tools/osse/paths_sync.py show [BOARD]        what Tom changed that the vault does not say yet, and each session's running order
   python3 tools/osse/paths_sync.py adopt BOARD CARD "Plan name"   swap one of Tom's cards for the plan written from it
   python3 tools/osse/paths_sync.py tidy                drop Tom's links the vault now says itself (run after build.py)
   python3 tools/osse/paths_sync.py settle [BOARD]      clear Tom's edits and drops once the vault holds them (run after build.py)
@@ -156,6 +156,14 @@ def show(only=None):
             lines.append(f'- NEW LINK {label(e["from"], b, data)} → {label(e["to"], b, data)}' + (f' · "{e["label"]}"' if e["label"] else ""))
         print(f"\n## {name}")
         print("\n".join(lines) if lines else "nothing new")
+    order = doc.get("order") or {}
+    if order and not only:
+        print("\n## Running order (Session plan; for the session screen, nothing to write in the vault)")
+        for sess in sorted(order, key=lambda t: int(t[1:]) if t[1:].isdigit() else 1e9):
+            print(f"{sess}:")
+            for i, uid in enumerate(order[sess], 1):
+                board, _, nid = uid.rpartition("|")
+                print(f"  {i}. {label(nid, bs.get(board, {'cards': {}}), data)}" + (f" ({board})" if board else ""))
 
 
 def adopt(board, card, plan):
@@ -177,6 +185,8 @@ def adopt(board, card, plan):
     for n in cv["nodes"]:
         if (n.get("osse") or {}).get("scene") == card:
             n["osse"]["scene"] = nid
+    for sess, uids in (doc.get("order") or {}).items():
+        doc["order"][sess] = [nid if u == f"{board}|{card}" else u for u in uids]
     for e in cv.get("edges", []):
         e["fromNode"] = nid if e["fromNode"] == card else e["fromNode"]
         e["toNode"] = nid if e["toNode"] == card else e["toNode"]

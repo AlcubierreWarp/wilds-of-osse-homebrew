@@ -18,7 +18,7 @@ The hub's game master section finds the screen by itself (see step 6). Tom runs 
 
 ## 1. Get the plan first
 
-The story comes from Tom's plan for the session: the plans marked `ready` for it in the Ossë vault (`python3 tools/osse/osse.py plans`, then `card` on each), and any prep Tom gives in the conversation. Look up who and what is involved with `osse.py brief`, `card` and `find`. Never invent scenes, NPCs, clues or lines. If there is no plan marked ready and none in the conversation, ask for it and stop.
+The story comes from Tom's plan for the session: the plans marked `ready` for it in the Ossë vault (`python3 tools/osse/osse.py plans`, then `card` on each), and any prep Tom gives in the conversation. Look up who and what is involved with `osse.py brief`, `card` and `find`. Run the scenes in the running order Tom set on the Paths ahead Session plan (`python3 tools/osse/paths_sync.py show`, last section), when he has set one. Never invent scenes, NPCs, clues or lines. If there is no plan marked ready and none in the conversation, ask for it and stop.
 
 From the plan, pull:
 

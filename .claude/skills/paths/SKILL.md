@@ -17,6 +17,7 @@ Tom plans on the Paths ahead page (`vault/paths.html`): one tab per session; he 
 - **EDITED**: Tom changed a plan's kind, summary or idea, or left a note to Claude.
 - **DROP**: Tom dropped a plan.
 - **NEW LINK**: Tom's link between two vault plans, with its label.
+- **Running order**: each session's scenes, in the order Tom set on the Session plan. Nothing goes into the vault; when building that session's screen (the `session-screen` skill), run the scenes in this order.
 
 ## Step 2: Turn it into vault changes
 - A scene card becomes a `kind: scene` plan with `where:` (a [[link]] when the vault has the place; plain text otherwise, and ask Tom whether it needs a place note) and `present:` (a list; [[links]] for people in the vault, plain text for the rest). Write the scene first, then the cards inside it with `scene: "[[Scene]]"`.

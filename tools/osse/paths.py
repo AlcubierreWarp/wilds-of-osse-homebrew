@@ -133,6 +133,10 @@ def sheet(n):
     return {k: str(n.get(k)) for k in ("hp", "hp_max", "hp_temp", "slots", "conditions", "sheet_at", "ddb") if n.get(k) not in (None, "")}
 
 
+# Each player character's colour, as the session screens (screen/sNN.html) use it.
+PC_COLOUR = {"Belaskro Tich": "#6fbf9a", "Gabriele d'Avidicci": "#ee8a8a", "GUS": "#e2be6a", "Princess Timbit": "#c3a2f2"}
+
+
 def lanes_data(site, pcs, data):
     cur, nodes = site.cur, site.nodes
     sess = sorted((n for n in nodes.values() if n["type"] == "session" and str(n.get("number", "")).isdigit()
@@ -144,7 +148,8 @@ def lanes_data(site, pcs, data):
         nid = p["id"]
         top, recent = _latest(_secs(site.text(nid)).get("Now", []), cur)
         short = nid if " " not in nid else next((str(a) for a in p.get("aliases", []) if " " not in str(a)), nid.split()[0])
-        out.append({"key": nid, "short": short, "kind": "pc",
+        out.append({"key": nid, "short": short, "kind": "pc", "colour": PC_COLOUR.get(nid, "#b9ab95"),
+                    "aliases": [str(a) for a in p.get("aliases", []) if a],
                     "now": {"title": nid, "href": site.slugs.get(nid, "") + ".html", "player": p.get("player", ""),
                             "class": _plain(p.get("class", "")), "location": _plain(p.get("location", "")),
                             "state": p.get("state", ""), "sheet": sheet(p), "recent": recent[:5], "recent_at": top}})
@@ -184,7 +189,10 @@ def page(site):
             '<div class="bar"><div class="whatif"><b>What-ifs</b><span id="wi-list" class="muted"></span>'
             '<button id="wi-reset" class="mini" hidden>Clear</button></div>'
             '<div class="tools"><button class="mini" data-act="scene">+ Scene</button><button class="mini" data-act="card">+ Card</button><span id="save" class="save"></span></div></div>'
-            '<div class="work"><div class="stage"><nav class="sess" id="sess" role="tablist" aria-label="Sessions"></nav>'
+            '<div class="runw" id="runw" hidden><div class="stage"><nav class="sess" id="rsess" role="tablist" aria-label="Sessions"></nav>'
+            '<div class="run" id="run" aria-label="Running order"></div></div>'
+            '<aside class="tray" id="loose"></aside></div>'
+            '<div class="work" id="work"><div class="stage"><nav class="sess" id="sess" role="tablist" aria-label="Sessions"></nav>'
             '<div class="board" id="board" aria-label="Planning board">'
             '<div class="world" id="world"><svg id="wires" class="wires"></svg><div id="nodes"></div></div>'
             '<div class="float"><button class="fb" data-act="zout" title="Zoom out" aria-label="Zoom out">−</button><button class="fb" data-act="zin" title="Zoom in" aria-label="Zoom in">+</button><button class="fb" data-act="fit" title="Fit to the window" aria-label="Fit to the window">'
@@ -338,8 +346,43 @@ CSS = r"""
 .drawer .tabs2{display:flex;gap:4px;margin:12px 0 4px}
 .drawer .tabs2 button{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--vline);background:none;border-radius:4px;padding:7px 10px;cursor:pointer;color:var(--vmuted)}
 .drawer .tabs2 button[aria-selected=true]{border-color:var(--vink);color:var(--vink);background:rgba(255,255,255,.5)}
+.work[hidden],.runw[hidden]{display:none}
+.lanes button.runb{color:#3f5a3c;border-color:#9bb397;background:#e7efe3}
+.lanes button.runb[aria-selected=true]{background:#3f5a3c;color:var(--vellum);border-color:#3f5a3c}
+.runw{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 200px);min-height:480px}
+.run{flex:1;min-height:0;overflow:auto;border:1px solid var(--vrule);border-radius:0 8px 8px 8px;background:#f6eed8;padding:14px clamp(10px,2vw,22px) 40px}
+.runh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 14px;margin:0 0 10px;font-size:14.5px;color:var(--vmuted)}
+.runh b{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:#3f5a3c}
+.rc{display:grid;grid-template-columns:20px 30px 1fr auto;gap:2px 10px;align-items:start;max-width:760px;margin:0 0 8px;padding:8px 10px 8px 6px;
+  background:#fbf5e6;border:1px solid var(--vline);border-left:5px solid #4d6b4a;border-radius:6px;box-shadow:0 1px 4px rgba(42,29,18,.1);user-select:none;-webkit-user-select:none}
+.rc.cut{opacity:.45}.rc.cut .rt b{text-decoration:line-through}
+.rc.drag{position:relative;z-index:5;box-shadow:0 10px 24px rgba(42,29,18,.3);opacity:.95}
+.rc .rg{color:var(--vmuted);font-size:17px;line-height:1.3;cursor:grab;touch-action:none;text-align:center}
+.rc .rn{font:600 19px/1.1 var(--f-display);color:#3f5a3c;text-align:center}
+.rc .rb{min-width:0;cursor:grab}
+.rc .rt{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}.rc .rt b{font-weight:600;font-size:15.5px;line-height:1.25}
+.rc .rw{font-size:13px;color:var(--vmuted);margin-top:1px}
+.pcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pcx{font:700 10.5px/1.55 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:0 7px;border-radius:4px;border:2px solid var(--c);color:#1b1410;background:color-mix(in srgb,var(--c) 18%,#fbf5e6);white-space:nowrap}
+.pcx.in{background:var(--c)}
+.ch.who.pc{border:2px solid var(--c);background:color-mix(in srgb,var(--c) 30%,#fbf5e6);color:#1b1410}
+.rc .rx{font:600 11px var(--f-mono);letter-spacing:.06em;border:1px solid var(--vline);background:rgba(255,255,255,.5);color:var(--vink);border-radius:4px;padding:6px 8px;cursor:pointer;white-space:nowrap}
+.rc .rx[aria-expanded=true]{background:var(--vink);color:var(--vellum)}
+.rc .rm{grid-column:3/5;border-top:1px dashed var(--vline);margin-top:6px;padding-top:6px;font-size:14px}
+.rc .rm p{margin:0 0 6px}
+.rc .rm ul{list-style:none;margin:0 0 6px;padding:0}
+.rc .rm li{display:flex;align-items:center;gap:8px;padding:4px 4px;border-radius:4px;cursor:pointer}.rc .rm li:hover{background:rgba(124,22,34,.07)}
+.mk{flex:none;min-width:74px;font:500 10px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--vmuted);border-left:4px solid var(--vmuted);padding-left:6px}
+.mk.k-decision{border-left-color:var(--vred);color:var(--vred)}.mk.k-pressure{border-left-color:#b8860b;color:#7a5a08}.mk.k-clock{border-left-color:#3d5a80;color:#3d5a80}
+.mk.k-bottleneck{border-left:4px double var(--vink);color:var(--vink)}.mk.k-note{border-left-color:#c9a400}
+.rc .rm small{color:var(--vmuted);margin-left:auto;white-space:nowrap}
+.rc .rm .acts{margin-top:6px}
+.loose h4{margin:12px 0 4px;display:flex;align-items:center;gap:6px}
+.loose .li{padding:6px 8px;margin:0 0 5px;border:1px solid var(--vline);border-left:4px solid var(--vmuted);border-radius:5px;background:#fbf5e6;cursor:pointer;font-size:14px}
+.loose .li:hover{border-color:var(--vred)}
+@media (max-width:900px){.runw{grid-template-columns:1fr;grid-template-rows:1fr 30vh;height:calc(100vh - 170px)}}
 @media (max-width:900px){.work{grid-template-columns:1fr;grid-template-rows:1fr 34vh;height:calc(100vh - 170px)}}
-@media print{.bar,.tray,.drawer,.float{display:none}.work{display:block;height:auto}}
+@media print{.bar,.tray,.drawer,.float,.rg,.rx{display:none}.runw{display:block;height:auto}.run{overflow:visible}.work{display:block;height:auto}}
 """
 
 JS = r"""(() => {
@@ -362,7 +405,7 @@ const KDESC = {scene: "Where, and who is there: it sets the stage. A box on the 
   pressure: "What the world does if no one acts: a portent that fires when they stall.",
   bottleneck: "A beat most paths reach, where branches meet again.",
   note: "A loose idea. Claude turns it into a plan when you ask."};
-let doc = {lanes: {}}, lane = null, view = {x: 0, y: 0, k: 1}, views = {}, hs = {}, hsh = {};
+let doc = {lanes: {}, order: {}}, lane = null, view = {x: 0, y: 0, k: 1}, views = {}, hs = {}, hsh = {};
 const tabOf = {};   // board -> open session tab
 
 /* ---------- state ---------- */
@@ -420,10 +463,128 @@ function ring(f, n, sz) {
 function extras(o) {   // what a scene or clock adds to its card
   let h = "";
   if (o.kind === "scene") h += `<div class="at">${o.where ? `<b>At</b>${esc(o.where)}` : "<i>Where? Set it in its panel.</i>"}</div>` +
-    (o.present && o.present.length ? `<div class="chips">${o.present.map(x => `<span class="ch who">${esc(x)}</span>`).join("")}</div>` : "");
+    (o.present && o.present.length ? `<div class="chips">${o.present.map(x => { const p = PCS.find(q => q.key === pcOf(x));
+      return `<span class="ch who${p ? " pc" : ""}"${p ? ` style="--c:${esc(p.colour)}"` : ""}>${esc(x)}</span>`; }).join("")}</div>` : "");
   if (o.kind === "clock") { const [f, n] = parseClock(o.clock);
     h += `<div class="clk"><button class="rng" data-tick title="Fill a segment (Shift-click empties one)" aria-label="Clock: ${f} of ${n}">${ring(f, n, 44)}</button><span>${f} of ${n} filled</span></div>`; }
   return h;
+}
+
+/* ---------- session plan: every board's scenes for a session, in running order ---------- */
+const RUN = "@session", PCS = D.lanes.filter(l => l.kind === "pc");
+let runMode = false, runTab = null;
+const opened = new Set();
+const lc = x => String(x || "").trim().toLowerCase();
+function pcOf(name) {   // a player character's key, "party", or null
+  const n = lc(name);
+  if (n === "the party" || n === "the whole party") return "party";
+  const p = PCS.find(q => lc(q.key) === n || (q.aliases || []).some(a => lc(a) === n));
+  return p ? p.key : null;
+}
+const pcChip = (p, inn, tip) => `<span class="pcx${inn ? " in" : ""}" style="--c:${esc(p.colour)}" title="${esc(tip)}">${esc(p.short)}</span>`;
+function withLane(k, fn) { const keep = lane; lane = k; try { return fn(); } finally { lane = keep; } }
+const shortOf = k => (D.lanes.find(l => l.key === k) || {}).short || k;
+const boardName = k => k === "world" ? "Around the party" : shortOf(k) + "’s board";
+function runSessions() {
+  const set = new Set();
+  D.lanes.forEach(l => withLane(l.key, () => L().sessions.forEach(t => { if (t !== "Later") set.add(t); })));
+  return [...set].sort((a, b) => sessNum(a) - sessNum(b));
+}
+function runScenes(t) {   // the scenes every board places in session t, in Tom's order; and the cards outside every scene
+  const m = new Map(), loose = [], seenLoose = new Set();
+  D.lanes.forEach(l => withLane(l.key, () => {
+    const k = l.key, ids = inTab(t);
+    ids.filter(isScene).forEach(id => {
+      const plan = id.startsWith("p:"), uid = plan ? id : k + "|" + id;
+      const o = plan ? view_of(id.slice(2)) : L().cards[id.slice(2)];
+      let s = m.get(uid);
+      if (!s) m.set(uid, s = {uid, id, boards: [], title: titleOf(id), where: o.where || "", present: o.present || [], text: (plan ? o.summary : o.text) || "",
+        ready: plan && o.status === "ready", mine: !plan, edited: plan && o.edited, cut: plan && !!cut[id.slice(2)], members: [], seen: new Set()});
+      if (!s.boards.includes(k)) s.boards.push(k);
+      membersOf(id).sort((a, b) => where(a).y - where(b).y).forEach(x => {
+        const mu = x.startsWith("p:") ? x : k + "|" + x; if (s.seen.has(mu)) return; s.seen.add(mu);
+        const mo = x.startsWith("p:") ? view_of(x.slice(2)) : L().cards[x.slice(2)], kd = kindOf(x) || "beat";
+        s.members.push({id: x, board: k, kind: kd, title: titleOf(x), clock: kd === "clock" ? parseClock(mo.clock) : null});
+      });
+    });
+    ids.filter(x => !isScene(x) && !sceneOf(x)).forEach(x => {
+      const u = x.startsWith("p:") ? x : k + "|" + x; if (seenLoose.has(u)) return; seenLoose.add(u);
+      loose.push({id: x, board: k, kind: kindOf(x) || "beat", title: titleOf(x)});
+    });
+  }));
+  const ord = (doc.order || {})[t] || [], all = [...m.values()];
+  return {scenes: ord.filter(u => m.has(u)).map(u => m.get(u)).concat(all.filter(x => !ord.includes(x.uid))), loose};
+}
+function runOrder() { const o = {}; runSessions().forEach(t => { const sc = runScenes(t).scenes; if (sc.length) o[t] = sc.map(x => x.uid); }); return o; }
+function scenePcs(s) {   // filled: listed as present; outlined: on their board, not listed as present
+  const inn = new Set(), thread = new Set();
+  s.present.forEach(n => { const p = pcOf(n); if (p === "party") PCS.forEach(x => inn.add(x.key)); else if (p) inn.add(p); });
+  s.boards.forEach(k => { if (k === "The Party") PCS.forEach(x => thread.add(x.key)); else if (PCS.some(x => x.key === k)) thread.add(k); });
+  return PCS.filter(p => inn.has(p.key) || thread.has(p.key))
+    .map(p => pcChip(p, inn.has(p.key), inn.has(p.key) ? `${p.key}: present` : `${p.key}: their thread, not listed as present`)).join("");
+}
+function runCard(s, i) {
+  const others = s.present.filter(n => !pcOf(n)), op = opened.has(s.uid);
+  return `<div class="rc${s.mine ? " mine" : ""}${s.cut ? " cut" : ""}" data-uid="${esc(s.uid)}">` +
+    `<span class="rg" title="Drag to move it in the running order">⠿</span><span class="rn">${i + 1}</span>` +
+    `<div class="rb"><div class="rt"><b>${esc(s.title)}</b>${s.ready ? '<span class="ch ready">ready</span>' : ""}` +
+    `${s.mine ? '<span class="ch ed">yours · not in vault</span>' : s.edited ? '<span class="ch ed">edited</span>' : ""}</div>` +
+    `<div class="rw">${s.where ? "At " + esc(s.where) : "<i>Where not set</i>"}${others.length ? " · with " + others.map(esc).join(", ") : ""}</div>` +
+    `<div class="pcs">${scenePcs(s)}</div></div>` +
+    `<button class="rx" aria-expanded="${op}" title="${op ? "Hide" : "Show"} what happens in this scene">${op ? "▾" : "▸"} ${s.members.length}</button>` +
+    (op ? `<div class="rm">${s.text ? `<p>${esc(s.text)}</p>` : ""}` +
+      (s.members.length ? `<ul>${s.members.map(m => `<li data-go="${esc(m.board)}" data-id="${esc(m.id)}" title="Open it on ${esc(boardName(m.board))}"><span class="mk k-${esc(m.kind)}">${esc(KINDS[m.kind] || "Beat")}</span>` +
+        `<span>${esc(m.title)}</span>${m.clock ? `<span class="rng">${ring(m.clock[0], m.clock[1], 18)}</span>` : ""}<small>${esc(shortOf(m.board))}</small></li>`).join("")}</ul>`
+        : `<p class="muted">Nothing set in this scene yet. Drag beats, decisions and clocks into it on ${esc(boardName(s.boards[0]))}.</p>`) +
+      `<div class="acts">${s.boards.map(k => `<button data-go="${esc(k)}" data-id="${esc(s.id)}">Open on ${esc(boardName(k))}</button>`).join("")}</div></div>` : "") + `</div>`;
+}
+function drawRun() {
+  const ts = runSessions(); if (!ts.includes(runTab)) runTab = ts[0];
+  const t = runTab, {scenes, loose} = runScenes(t), all = scenes.length && scenes.every(x => opened.has(x.uid));
+  $("#rsess").innerHTML = ts.map(x => `<button role="tab" data-rtab="${esc(x)}" aria-selected="${x === t}">${esc(x)}${sessNum(x) === CUR + 1 ? " · next" : ""}<small>${runScenes(x).scenes.length}</small></button>`).join("");
+  $$("#rsess [data-rtab]").forEach(b => b.onclick = () => { runTab = b.dataset.rtab; drawRun(); $("#run").scrollTop = 0; });
+  $("#run").innerHTML = `<div class="runh"><span><b>Running order · ${esc(t)}</b> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"} from every board</span>` +
+    (scenes.length ? `<span>Drag a scene by its ⠿ to move it. Tap it to see what happens in it. <button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button></span>` : "") + `</div>` +
+    (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add a scene on a character's board (+ Scene) and drag its beats, decisions and clocks inside; it shows up here.</p>`);
+  const by = {}; loose.forEach(x => (by[x.board] ||= []).push(x));
+  $("#loose").innerHTML = `<div class="trayh"><b>Not in a scene</b></div><p class="muted" style="font-size:13.5px;margin:6px 0 0">Cards in ${esc(t)} outside every scene. Tap one to open it on its board.</p><div class="tlist loose">` +
+    (Object.keys(by).length ? Object.entries(by).map(([k, xs]) => { const p = PCS.find(q => q.key === k);
+      return `<h4>${p ? pcChip(p, true, k) : esc(shortOf(k))}</h4>` + xs.map(x => `<div class="li k-${esc(x.kind)}" data-go="${esc(k)}" data-id="${esc(x.id)}"><span class="mk k-${esc(x.kind)}">${esc(KINDS[x.kind] || "Beat")}</span> ${esc(x.title)}</div>`).join(""); }).join("")
+      : `<p class="empty">Every card in ${esc(t)} sits in a scene.</p>`) + `</div>`;
+  $$("#runw [data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); goto(b.dataset.go, t, b.dataset.id); });
+  $$("#run .rx").forEach(b => b.onclick = ev => { ev.stopPropagation(); toggleRun(b.closest(".rc").dataset.uid); });
+  const ax = $("#run [data-allx]"); if (ax) ax.onclick = () => { scenes.forEach(x => all ? opened.delete(x.uid) : opened.add(x.uid)); drawRun(); };
+  $$("#run .rc").forEach(el => runDrag(el, t));
+}
+function toggleRun(u) { if (opened.has(u)) opened.delete(u); else opened.add(u); drawRun(); }
+function runDrag(el, t) {
+  el.addEventListener("pointerdown", ev => {
+    if (ev.button > 0 || ev.target.closest("button,li,a")) return;
+    const grip = !!ev.target.closest(".rg");
+    if (!grip && ev.pointerType !== "mouse") { const u = el.dataset.uid; el.addEventListener("click", () => toggleRun(u), {once: true}); return; }   // touch: the grip drags, a tap opens
+    ev.preventDefault();
+    const list = $("#run"), st = ev.clientY; let moved = false;
+    const mv = e => {
+      if (!moved && Math.abs(e.clientY - st) < 5) return;
+      moved = true; el.classList.add("drag");
+      const after = $$("#run .rc").filter(x => x !== el).find(x => { const r = x.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; });
+      if (after) { if (el.nextElementSibling !== after) list.insertBefore(el, after); } else if (list.lastElementChild !== el) list.append(el);
+      $$("#run .rc .rn").forEach((n, i) => { n.textContent = i + 1; });
+      const r = list.getBoundingClientRect(); if (e.clientY < r.top + 40) list.scrollTop -= 14; else if (e.clientY > r.bottom - 40) list.scrollTop += 14;
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); window.removeEventListener("pointercancel", up);
+      el.classList.remove("drag");
+      if (!moved) { if (!grip) toggleRun(el.dataset.uid); return; }
+      (doc.order ||= {})[t] = $$("#run .rc").map(x => x.dataset.uid); changed(); drawRun();
+    };
+    window.addEventListener("pointermove", mv); window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up);
+  });
+}
+function goto(k, t, id) {
+  pick(k);
+  if (L().sessions.includes(t) && T() !== t) openTab(t);
+  if (id && where(id)) open(id);
 }
 
 /* ---------- what-ifs (the same rules as build.py) ---------- */
@@ -1079,7 +1240,11 @@ function fromCanvas(cv, after) {
   (cv.edges || []).forEach(e => { if ((e.osse || {}).own) s.edges.push({id: e.id, from: e.osse.from || e.fromNode, to: e.toNode, label: e.label || ""}); });
   return s;
 }
-function pack() { const lanes = {}; for (const k in doc.lanes) lanes[k] = toCanvas(k); return {format: "jsoncanvas-1.0 per board, sessions side by side", after: CUR, lanes}; }
+function pack() {
+  doc.order = runOrder();
+  const lanes = {}; for (const k in doc.lanes) lanes[k] = toCanvas(k);
+  return {format: "jsoncanvas-1.0 per board, sessions side by side; order: each session's scenes in running order", after: CUR, lanes, order: doc.order};
+}
 let timer = null, dirty = false;
 function status(t, bad) { const el = $("#save"); el.textContent = t; el.classList.toggle("bad", !!bad); }
 function changed() {
@@ -1105,20 +1270,25 @@ async function load() {
   } else status("Unlock the game master section on the hub to save to the relay. Until then this device keeps your changes.");
   if (!got || !got.lanes || !Object.keys(got.lanes).length) { try { const loc = JSON.parse(store.get("osse-paths-local") || "null"); if (loc && loc.lanes) { got = loc; if (KEY) dirty = true; } } catch (e) {} }
   if (got && got.lanes) for (const k in got.lanes) doc.lanes[k] = fromCanvas(got.lanes[k], got.after);
+  if (got && got.order) doc.order = got.order;
   if (dirty) save();
 }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && dirty && KEY) save(); });
 
 /* ---------- boards ---------- */
 function pick(key) {
-  if (lane) views[lane + "|" + T()] = {...view};
-  lane = key; store.set("osse-paths-lane", key); history.replaceState(null, "", "#" + encodeURIComponent(key));
+  if (lane && !runMode) views[lane + "|" + T()] = {...view};
+  runMode = key === RUN;
+  $("#runw").hidden = !runMode; $("#work").hidden = runMode; $$(".tools .mini").forEach(b => { b.hidden = runMode; });
+  store.set("osse-paths-lane", key); history.replaceState(null, "", "#" + encodeURIComponent(key));
   $$("#lanes button").forEach(b => b.setAttribute("aria-selected", b.dataset.lane === key));
-  closeDrawer(); draw();
+  closeDrawer();
+  if (runMode) { drawRun(); return; }
+  lane = key; draw();
   const v = views[key + "|" + T()]; if (v) { view = {...v}; applyView(); } else fit();
 }
-function refresh() { recut(); draw(); if (shown) open(shown, mode); }
-$("#lanes").innerHTML = D.lanes.map(l => `<button role="tab" data-lane="${esc(l.key)}">${esc(l.short)}<small>${l.count}</small></button>`).join("");
+function refresh() { recut(); if (runMode) { drawRun(); return; } draw(); if (shown) open(shown, mode); }
+$("#lanes").innerHTML = `<button role="tab" class="runb" data-lane="${RUN}" title="Every board's scenes for a session, in running order">Session plan</button>` + D.lanes.map(l => `<button role="tab" data-lane="${esc(l.key)}">${esc(l.short)}<small>${l.count}</small></button>`).join("");
 $$("#lanes button").forEach(b => b.onclick = () => pick(b.dataset.lane));
 $("#wi-reset").onclick = () => { ov.out = {}; ov.dead = {}; ov.drop = {}; refresh(); };
 $("#tray-all").onchange = tray; $("#tray-q").oninput = tray;
@@ -1142,7 +1312,7 @@ $("#hint").textContent = "Drag plans in from the tray · drag a card's + to link
 recut();
 load().then(() => {
   const want = decodeURIComponent(location.hash.slice(1)) || store.get("osse-paths-lane");
-  pick(D.lanes.some(l => l.key === want) ? want : D.lanes[0].key);
+  pick(want === RUN || D.lanes.some(l => l.key === want) ? want : D.lanes[0].key);
 });
 })();
 """
