@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Runic&family=Cinzel:wght@500;600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Runic&family=Cinzel:wght@500;600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Kalam:wght@400&display=swap">
 <style>
 /* Layout: a brass nameplate over a red velvet band; the file drawer on the left, the document window on the right; one column on phones. */
 :root{
@@ -215,6 +215,9 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
   font:500 1.3em/1.1 var(--f-marshal);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
 .m-hero-stamp{margin:.6em .4em 0 0}
 .m-stamp-row{display:flex;justify-content:flex-end;padding:1.4em 2.2em .4em}
+/* Green ink: a handwritten note added to the page after it was typed. */
+.m-ink{font:400 1.18em/1.35 'Kalam',cursive;color:#1d6b3c;width:fit-content;max-width:64%;margin:.35em 0 .6em auto;padding:0 .2em;transform:rotate(-1.2deg);transform-origin:right top}
+.m-item .m-ink{margin-top:.45em}
 .m-file{display:grid;grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);gap:.05em 1em;margin:0;padding:.45em 0;border-top:1px dashed #a9a196;border-bottom:1px dashed #a9a196;font-size:.9em}
 .m-file dt{font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#26324a}
 .m-file dd{margin:0}
@@ -697,7 +700,7 @@ function assetHTML(a){
 /* Marshal pages. The body text marks the layout:
    [page] new page · --- footer lines follow · [stamp: Word] · ## Field exercise … box · ## Addendum … clipped card
    ## Step 2 · Title / ## Final step · Title · other ## section heading · **1.1 Title.** item text, then *aside line*
-   | a | b | table · - [ ] checkbox · + option box · > quoted message. Lead lines before the first item open the page. */
+   | a | b | table · - [ ] checkbox · + option box · > quoted message · [ink: note] green handwritten note. Lead lines before the first item open the page. */
 const NUMWORD = {one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12};
 const ITEM = /^\*\*((?:[A-Z]\.)?\d+(?:\.\d+)*)\s+(.+?)\*\*\s*(.*)$/;
 function mParse(src, useLead){
@@ -733,7 +736,8 @@ function mParse(src, useLead){
   const endItem = () => {
     if (!item) return;
     emit(`<div class="m-item"><span class="m-num">${esc(item.num)}</span><div><div class="m-ttl">${inline(item.ttl)}</div>${
-      item.text.map(t => `<div>${inline(t)}</div>`).join("")}${item.aside.map(t => `<div class="m-aside">${inline(t)}</div>`).join("")}</div></div>`);
+      item.text.map(t => `<div>${inline(t)}</div>`).join("")}${item.aside.map(t => `<div class="m-aside">${inline(t)}</div>`).join("")}${
+      item.ink.map(t => `<div class="m-ink">${t}</div>`).join("")}</div></div>`);
     item = null;
   };
   const endBlocks = () => { endPara(); endQuote(); endList(); endTable(); endItem(); };
@@ -761,6 +765,13 @@ function mParse(src, useLead){
       else { endCtx(); emit(`<div class="m-stamp-row">${s}</div>`); }
       continue;
     }
+    if ((m = l.match(/^\[ink:\s*(.+?)\]$/i))) {
+      const t = m[1].split(/\s*\/\/\s*/).map(inline).join("<br>");
+      if (item) { item.ink.push(t); continue; }
+      leave(); endPara(); endQuote(); endList(); endTable();
+      emit(`<div class="m-ink">${t}</div>`);
+      continue;
+    }
     if ((m = l.match(/^##\s+(.*)/))) {
       const h = m[1]; endCtx();
       let s;
@@ -775,7 +786,7 @@ function mParse(src, useLead){
     }
     if ((m = l.match(ITEM))) {
       if (ctx && ctx.type !== "step") endCtx(); leave(); endBlocks();
-      item = {num: m[1], ttl: m[2].replace(/\.$/, ""), text: m[3] ? [m[3]] : [], aside: []};
+      item = {num: m[1], ttl: m[2].replace(/\.$/, ""), text: m[3] ? [m[3]] : [], aside: [], ink: []};
       continue;
     }
     if (item && (m = l.match(/^\*([^*].*)\*$/))) { item.aside.push(m[1]); continue; }
@@ -943,7 +954,7 @@ function openEditor(id){
         <label>Order in the list<input id="f-order" type="number" value="${v("order")}"></label>
       </div>
       <label>Text<textarea id="f-body" rows="16">${v("body")}</textarea></label>
-      <p class="hint">Blank line starts a paragraph · <code>**1.1 Title.** text</code> numbered item, <code>*aside*</code> on the next line · <code>## Section</code> · <code>## Field exercise · …</code> box · <code>## Step 2 · Title</code> · <code>## Final step · Title</code> · <code>## Addendum · …</code> clipped card · <code>- item</code> · <code>- [ ] checkbox</code> · <code>+ **Option.** text</code> · <code>| a | b |</code> table · <code>&gt; quoted line</code> · <code>[stamp: Released]</code> · <code>---</code> then footer lines · <code>[page]</code> new page · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words). Lines before the first item open the page: the first is the subtitle, the rest the intro.</p>
+      <p class="hint">Blank line starts a paragraph · <code>**1.1 Title.** text</code> numbered item, <code>*aside*</code> on the next line · <code>## Section</code> · <code>## Field exercise · …</code> box · <code>## Step 2 · Title</code> · <code>## Final step · Title</code> · <code>## Addendum · …</code> clipped card · <code>- item</code> · <code>- [ ] checkbox</code> · <code>+ **Option.** text</code> · <code>| a | b |</code> table · <code>&gt; quoted line</code> · <code>[stamp: Released]</code> · <code>[ink: note]</code> green handwritten note (<code>//</code> breaks the line) · <code>---</code> then footer lines · <code>[page]</code> new page · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words). Lines before the first item open the page: the first is the subtitle, the rest the intro.</p>
       <label>Attachment: image or PDF, up to 20 MB<input id="f-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"></label>
       ${d.asset ? `<label class="check"><input type="checkbox" id="f-noasset"> Remove ${esc(d.asset.name || "the attachment")}</label>` : ""}
       <label>Game master note · never shown to Gus<textarea id="f-note" rows="4">${v("note")}</textarea></label>

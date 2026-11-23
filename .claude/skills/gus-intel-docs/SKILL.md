@@ -41,6 +41,15 @@ The author is a construct writing for another construct, about humans, as if hum
 - Deliver them straight, usually as a quoted letter or a final step.
 - Follow them with one dry institutional line, never a joke that cancels them: "We have not edited it. We wanted to."
 
+**Green ink (DM only: it is Vigil):**
+- Handwritten notes in green ink, added to the typed page after the fact, written straight to Gus about the chapters and lessons. Markup: `[ink: note]` on its own line (see `gus-document`). It sits under the rule, box or paragraph above it.
+- The writer is a different voice from the Stevens: one person writing to Gus in the second person, short and plain, with no bureaucratic framing. Gus is never told who writes them. No name, no initial, no signature. The green ink is the only mark until Tom says otherwise.
+- Ease in. Tom moves the stage; never jump ahead of it.
+  1. **Mysterious** (current stage). Standard writing, no jokes. One or two notes per document at most, often a single word or one line. They show someone is watching Gus's field work: a correction, a nudge to reread a rule, a plain "Seen." Tie them to things Gus actually did at the table (check `osse.py card GUS`).
+  2. **Dry.** The same economy, with a trace of personality: an aside that quietly disagrees with a rule or a Steven.
+  3. **Human humour about construct things.** A construct who has tried these rules from the inside and finds them funny, using human jokes about bot life.
+- Never mock Gus, never reveal a DM secret, and never say Gus is one of a kind (see above).
+
 **Party winks:** Point at other PCs indirectly through tells or examples, and never by name. For example, "A cat demanding things: not an emotion, this is nobility. Comply." for Princess Timbit.
 
 **Field Exercises:**
@@ -74,4 +83,4 @@ New kinds are welcome: a dossier, a mission briefing, a requisition form GUS fil
 
 ## 5. After Tom approves a document
 
-Add a line for it to the vault note `GUS archive registry` (create it in `Lore/` as `type: lore`, `kind: term`, `stage: prep` if it does not exist yet): code, title, status (issued, sealed, planned), hand-over trigger, a one-line summary of each rule, and any new cross-references, gags, withdrawn entries or threads. Run `python3 tools/osse/build.py`.
+Add a line for it to the vault note `GUS archive registry` (create it in `Lore/` as `type: lore`, `kind: term`, `stage: prep` if it does not exist yet): code, title, status (issued, sealed, planned), hand-over trigger, a one-line summary of each rule, every green-ink note and its stage, and any new cross-references, gags, withdrawn entries or threads. Run `python3 tools/osse/build.py`.

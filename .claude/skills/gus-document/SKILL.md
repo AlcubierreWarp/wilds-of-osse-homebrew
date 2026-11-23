@@ -39,6 +39,7 @@ For an annex, `from` is `Author. Reviewed by Reviewer` and the grid splits it. F
 | `> lines` (last short line is the signature) | A quoted letter card |
 | `\| Observed \| Assessment \|` rows | A table, first row as header |
 | `\|\|words\|\|` | Blacked out; Gus's copy never holds the words |
+| `[ink: note]` (`//` breaks the line) | A green handwritten note under the rule, box or paragraph above it; see Green ink in `gus-intel-docs` |
 | `---` then two lines | The footer: left line, right line |
 | `[page]` | A new page (only when one page clearly is not enough) |
 
