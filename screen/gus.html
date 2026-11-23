@@ -92,8 +92,11 @@ img{max-width:100%}
 .tab .n{opacity:.75}
 .tab:hover{border-color:var(--gold)}
 .tab.on{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,#a97d34);color:var(--engrave);border-color:var(--gold-hi)}
+.tab.ep{border-color:#c8414c;color:#ff8a8f}
+.tab.ep:hover{border-color:#ff7880}
 .tab.ep.on{background:linear-gradient(180deg,#9d2530,#6e1b20);color:#ffe7e2;border-color:#c8414c}
-.tab.alert{background:#e3202f;color:#fff;border-color:#ff7880;box-shadow:0 0 16px 3px rgba(255,38,54,.7);animation:alarm 1.3s ease-in-out infinite}
+/* Unopened protocol: the tab is filled red and pulses until Gus opens the file, then falls back to the red outline. */
+.tab.ep.alert{background:#e3202f;color:#fff;border-color:#ff7880;box-shadow:0 0 16px 3px rgba(255,38,54,.7);animation:alarm 1.3s ease-in-out infinite}
 @keyframes alarm{50%{background:#a3121d;box-shadow:0 0 5px 0 rgba(255,38,54,.35)}}
 .tab:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
 .files{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -391,7 +394,7 @@ const KIND = {
 };
 const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
 const S = {tab:"files", view:"player", vault:{}, shelf:{}, signal:null, links:{}, sel:null, edit:null, busy:false,
-  confirm:null, link:"connecting", fails:0, primed:false};
+  confirm:null, link:"connecting", fails:0, primed:false, pick:true};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = {
@@ -561,9 +564,14 @@ function render(){
   const cur = S.sel && current()[S.sel];
   if (cur && !S.edit) S.tab = isEp(cur) ? "ep" : "files";
   const L = all.filter(d => isEp(d) === (S.tab === "ep"));
-  if (!S.sel && L.length && !S.edit && matchMedia("(min-width: 821px)").matches) {
-    S.sel = S.view === "player" ? [...L].sort((a,b) => (b.revealedAt||0) - (a.revealedAt||0))[0].id : L[0].id;
-    if (S.view === "player") markSeen(S.sel);
+  /* Only a push changes Gus's screen by itself. On load, or when someone picks a tab, a wide screen opens a file
+     Gus has already read (the game master gets the first one). A new file waits in the list with its New tag. */
+  if (S.pick && S.link === "live") {
+    S.pick = false;
+    if (!S.sel && !S.edit && matchMedia("(min-width: 821px)").matches) {
+      const read = S.view === "player" ? L.filter(d => !unread(d.id)).sort((a,b) => (b.revealedAt||0) - (a.revealedAt||0)) : L;
+      if (read.length) S.sel = read[0].id;
+    }
   }
   const dm = S.view === "dm";
   $("#modes").hidden = !gmKey();
@@ -633,7 +641,7 @@ async function unlock(e){
   if (!gm && !player) { msg.textContent = "That code was not accepted."; $("#code").select(); return; }
   store.set(gm ? "gus-key-gm" : "gus-key-player", code);
   if (gm) tab.set("gus-view", "dm");
-  decideView(); S.link = "connecting"; S.primed = false; lastView = ""; render(); poll();
+  decideView(); S.link = "connecting"; S.primed = false; S.pick = true; lastView = ""; render(); poll();
 }
 document.addEventListener("submit", e => { if (e.target.id === "login") unlock(e); });
 
@@ -646,7 +654,7 @@ function viewHTML(){
     if (S.link === "lost") return rest("Archive link lost", "The terminal will keep trying. Files appear as soon as the link is back.");
     return rest(S.view === "dm" ? "Choose a file" : "Awaiting files", S.view === "dm"
       ? "Pick a file to read it, reveal it or push it to Gus's screen."
-      : "Pick a file to read it. New files open here the moment they arrive.");
+      : "Pick a file to read it. Files the game master pushes open here the moment they arrive.");
   }
   return (S.view === "dm" ? gmStrip(S.sel, d) : "") + docHTML(d);
 }
@@ -1003,7 +1011,7 @@ document.addEventListener("click", e => {
     if (matchMedia("(max-width: 820px)").matches) $("#view").scrollIntoView({behavior:"smooth"});
   } else if (a === "mode") {
     tab.set("gus-view", b.dataset.v); decideView();
-    S.sel = null; S.edit = null; S.confirm = null; S.primed = false; S.link = "connecting"; lastView = ""; render(); poll();
+    S.sel = null; S.edit = null; S.confirm = null; S.primed = false; S.pick = true; S.link = "connecting"; lastView = ""; render(); poll();
   } else if (a === "new") { S.sel = null; S.confirm = null; openEditor(null); render(); }
   else if (a === "edit") { S.confirm = null; openEditor(id); }
   else if (a === "cancel") { S.edit = null; lastView = ""; render(); }
@@ -1014,7 +1022,7 @@ document.addEventListener("click", e => {
   else if (a === "push" || a === "reveal" || a === "hide" || a === "read" || a === "unread") act(a, id);
   else if (a === "print") downloadPdf(b);
   else if (a === "tab") {
-    if (S.tab !== b.dataset.v) { S.tab = b.dataset.v; S.sel = null; S.confirm = null; S.edit = null; lastView = ""; }
+    if (S.tab !== b.dataset.v) { S.tab = b.dataset.v; S.sel = null; S.confirm = null; S.edit = null; S.pick = true; lastView = ""; }
     render();
   }
   else if (a === "lock") {

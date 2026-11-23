@@ -87,10 +87,10 @@ What Gus has opened is kept in the relay, so a new browser or device does not fl
 | Button | What Shane sees |
 |---|---|
 | Push to Gus's screen | The file opens on his screen with an incoming-file signal |
-| Reveal quietly | The file joins his list, marked New |
+| Reveal quietly | The file joins his list, marked New. His screen does not change. |
 | Take back | The file leaves his list |
 
-Emergency protocols (files of the Emergency protocol type) sit on their own Emergency tab in the file list. On Gus's screen that tab glows bright red while a protocol he has not opened is waiting; pushing one switches him to it. Everything else is on the Files tab.
+Emergency protocols (files of the Emergency protocol type) sit on their own Emergency tab in the file list. On Gus's screen that tab is filled bright red and pulses while a protocol he has not opened is waiting, and goes back to a red outline once he opens it. Pushing one switches him to it. Only a push changes his screen by itself. Everything else is on the Files tab.
 
 Every file is laid out as letter-sized Marshal pages modelled on the handouts: field manual chapters get the chapter block, annexes the file grid, emergency protocols the oxblood band and numbered steps. The Open PDF button at the top opens the attached PDF, or, when there is none, builds a PDF of the pages in the browser and downloads it (html2canvas and jsPDF, loaded on first use; the print dialog is the fallback if they cannot load). The editor's hint lists the markup (`**1.1 Title.**` rules, `## Field exercise`, `## Step 2 · …`, `[stamp: …]`, `---` for the footer, `[page]` for a new page).
 
