@@ -13,6 +13,8 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | **Fronts and grim portents** | *Dungeon World*, Fronts | The world moves when the party does not. What a danger does if no one stops it is `kind: pressure`: a plan that fires when they stall. |
 | **Secrets and clues, apart from where they are found** | Mike Shea, *Return of the Lazy Dungeon Master* | Secrets are written without fixing how they come out. Ossë already keeps secrets as their own notes; plans only say they need one hidden or revealed. |
 | **Character-first prep; flags** | Shea, *Review the Characters*; Burning Wheel Beliefs | Start from each character and what they want, not from the plot. Each board starts from where the character stands at the end of the last session. |
+| **Scenes and beats** | Robert McKee, *Story*; screenwriting practice | A scene is a unit of place, time and people that sets the stage; a beat is one exchange or turn inside it. Ossë marks the stage as `kind: scene` (with `where:` and `present:`) and the moments inside it as beats, decisions, clocks and pressures that name it with `scene:`. |
+| **Progress clocks** | John Harper, *Blades in the Dark* | A clock is a circle cut into segments; fill one when time passes or things go wrong, and something happens when it is full. Ossë marks it `kind: clock` with `clock: filled/segments`. |
 | **Decision points** | Choice-based design generally | A decision is a choice the character faces, with options. Each option leads to its own plan. Ossë marks it `kind: decision` with an `## Options` section. |
 
 ## The board
@@ -26,20 +28,38 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | **Cards** | Live plans, by kind (below) | Plan notes |
 | **Links** | Solid: the vault already joins them. Dashed red: Tom's, not in the vault yet | `plan: [[X]]` in the later plan's Requires, or a decision's `## Options` |
 | **Secret chips** | A secret a card needs hidden or revealed. Tap to try a what-if | `hidden:` / `revealed:` requirements |
+| **Scenes on the board** | A scene is a box with its details in a header: where, who is present, the situation. Drag it by the header and the cards inside move with it; drag the corner to resize it. Drop a card inside to set it in the scene. Where and who are picked from the vault's places and people, or typed | `where:`, `present:`; `scene:` on the cards inside |
+| **Zoom** | + and − at the top right of the canvas, beside Fit and Key; also pinch or Command-scroll | |
 | **Tom's own cards** | New ideas drawn on the board | Become plan notes when Tom asks (the `paths` skill) |
 | **Edits** | Tom changes a plan's kind, summary or idea on the board, or leaves Claude a note. The card says "edited · not in vault" | Written into the plan note when Tom asks; the plan keeps its name |
 | **Deleting** | The × on a card takes a plan back to the tray, or deletes Tom's own card. Drop this plan (in its panel) removes it from the board and the tray | A dropped plan gets `status: dropped` when Tom asks |
 
 ## Plan kinds
 
-`kind:` on a plan note. Empty means scene.
+`kind:` on a plan note. Empty means beat.
 
-| Kind | Use it for | Term |
-| --- | --- | --- |
-| `scene` | A situation that could happen | `schema:PlanAction` |
-| `decision` | A choice the character faces; each option is its own plan | `schema:ChooseAction` |
-| `pressure` | What the world does if no one acts | `osse:Pressure` |
-| `bottleneck` | A beat most paths reach, where branches meet | `osse:Bottleneck` |
+| Kind | Use it for | On the board | Term |
+| --- | --- | --- | --- |
+| `scene` | The stage: a place, who is there, what is going on. `where:` and `present:` | A box; the cards inside it happen during the scene | `osse:Scene` |
+| `beat` | One key moment in a scene or encounter | A card | `osse:Beat` |
+| `decision` | A choice the character faces; each option is its own plan | A card listing its options | `schema:ChooseAction` |
+| `clock` | Time pressure, or something that happens when it fills. `clock: 2/6` | A card with a segmented clock; tap it to fill a segment | `osse:Clock` |
+| `pressure` | What the world does if no one acts | A card | `osse:Pressure` |
+| `bottleneck` | A beat most paths reach, where branches meet | A card with a double edge | `osse:Bottleneck` |
+
+A beat, decision, clock or pressure inside a scene names it with `scene: "[[Scene plan]]"`. Scenes do not nest.
+
+```
+---
+type: plan
+kind: scene
+status: draft
+summary: "A masked ball at the manor, the night the steward goes missing"
+where: "[[Aerrowyn Manor]]"
+present: ["[[Corvane Aerrowyn]]", "[[The Party]]", "a masked courier"]
+target: S15
+---
+```
 
 ## Decisions
 

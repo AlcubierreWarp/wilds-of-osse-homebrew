@@ -7,9 +7,10 @@ A plan is one idea for the future: a scene, a reveal, a twist, an NPC's next mov
 type: plan
 stage: draft
 status: draft        # draft | ready | played | dropped | pruned
-kind: scene          # scene | decision | pressure | bottleneck (docs/osse/branching.md)
+kind: beat           # beat (or empty) | scene | decision | clock | pressure | bottleneck (docs/osse/branching.md)
 for: "[[Mira Holt]]"  # optional: the player character (or The Party) whose board it sits on
 summary: "one line"
+scene: "[[The night market]]"   # optional: the scene plan this happens in
 target: S14          # optional: the session it is aimed at
 thread: "[[The Grey Patron]]"   # optional
 updated: 2026-11-18
@@ -35,7 +36,7 @@ What happens and why it is interesting.
 ## Log
 ```
 
-**Kinds and options.** A `decision` lists its choices under `## Options`, one per line: `- [[Plan]] · what they choose`; each option is its own plan. Kinds, boards and the research behind them: [branching.md](branching.md).
+**Kinds and options.** A `decision` lists its choices under `## Options`, one per line: `- [[Plan]] · what they choose`; each option is its own plan. A `scene` sets the stage: `where:` (a place, as a [[link]] when the vault has it) and `present:` (a list of who is there). Beats, decisions, clocks and pressures that happen during it name it with `scene:`. A `clock` carries `clock: 0/6` (segments filled / segments). Kinds, boards and the research behind them: [branching.md](branching.md).
 
 **Statuses.** `draft`: an idea. `ready`: Tom wants it at the next table. `played`: it happened (set `played: S14`). `dropped`: Tom set it aside. `pruned`: the build found it impossible. Only `draft` and `ready` are live.
 

@@ -261,7 +261,8 @@ def parse_plan(n):
                 links_raw.append(s)
     return reqs, links, links_raw
 
-KINDS = {"", "scene", "decision", "pressure", "bottleneck"}
+KINDS = {"", "beat", "scene", "decision", "pressure", "clock", "bottleneck"}   # empty means beat
+CLOCK = re.compile(r"^\s*(\d+)\s*/\s*(\d+)\s*$")
 
 def parse_options(text):
     """A decision's `## Options`: `- [[Plan]] · what the character chooses`. Returns [(plan, choice)]."""
@@ -280,7 +281,30 @@ def plan_shape_checks(notes, problems):
         fm = n["fm"]
         kind = str(fm.get("kind") or "").strip().lower()
         if kind not in KINDS:
-            problems.append(f"{nm}: kind '{kind}' is not scene, decision, pressure or bottleneck")
+            problems.append(f"{nm}: kind '{kind}' is not beat, scene, decision, pressure, clock or bottleneck")
+        where = fm.get("where")
+        if where and link_name(where) and (link_name(where) not in notes or notes[link_name(where)]["type"] != "place"):
+            problems.append(f"{nm}: where [[{link_name(where)}]] is not a place note")
+        for v in fm.get("present") if isinstance(fm.get("present"), list) else [fm.get("present")] if fm.get("present") else []:
+            t = link_name(v)
+            if t and t not in notes:
+                problems.append(f"{nm}: present [[{t}]] points to a missing note")
+        if (where or fm.get("present")) and kind != "scene":
+            problems.append(f"{nm}: where and present belong on a scene: set kind: scene or move them to the scene")
+        sc = fm.get("scene")
+        if sc:
+            t = link_name(sc)
+            if not t or t not in notes or notes[t]["type"] != "plan" or str(notes[t]["fm"].get("kind") or "").strip().lower() != "scene":
+                problems.append(f"{nm}: scene '{sc}' must be [[a plan]] with kind: scene")
+            elif kind == "scene":
+                problems.append(f"{nm}: a scene cannot sit inside another scene")
+        ck = fm.get("clock")
+        if ck not in (None, ""):
+            m = CLOCK.match(str(ck))
+            if not m or int(m.group(2)) < 2 or int(m.group(1)) > int(m.group(2)):
+                problems.append(f"{nm}: clock '{ck}' must read filled/segments, like 1/6")
+            if kind != "clock":
+                problems.append(f"{nm}: has a clock, so set kind: clock")
         opts = parse_options(n["text"])
         for target, choice in opts:
             if not target:
@@ -663,10 +687,11 @@ if __name__ == "__main__":
         node = {"id": n["name"], "path": n["path"], "type": n["type"], "aliases": n["aliases"]}
         for k in ("summary", "importance", "stage", "state", "state_since", "first_seen", "location", "holder", "in",
                   "status", "target", "revealed", "race", "role", "kind", "player", "number", "pronouns",
-                  "for", "hp", "hp_max", "hp_temp", "slots", "conditions", "sheet_at", "ddb", "class", "played"):
+                  "for", "hp", "hp_max", "hp_temp", "slots", "conditions", "sheet_at", "ddb", "class", "played",
+                  "where", "present", "scene", "clock"):
             v = n["fm"].get(k)
             if v not in (None, "", []):
-                node[k] = LINK.sub(r"\1", v) if isinstance(v, str) else v
+                node[k] = LINK.sub(r"\1", v) if isinstance(v, str) else [LINK.sub(r"\1", x) if isinstance(x, str) else x for x in v] if isinstance(v, list) else v
         if n["type"] == "plan":
             node["status"] = status_of.get(n["name"], node.get("status"))
         t = terms.type_term(n["type"], n["fm"].get("kind") if isinstance(n["fm"].get("kind"), str) else "")

@@ -56,7 +56,7 @@ def label(nid, board, data):
 def boards(doc):
     out = {}
     for name, cv in (doc.get("lanes") or {}).items():
-        b = {"placed": {}, "cards": {}, "edges": [], "edits": {}}
+        b = {"placed": {}, "cards": {}, "edges": [], "edits": {}, "scene": {}}
         for n in cv.get("nodes", []):
             o = n.get("osse") or {}
             if o.get("plan"):
@@ -64,9 +64,12 @@ def boards(doc):
                     b["edits"][o["plan"]] = o["edit"]
                 if not o.get("tray"):
                     b["placed"][o["plan"]] = o.get("session") or o.get("column", "")
+                    b["scene"]["p:" + o["plan"]] = o.get("scene", "")
             elif o.get("card"):
                 b["cards"][n["id"]] = {"kind": o.get("kind", "note"), "title": o.get("title", ""), "body": o.get("body", ""),
-                                       "column": o.get("session") or o.get("column", "")}
+                                       "column": o.get("session") or o.get("column", ""), "where": o.get("where", ""),
+                                       "present": o.get("present", []), "clock": o.get("clock", "")}
+                b["scene"][n["id"]] = o.get("scene", "")
         b["edges"] = [{"id": e["id"], "from": (e.get("osse") or {}).get("from") or e["fromNode"], "to": e["toNode"], "label": e.get("label", "")}
                       for e in cv.get("edges", []) if (e.get("osse") or {}).get("own")]
         out[name] = b
@@ -103,6 +106,13 @@ def show(only=None):
             want = "" if col == "Later" else col
             if want != tgt:
                 lines.append(f"- [[{pid}]]: placed in {col}; vault target is {d['target'] or 'empty'} → set target: {want or '(empty)'}")
+            sc = b["scene"].get("p:" + pid, "")
+            if sc.startswith("p:") and d["scene"] != sc[2:]:
+                lines.append(f"- [[{pid}]]: placed in the scene [[{sc[2:]}]] → set scene: [[{sc[2:]}]]")
+            elif sc in b["cards"]:
+                lines.append(f"- [[{pid}]]: placed in Tom's new scene {sc} → set scene: once that card is a plan")
+            elif not sc and d["scene"]:
+                lines.append(f"- [[{pid}]]: the vault sets it in the scene [[{d['scene']}]], but Tom placed it outside → ask before clearing scene")
             if name not in d["lanes"] and name != "world":
                 lines.append(f"- [[{pid}]]: placed on this board but not tied to it → add for: [[{name}]]")
         for pid, ed in b["edits"].items():
@@ -110,7 +120,9 @@ def show(only=None):
                 continue
             if ed.get("drop"):
                 lines.append(f"- DROP [[{pid}]]: Tom dropped it → status: dropped, log line")
-            changes = [f'{k}: "{ed[k]}"' for k in ("kind", "summary") if k in ed]
+            changes = [f'{k}: "{ed[k]}"' for k in ("kind", "summary", "where", "clock") if k in ed]
+            if "present" in ed:
+                changes.append("present: " + ", ".join(ed["present"]) if ed["present"] else "present: (nobody)")
             if "idea" in ed:
                 changes.append("idea (rewrite ## Idea, linking names as [[ ]]):\n      " + ed["idea"].replace("\n", "\n      "))
             if ed.get("note"):
@@ -125,7 +137,15 @@ def show(only=None):
         for cid, c in b["cards"].items():
             ins = [e for e in b["edges"] if e["to"] == cid]
             outs = [e for e in b["edges"] if e["from"] == cid]
-            lines.append(f'- NEW CARD {cid} ({c["kind"]}, {c["column"]}): "{c["title"] or "untitled"}"' + (f' — {c["body"]}' if c["body"] else ""))
+            lines.append(f'- NEW CARD {cid} ({c["kind"]}, {c["column"]}): "{c["title"] or "untitled"}"' + (f': {c["body"]}' if c["body"] else ""))
+            if c["where"]:
+                lines.append(f'    where: {c["where"]}')
+            if c["present"]:
+                lines.append(f'    present: {", ".join(c["present"])}')
+            if c["clock"]:
+                lines.append(f'    clock: {c["clock"]}')
+            if b["scene"].get(cid):
+                lines.append(f'    in the scene {label(b["scene"][cid], b, data)}')
             for e in ins:
                 lines.append(f'    from {label(e["from"], b, data)}' + (f' · "{e["label"]}"' if e["label"] else ""))
             for e in outs:
@@ -149,11 +169,14 @@ def adopt(board, card, plan):
                 sys.exit(f"No plan note {path} in the vault: write it and run build.py first")
             nid = "p:" + plan
             o = n.get("osse") or {}
-            keep = {k: o[k] for k in ("session", "lx", "ly", "column") if k in o}
+            keep = {k: o[k] for k in ("session", "lx", "ly", "column", "w", "h", "scene") if k in o}
             n.clear(); n.update({"id": nid, "type": "file", "file": path, "x": n.get("x", 0), "y": n.get("y", 0),
                                  "width": 250, "height": 140, "osse": {"plan": plan, **keep}})
     if not nid:
         sys.exit(f"No card {card} on board {board}")
+    for n in cv["nodes"]:
+        if (n.get("osse") or {}).get("scene") == card:
+            n["osse"]["scene"] = nid
     for e in cv.get("edges", []):
         e["fromNode"] = nid if e["fromNode"] == card else e["fromNode"]
         e["toNode"] = nid if e["toNode"] == card else e["toNode"]
