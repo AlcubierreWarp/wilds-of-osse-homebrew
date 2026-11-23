@@ -21,6 +21,8 @@ Gus's documents live in the archive relay, and the archive page lays them out as
 | Emergency protocol | `protocol` | `Handler signal lost` | `Emergency protocol EP-07` | Oxblood band with trigger box, hazard stripe, numbered steps |
 | Anything else | `letter`, `report`, `log`, `other` | free | free | Oxblood band with From / To / Dated |
 
+**A note on its own** (green ink filed as its own listing, between chapters or annexes): `kind: other`, a short `title`, blank `ref`, `classification`, `from`, `to` and `date`, `order` to place it in the list, and `[note]` as the first line of the body. The archive lists it as a Handwritten note and shows it as a loose lined sheet in green handwriting, with no Marshal letterhead. Blank lines split paragraphs.
+
 For an annex, `from` is `Author. Reviewed by Reviewer` and the grid splits it. For a protocol, `date` is `Trigger: …` and a lead line `**Status: active.**` fills the status.
 
 ## 2. The markup
@@ -40,6 +42,7 @@ For an annex, `from` is `Author. Reviewed by Reviewer` and the grid splits it. F
 | `\| Observed \| Assessment \|` rows | A table, first row as header |
 | `\|\|words\|\|` | Blacked out; Gus's copy never holds the words |
 | `[ink: note]` (`//` breaks the line) | A green handwritten note under the rule, box or paragraph above it; see Green ink in `gus-intel-docs` |
+| `[sticky: note]` (`//` breaks the line) | A sticky note in green ink, pressed on at the right margin |
 | `---` then two lines | The footer: left line, right line |
 | `[page]` | A new page (only when one page clearly is not enough) |
 

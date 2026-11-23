@@ -42,7 +42,11 @@ The author is a construct writing for another construct, about humans, as if hum
 - Follow them with one dry institutional line, never a joke that cancels them: "We have not edited it. We wanted to."
 
 **Green ink (DM only: it is Vigil):**
-- Handwritten notes in green ink, added to the typed page after the fact, written straight to Gus about the chapters and lessons. Markup: `[ink: note]` on its own line (see `gus-document`). It sits under the rule, box or paragraph above it.
+- Handwritten notes in green ink, written straight to Gus about the chapters and lessons. Three forms (markup in `gus-document`):
+  - **Scribbled on a page:** `[ink: note]` on its own line, under the rule, box or paragraph above it.
+  - **Sticky note on a page:** `[sticky: note]`, pressed on at the right margin.
+  - **A note filed on its own,** with its own listing between chapters or annexes: a file whose body starts with `[note]`.
+- **Only when Tom asks.** The notes are tied to plot. Never add green ink to a document, or file a note, unless Tom asks for that note.
 - The writer is a different voice from the Stevens: one person writing to Gus in the second person, short and plain, with no bureaucratic framing. Gus is never told who writes them. No name, no initial, no signature. The green ink is the only mark until Tom says otherwise.
 - Ease in. Tom moves the stage; never jump ahead of it.
   1. **Mysterious** (current stage). Standard writing, no jokes. One or two notes per document at most, often a single word or one line. They show someone is watching Gus's field work: a correction, a nudge to reread a rule, a plain "Seen." Tie them to things Gus actually did at the table (check `osse.py card GUS`).

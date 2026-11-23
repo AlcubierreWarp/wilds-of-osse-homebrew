@@ -218,6 +218,17 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
 /* Green ink: a handwritten note added to the page after it was typed. */
 .m-ink{font:400 1.18em/1.35 'Kalam',cursive;color:#1d6b3c;width:fit-content;max-width:64%;margin:.35em 0 .6em auto;padding:0 .2em;transform:rotate(-1.2deg);transform-origin:right top}
 .m-item .m-ink{margin-top:.45em}
+/* A sticky note pressed onto the page, written in the same green ink. */
+.m-sticky{float:right;clear:right;width:min(34%,15em);margin:.2em 0 .8em 1.2em;padding:1em .9em 1.1em;background:#f4e48c;
+  box-shadow:0 3px 6px rgba(0,0,0,.22),inset 0 1.6em 0 rgba(255,255,255,.12);transform:rotate(2.2deg);
+  font:400 1.12em/1.32 'Kalam',cursive;color:#1d6b3c}
+.m-body::after{content:"";display:block;clear:both}
+/* A loose handwritten note filed on its own: no Marshal letterhead. */
+.m-note{position:relative;width:min(100%,30em);aspect-ratio:5/7;margin:0 auto;padding:2.4em 2.2em;box-sizing:border-box;
+  background:#f6f1e4 repeating-linear-gradient(#f6f1e4 0 1.55em,#c9d6e2 1.55em calc(1.55em + 1px));background-position:0 2.3em;
+  box-shadow:0 6px 18px rgba(0,0,0,.45);transform:rotate(-.6deg);font:400 1.22em/1.55em 'Kalam',cursive;color:#1d6b3c}
+.m-note p{margin:0 0 1.55em}
+.file .rune.ink{color:#3f9a62}
 .m-file{display:grid;grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);gap:.05em 1em;margin:0;padding:.45em 0;border-top:1px dashed #a9a196;border-bottom:1px dashed #a9a196;font-size:.9em}
 .m-file dt{font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#26324a}
 .m-file dd{margin:0}
@@ -304,6 +315,7 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
 #pdf-root .redact{padding:.05em 0;border-radius:0}
 #pdf-root .m-chap{outline:0;margin:0;padding:3px;border:1px solid #1f2d45;background:#1f2d45 content-box;width:calc(7.4em + 8px);height:calc(7.4em + 8px)}
 #pdf-root .m-page{width:816px;height:1056px;aspect-ratio:auto;overflow:hidden;box-shadow:none;margin:0}
+#pdf-root .m-note{width:480px;height:672px;aspect-ratio:auto;transform:none;box-shadow:none;margin:0}
 @media print{
   @page{size:letter;margin:0}
   html,body{background:#fff!important}
@@ -312,6 +324,7 @@ figcaption{font:500 11px/1.4 var(--f-mono);letter-spacing:.12em;text-transform:u
   #print-root .m-pages{display:block;max-width:none;width:8.5in;margin:0}
   #print-root .m-page{width:8.5in;height:11in;aspect-ratio:auto;overflow:hidden;box-shadow:none;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   #print-root .m-page:last-child{break-after:auto}
+  #print-root .m-note{width:5in;height:7in;aspect-ratio:auto;transform:none;box-shadow:none;margin:0 auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 .rest{padding:clamp(36px,6vw,70px) 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
 .rest .lens{width:64px;height:64px}
@@ -400,6 +413,9 @@ const KIND = {
   manual:{label:"Field manual chapter",rune:"ᛗ"}, protocol:{label:"Emergency protocol",rune:"ᛉ"}, letter:{label:"Letter",rune:"ᚹ"}, annex:{label:"Annex",rune:"ᚨ"},
   log:{label:"System log",rune:"ᛜ"}, report:{label:"Report",rune:"ᚱ"}, image:{label:"Image",rune:"ᛟ"}, other:{label:"Document",rune:"ᛞ"}
 };
+const NOTE = {label:"Handwritten note", rune:"ᛃ"};
+/* A file whose text starts with [note] is a loose handwritten note, filed on its own. */
+const isNote = d => /^\s*\[note\]/i.test(String(d && d.body || ""));
 const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
 const S = {tab:"files", view:"player", vault:{}, shelf:{}, signal:null, links:{}, sel:null, edit:null, busy:false,
   confirm:null, link:"connecting", fails:0, primed:false, pick:true};
@@ -601,8 +617,8 @@ function render(){
   if (S.link === "live" && !L.length) h += `<p class="empty">${ep
     ? (dm ? "No emergency protocols yet. A file of the Emergency protocol type appears here." : "No emergency protocols on record. If one unseals, this tab lights up.")
     : (dm ? "No files yet. Add the first one with New file." : "No files on record yet. When the game master gives Gus a document, it appears here.")}</p>`;
-  if (L.length) h += `<ul class="files">${L.map(d => { const k = KIND[d.kind] || KIND.other; return `<li><button type="button" class="file${S.sel === d.id ? " on" : ""}" data-a="sel" data-id="${esc(d.id)}" aria-pressed="${S.sel === d.id}">
-    <span class="rune" aria-hidden="true">${k.rune}</span><span class="meta"><span class="ref">${esc(d.ref || k.label)}</span><span class="t">${esc(d.title || "Untitled")}</span></span>${chip(d.id)}</button></li>`; }).join("")}</ul>`;
+  if (L.length) h += `<ul class="files">${L.map(d => { const n = isNote(d), k = n ? NOTE : KIND[d.kind] || KIND.other; return `<li><button type="button" class="file${S.sel === d.id ? " on" : ""}" data-a="sel" data-id="${esc(d.id)}" aria-pressed="${S.sel === d.id}">
+    <span class="rune${n ? " ink" : ""}" aria-hidden="true">${k.rune}</span><span class="meta"><span class="ref">${esc(d.ref || k.label)}</span><span class="t">${esc(d.title || "Untitled")}</span></span>${chip(d.id)}</button></li>`; }).join("")}</ul>`;
   const shut = S.link === "locked" || S.link === "refused";
   $("#list").hidden = shut; $(".grid").classList.toggle("shut", shut);
   lastList = paint($("#list"), h, lastList);
@@ -737,7 +753,7 @@ function mParse(src, useLead){
     if (!item) return;
     emit(`<div class="m-item"><span class="m-num">${esc(item.num)}</span><div><div class="m-ttl">${inline(item.ttl)}</div>${
       item.text.map(t => `<div>${inline(t)}</div>`).join("")}${item.aside.map(t => `<div class="m-aside">${inline(t)}</div>`).join("")}${
-      item.ink.map(t => `<div class="m-ink">${t}</div>`).join("")}</div></div>`);
+      item.ink.join("")}</div></div>`);
     item = null;
   };
   const endBlocks = () => { endPara(); endQuote(); endList(); endTable(); endItem(); };
@@ -767,9 +783,16 @@ function mParse(src, useLead){
     }
     if ((m = l.match(/^\[ink:\s*(.+?)\]$/i))) {
       const t = m[1].split(/\s*\/\/\s*/).map(inline).join("<br>");
-      if (item) { item.ink.push(t); continue; }
+      if (item) { item.ink.push(`<div class="m-ink">${t}</div>`); continue; }
       leave(); endPara(); endQuote(); endList(); endTable();
       emit(`<div class="m-ink">${t}</div>`);
+      continue;
+    }
+    if ((m = l.match(/^\[sticky:\s*(.+?)\]$/i))) {
+      const h = `<div class="m-sticky">${m[1].split(/\s*\/\/\s*/).map(inline).join("<br>")}</div>`;
+      if (item) { item.ink.unshift(h); continue; }
+      leave(); endPara(); endQuote(); endList(); endTable();
+      emit(h);
       continue;
     }
     if ((m = l.match(/^##\s+(.*)/))) {
@@ -853,7 +876,12 @@ function mHeader(d, pg, idx){
     <dl class="m-band-meta">${meta}</dl></div><div class="m-hazard" aria-hidden="true"></div>
     ${lead.length ? `<div class="m-intro m-lead">${lead.map(l => inline(l)).join("<br>")}</div>` : ""}${side ? `<div class="m-stamp-row">${side}</div>` : ""}`;
 }
+function notePage(d){
+  const paras = String(d.body || "").replace(/\r/g, "").replace(/^\s*\[note\][^\n]*\n?/i, "").trim().split(/\n\s*\n/);
+  return `<div class="m-pages"><section class="m-note">${paras.map(p => `<p>${p.split("\n").map(l => inline(l.trim())).join("<br>")}</p>`).join("")}</section></div>`;
+}
 function marshalPages(d, withImage){
+  if (isNote(d)) return notePage(d);
   const pages = mParse(d.body, ["manual", "annex", "protocol"].includes(d.kind));
   const n = pages.length;
   return `<div class="m-pages">${pages.map((pg, i) => {
@@ -867,7 +895,7 @@ function marshalPages(d, withImage){
 }
 
 function docHTML(d){
-  const k = KIND[d.kind] || KIND.other;
+  const k = isNote(d) ? NOTE : KIND[d.kind] || KIND.other;
   const a = d.asset;
   const isPdf = a && a.type === "application/pdf" && /^[a-f0-9]{32}$/.test(a.id || "");
   const link = isPdf && S.links[a.id];
@@ -906,12 +934,13 @@ async function downloadPdf(btn){
     });
     await document.fonts.ready;
     await Promise.all([...root.querySelectorAll("img")].map(img => img.decode().catch(() => {})));
-    const pdf = new window.jspdf.jsPDF({unit: "in", format: "letter", orientation: "portrait", compress: true});
-    const pages = [...root.querySelectorAll(".m-page")];
+    const note = isNote(d), size = note ? [5, 7] : [8.5, 11];
+    const pdf = new window.jspdf.jsPDF({unit: "in", format: note ? size : "letter", orientation: "portrait", compress: true});
+    const pages = [...root.querySelectorAll(".m-page, .m-note")];
     for (let i = 0; i < pages.length; i++) {
-      const canvas = await html2canvas(pages[i], {scale: 2, backgroundColor: "#f3ebdc", useCORS: true, logging: false});
-      if (i) pdf.addPage("letter", "portrait");
-      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 8.5, 11);
+      const canvas = await html2canvas(pages[i], {scale: 2, backgroundColor: note ? "#f6f1e4" : "#f3ebdc", useCORS: true, logging: false});
+      if (i) pdf.addPage(note ? size : "letter", "portrait");
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, size[0], size[1]);
     }
     pdf.save(("Gus Handout - " + (d.title || "Document")).replace(/[\\/:*?"<>|]+/g, "") + ".pdf");
   } catch (e) {
@@ -954,7 +983,7 @@ function openEditor(id){
         <label>Order in the list<input id="f-order" type="number" value="${v("order")}"></label>
       </div>
       <label>Text<textarea id="f-body" rows="16">${v("body")}</textarea></label>
-      <p class="hint">Blank line starts a paragraph · <code>**1.1 Title.** text</code> numbered item, <code>*aside*</code> on the next line · <code>## Section</code> · <code>## Field exercise · …</code> box · <code>## Step 2 · Title</code> · <code>## Final step · Title</code> · <code>## Addendum · …</code> clipped card · <code>- item</code> · <code>- [ ] checkbox</code> · <code>+ **Option.** text</code> · <code>| a | b |</code> table · <code>&gt; quoted line</code> · <code>[stamp: Released]</code> · <code>[ink: note]</code> green handwritten note (<code>//</code> breaks the line) · <code>---</code> then footer lines · <code>[page]</code> new page · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words). Lines before the first item open the page: the first is the subtitle, the rest the intro.</p>
+      <p class="hint">Blank line starts a paragraph · <code>**1.1 Title.** text</code> numbered item, <code>*aside*</code> on the next line · <code>## Section</code> · <code>## Field exercise · …</code> box · <code>## Step 2 · Title</code> · <code>## Final step · Title</code> · <code>## Addendum · …</code> clipped card · <code>- item</code> · <code>- [ ] checkbox</code> · <code>+ **Option.** text</code> · <code>| a | b |</code> table · <code>&gt; quoted line</code> · <code>[stamp: Released]</code> · <code>[ink: note]</code> green handwritten note (<code>//</code> breaks the line) · <code>[sticky: note]</code> sticky note · first line <code>[note]</code> makes the whole file a loose handwritten note · <code>---</code> then footer lines · <code>[page]</code> new page · <code>**bold**</code> · <code>*italic*</code> · <code>||blacked out||</code> (Gus's copy never holds the words). Lines before the first item open the page: the first is the subtitle, the rest the intro.</p>
       <label>Attachment: image or PDF, up to 20 MB<input id="f-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf"></label>
       ${d.asset ? `<label class="check"><input type="checkbox" id="f-noasset"> Remove ${esc(d.asset.name || "the attachment")}</label>` : ""}
       <label>Game master note · never shown to Gus<textarea id="f-note" rows="4">${v("note")}</textarea></label>
