@@ -6,7 +6,8 @@
   python3 tools/osse/osse.py find bell             names, aliases and summaries; --body also searches note text
   python3 tools/osse/osse.py plans                 live plans by target; --checks for the judgment calls only
   python3 tools/osse/osse.py walk "Mira Holt" ...  the full graph walk (tools/osse/graph.py and its options)
-  python3 tools/osse/osse.py build [--dry]         rebuild the generated files (tools/osse/build.py)
+  python3 tools/osse/osse.py build [--dry]         rebuild the generated files and the vault/ DM pages (tools/osse/build.py)
+  python3 tools/osse/osse.py page "Mira Holt"      where that entry's DM page is (vault/, rebuilt by every build)
 Reads the vault's .osse/graph.json (rebuilt by build.py) and the notes themselves. Never writes."""
 import json, os, re, subprocess, sys
 
@@ -186,6 +187,12 @@ if __name__ == "__main__":
     if cmd == "walk":
         sys.exit(subprocess.call([sys.executable, os.path.join(HERE, "graph.py")] + rest))
     g, nodes = load()
+    if cmd == "page" and rest:
+        import pages
+        site = pages.Site(g); nid = resolve(nodes, " ".join(w for w in rest if not w.startswith("--")))
+        f = site.slugs[nid] + ".html"
+        print(f"{nid}\n  local: {os.path.join(pages.OUT, f)}\n  site:  {pages.SITE}{f}")
+        sys.exit()
     words = [x for x in rest if not x.startswith("--")]
     if cmd == "brief":
         brief(g, nodes)

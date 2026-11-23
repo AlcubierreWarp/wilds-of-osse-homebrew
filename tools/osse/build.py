@@ -5,7 +5,7 @@
    python3 tools/osse/build.py --dry --assume "Mira Holt: state=dead" --assume "The bridge was sabotaged: revealed=S13"
                                      preview: which plans a proposed change would prune (nothing is written)
 Reads the Ossë vault (iCloud; set OSSE_VAULT to point elsewhere) and writes Index.md, Plan board.md, Glossary.md,
-Map.canvas and .osse/graph.json there. Campaign content never enters this repository.
+Map.canvas and .osse/graph.json there, and the DM pages in this repo's vault/ folder (see tools/osse/pages.py).
 The only notes it ever edits are plans: status, pruned, pruned_by and a Log line."""
 import os, re, sys, json, math, datetime
 
@@ -666,3 +666,7 @@ if __name__ == "__main__":
         print("(dry run: nothing was written; these plans would be pruned)")
     for p in problems:
         print("PROBLEM:", p)
+    if not DRY:
+        import pages
+        total, changed, _ = pages.build_pages()
+        print(f"DM pages: {total} in vault/ of the homebrew repo, {changed} changed" + ("; commit and push them" if changed else ""))
