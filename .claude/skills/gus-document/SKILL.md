@@ -46,7 +46,7 @@ The four documents already in the archive are the best examples. A game master c
 
 ## 3. File it
 
-1. Write the document to the session scratchpad, never inside the repository (it is public, and a sealed document is a secret). Start it with the header block described at the top of `relay/gus/add_doc.py`: `id` (for example `mi-fm-03`, `mi-fm-01-anx-b`, `ep-09`), `kind`, `title`, `ref`, `classification`, `from`, `to`, `date`, and a `note` for Tom (why it exists, when to hand it over).
+1. Write the document to the session scratchpad. A sealed document is a game secret, so it never reaches Gus's screen until Tom reveals it; it is fine in the repo if Tom wants a copy kept. Start it with the header block described at the top of `relay/gus/add_doc.py`: `id` (for example `mi-fm-03`, `mi-fm-01-anx-b`, `ep-09`), `kind`, `title`, `ref`, `classification`, `from`, `to`, `date`, and a `note` for Tom (why it exists, when to hand it over).
 2. Try it against the local stand-in first: start the `gus-relay-mock` and `screen` previews, run `/usr/bin/python3 -I relay/gus/add_doc.py <file> --mock`, open `http://localhost:8713/gus.html?relay=http://localhost:8714#gm=test-gm` and look at every page at desktop and phone width. Fix anything that runs long or wraps badly.
 3. File it for real: `/usr/bin/python3 -I relay/gus/add_doc.py <file>`. It reads the game master key from the Keychain itself. It refuses to change a document Gus can already see unless Tom asked for that change, in which case add `--update-revealed`.
 4. Tell Tom what the document is, that it is sealed in his archive, and when it is meant to be handed over. Point out any new canon it creates.

@@ -6,7 +6,8 @@ Change model: Direct. Commit to main.
 
 ## Commands
 - Build: `python3 tools/build.py` (merges `src/` into `wilds-of-osse.json`)
-- Check before every commit: `python3 tools/build.py && python3 -c "import json; d=json.load(open('wilds-of-osse.json')); assert d['_meta']['sources']; print(len(d.get('monster', [])), 'creatures')"`
+- Check before every commit: `python3 tools/check_secrets.py && python3 tools/build.py && python3 -c "import json; d=json.load(open('wilds-of-osse.json')); assert d['_meta']['sources']; print(len(d.get('monster', [])), 'creatures')"`
+- The pre-commit hook in `.githooks/` runs the secret check on staged files. On a new clone, turn it on with `git config core.hooksPath .githooks`. GitHub push protection and the `check-secrets` workflow back it up.
 
 ## Where things live
 - `src/`: the content, one file per group, and `_meta.json` (source block, version, timestamps). Edit these.
@@ -32,8 +33,10 @@ Change model: Direct. Commit to main.
 The campaign's truth lives in the Ossë Obsidian vault in iCloud, outside this repo. All vault work runs from here.
 - Start any campaign question with `python3 tools/osse/osse.py brief`, then `card NAME` or `find TEXT`. Open notes only to edit them.
 - After any vault change, `python3 tools/osse/build.py` and fix every problem it prints.
-- Never copy vault content into this repo, a commit message or an issue. Only `tools/chronicle.py export` publishes from it.
+- `vault/` holds a DM page for every vault note, rebuilt by `build.py`. It is a DM screen: link it only from the hub's game master section.
+- The two boundaries (player screens vs DM screens, real-world secrets vs game secrets) are in `docs/osse/README.md`.
 
 ## Hard rules
 - Never rename or move `wilds-of-osse.json`, and never rename the repository or the `main` branch: players' saved raw link depends on all three.
-- This repository is public. No personal details, no secrets.
+- This repository is public. No real-world secrets or personal details (keys, tokens, passwords, signed URLs, codes, emails, addresses): `python3 tools/check_secrets.py` must pass before every commit. Game content, including game secrets, is fine.
+- Player screens show only what has come out in play. Unrevealed game secrets, prep and plans stay on DM screens.

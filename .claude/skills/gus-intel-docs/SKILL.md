@@ -11,7 +11,7 @@ This skill is how the documents sound and how they are numbered. The `gus-docume
 
 ## 1. Before writing
 
-1. **See what exists.** The archive is the registry: open `screen/gus.html` in game master view (see `gus-document`) and read every document and its note for Tom. Running gags, withdrawn entries and open threads that are not on the page are in the vault note `GUS archive registry` when it exists (`python3 tools/osse/osse.py card "GUS archive registry"`). It is DM-only, so it lives in the vault, never in this repo.
+1. **See what exists.** The archive is the registry: open `screen/gus.html` in game master view (see `gus-document`) and read every document and its note for Tom. Running gags, withdrawn entries and open threads that are not on the page are in the vault note `GUS archive registry` when it exists (`python3 tools/osse/osse.py card "GUS archive registry"`). It is DM-only: never on Gus's screen.
 2. **Check canon** when the document touches story facts (handlers, NPCs, missions, GUS's past): `python3 tools/osse/osse.py card GUS`, then any entry it names. Played sessions outrank plans. Never put a DM secret on a handout unless Tom says so.
 3. **Settle the format**: chapter, annex, emergency protocol, or another kind (section 4).
 4. If the request is clear, draft straight away. Tom reviews it and redirects. Ask first only when a choice would change the story, such as revealing a secret or killing an NPC.

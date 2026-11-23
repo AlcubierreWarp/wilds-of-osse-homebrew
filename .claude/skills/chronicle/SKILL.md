@@ -14,7 +14,7 @@ Notion player summary ──(for now)──▶ Ossë vault: Chronicle/S<n> - <ti
                                      Ossë vault: Chronicle/Quest lines.md     ─┘
 ```
 
-- The Ossë vault (iCloud Obsidian, game master only) is canon. Its `Chronicle/` folder is the one part written for the players, and the export reads nothing else, so secrets and plans cannot reach the public site.
+- The Ossë vault (iCloud Obsidian, game master only) is canon. Its `Chronicle/` folder is the one part written for the players, and the export reads nothing else, so unrevealed secrets and plans cannot reach a player screen.
 - For now each session's recap is pulled from its Notion player summary into the vault. Once the vault's own session notes carry everything, write the chronicle note from the vault session note instead (only what the table saw).
 - A `[[link]]` in a chronicle note shows as **bold** on the site: that is how names with a vault entry are marked. Only the shown text is published, never the link target.
 

@@ -5,9 +5,9 @@ description: Run the end-of-session sync for the Wilds of Ossë campaign. Reads 
 
 # Ossë post-session sync
 
-The rules are in `docs/osse/` (README first, then `notes.md` and `plans.md`). This skill is the order of work. Everything runs from this repo; the vault is only read and written as files. Vault content never goes into the repo, except the chronicle export.
+The rules are in `docs/osse/` (README first, then `notes.md` and `plans.md`). This skill is the order of work. Everything runs from this repo; the vault is read and written as files. Mind the two boundaries in `docs/osse/README.md`: the chronicle is a player screen, so it shows only what came out in play.
 
-The Notion page IDs (Player Session Summaries index, glossary page) are in the vault's `CLAUDE.md`, not here: the repo is public.
+Notion: the Player Session Summaries index is page `398320a689d3808b94a7ca6292c2e0ed`; the Name & Spelling Glossary is page `398320a689d38054bc3aebda6168c9fe`.
 
 ## Rules that never bend
 - **Propose before writing.** Show Tom the whole proposal and wait for a clear yes. Then write, build, and report.
@@ -49,7 +49,7 @@ Grouped by note, phone-sized:
 Then preview the automatic pruning: `python3 tools/osse/build.py --dry` with one `--assume "Note: key=value"` per proposed property change, and list what it would prune and why. Link changes cannot be assumed; reason those out from the plans' `## Requires`. Tom should never be surprised by what the build drops.
 
 ## Step 6: Write, build, report
-On approval, write every change with a short script (never re-type a note). Run `python3 tools/osse/build.py`. Fix every PROBLEM line. Report: notes created and updated, plans played, **plans pruned by the build (with reasons)**, stale plans, and the judgment calls (`osse.py plans --checks`) for next time.
+On approval, write every change with a short script (never re-type a note). Run `python3 tools/osse/build.py` (it also rebuilds the `vault/` DM pages). Fix every PROBLEM line. Commit `vault/` and push. Report: notes created and updated, plans played, **plans pruned by the build (with reasons)**, stale plans, and the judgment calls (`osse.py plans --checks`) for next time.
 
 ## Step 7: Players' chronicle
 Follow the `chronicle` skill: write `Chronicle/S<n> - <title>.md` with `tools/chronicle.py note`, export, check, commit and push. Only what the table saw; no secrets, plans or prep. Add any new quest line to `Chronicle/Quest lines.md`.

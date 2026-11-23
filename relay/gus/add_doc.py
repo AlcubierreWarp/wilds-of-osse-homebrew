@@ -24,7 +24,7 @@ The document file starts with a header block, then the body in the page markup t
 Nothing is ever revealed or pushed from here. Tom does that from the archive page at the table.
 A document Gus can already see is only changed with --update-revealed, because the change reaches Gus at once.
 The game master key is read from the macOS Keychain inside this process and never printed.
-Keep document files out of the repository: it is public, and sealed documents are secrets until revealed.
+Sealed documents are game secrets: only the game master view shows them until Tom reveals them at the table.
 """
 import json
 import re
