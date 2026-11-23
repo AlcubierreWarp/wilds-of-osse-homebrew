@@ -383,7 +383,7 @@ def topbar(site, crumb=""):
     who = "The Codex · what the party knows" if site.player else "Ossë vault · DM screen"
     return (f'<header><div><div class="eyebrow">{who} · after S{site.cur}</div>'
             f'<nav class="crumbs"><a href="index.html">All entries</a>{(" / " + crumb) if crumb else ""}</nav></div>'
-            f'<a class="home" href="../">Hub</a></header>')
+            f'<a class="home" href="../" title="Back to the Wilds of Ossë table hub">← Table hub</a></header>')
 
 
 def page(site, n):

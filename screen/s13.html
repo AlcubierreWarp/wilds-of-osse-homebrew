@@ -27,6 +27,8 @@ button.on{background:var(--gold);color:#1a130c;border-color:var(--gold)}
 .bar{display:flex;gap:8px;align-items:center;padding:6px 8px;border-bottom:1px solid var(--line);flex:none}
 .bar .tabb{font:700 18px/1 Georgia,serif;padding:10px 16px}
 .bar .sp{flex:1}
+.bar .home{color:var(--soft);font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;padding:8px 10px;border:1px solid var(--line);border-radius:4px}
+.bar .home:hover{color:var(--ink)}
 .bar .mv{color:var(--soft);font-size:14px}
 .grid{flex:1;min-height:0;display:grid;gap:6px;padding:6px;grid-template-columns:1fr 1fr;grid-template-rows:320px repeat(5,minmax(0,1fr))}
 .grid.one{grid-template-columns:1fr;grid-template-rows:1fr}
@@ -606,12 +608,12 @@ function render(){const app=document.getElementById("app");const keep={},vals={}
  app.querySelectorAll("[data-k]").forEach(el=>{const s=el.querySelector(".pb")||el.querySelector(".spg")||el;keep[el.dataset.k]=s.scrollTop;});
  app.className=touch&&!single?"touch":"";
  if(touch&&!single){const views=TV[S.tab],vi=Math.min((S.tv&&S.tv[S.tab])||0,views.length-1),v=views[vi];
-  app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
+  app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button><a class="home" href="../" title="Back to the Wilds of Ossë table hub">← Table hub</a></div>
   <div class="tgrid"><section class="pn spot" data-k="t-spot">${P.spot()}</section>
   <div class="tright"><div class="seg">${views.map((x,i)=>`<button class="${i===vi?"on":""}" data-a="tv" data-v="${i}">${x[0]}</button>`).join("")}</div>
   <div class="tview${v[2]?" "+v[2]:""}" style="--n:${v[1].length}">${v[1].map(k=>`<section class="pn" data-k="t-${S.tab}-${k}">${P[k]()}</section>`).join("")}</div></div></div>`;}
  else if(single){app.innerHTML=`<div class="grid one"><section class="pn${single==="spot"?" spot":""}" data-k="one-${single}">${P[single]()}</section></div>`;}
- else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button></div>
+ else{app.innerHTML=`<div class="bar">${TABN.map((t,i)=>`<button class="tabb${S.tab===i+1?" on":""}" data-a="tab" data-v="${i+1}">${t}</button>`).join("")}<span class="sp"></span><span class="mv">Movement ${S.mv+1}: ${esc(MOVES[S.mv].t)}</span><button class="sm" data-a="xopen">Export</button><button class="quiet" data-a="reset">${S.armReset?"Tap again to reset":"Reset"}</button><a class="home" href="../" title="Back to the Wilds of Ossë table hub">← Table hub</a></div>
  <div class="grid" style="grid-template-rows:${ROWS[S.tab]}">${LAYOUT[S.tab].map(l=>`<section class="pn${l[0]==="spot"?" spot":""}${l[3]?" "+l[3]:""}" data-k="${S.tab}-${l[0]}" style="grid-column:${l[1]};grid-row:${l[2]}">${P[l[0]]()}</section>`).join("")}</div>`;}
  if(modal&&!single)app.insertAdjacentHTML("beforeend",modalHTML());
  app.querySelectorAll("[data-k]").forEach(el=>{const v=keep[el.dataset.k];if(v){const s=el.querySelector(".pb")||el.querySelector(".spg")||el;s.scrollTop=v;}});

@@ -86,6 +86,7 @@ NPCs: every move must be a published mechanic, or a baseline rule with new flavo
 - One file. The hub's Google Fonts link (Cinzel, Spectral, IBM Plex Mono) is the only outside resource; no other fonts, scripts or images. State lives in `localStorage` under a key unique to the session (`osse-sNN-v1`), so both layouts on one device stay in step. The iPad and the tall screen are separate devices and keep separate state.
 - The hub's tokens: `--ink:#0b0908`, `--panel:#16110e`, `--panel-2:#1d1612`, `--gold:#d2a851`, `--gold-hi:#f0d494`, `--gold-lo:#8d6829`, `--velvet:#6b1220`, `--text:#ece2cf`, `--muted:#a99a82`. Cinzel for headings, Spectral for text, Plex Mono for labels and numbers. Panels are the hub's cards; buttons are its gold buttons. Keep the PC colours from the last screen.
 - Nothing the game master needs in the moment may sit behind a scroll in Spotlight. The main control of a view sits in its header and never scrolls away. Next names where it goes.
+- The top bar ends, at the right, with the site-wide button back to the hub: `<a class="home" href="../">← Table hub</a>`, styled to the screen.
 - Anything that wipes state needs a second tap. Numbers that change often get a typed field as well as buttons.
 - Body text 16px or larger on the iPad, 18px or larger on the tall screen.
 - Canadian English. No em dashes.
