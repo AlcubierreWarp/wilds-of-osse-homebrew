@@ -1,15 +1,24 @@
 ---
 name: session-screen
-description: Build and publish the game master screen page for a Wilds of Ossë session (screen/sNN.html), from that session's plan. Use when asked to make, update or publish a session screen, dashboard or DM screen.
+description: Build and publish the game master screen page for a Wilds of Ossë session (screen/sNN.html, with an iPad layout and a tall 1080p layout), from that session's plan. Use when asked to make, update or publish a session screen, dashboard or DM screen.
 ---
 
 # Session screen
 
-One self-contained page per session, `screen/sNN.html`, run in a single 5e.tools DM Screen pane (Embed) on a vertical monitor. `screen/s13.html` is the reference build. Start every new screen as a copy of the most recent one.
+One self-contained page per session, `screen/sNN.html`, with two layouts of the same board:
+
+| Layout | Address | Device |
+| --- | --- | --- |
+| iPad | `screen/sNN.html#ipad` | iPad in landscape, 1024 by 740, tap only |
+| Tall | `screen/sNN.html#tall` | the vertical 1080p monitor, 1080 by 1920, browser full screen |
+
+Both follow the iPad layout: Spotlight plus one view at a time. On the iPad, Spotlight sits on the left and the view on the right; on the tall screen, Spotlight sits on top and the view fills the rest. The look is the table hub's (`index.html`): its palette, its fonts and its gold-on-dark panels. Start a new screen from the most recent one built to this standard; until there is one, take the iPad view of `screen/s13.html` for the structure and the hub for the look.
+
+The hub's game master section finds the screen by itself (see step 6). Tom runs combat in Roll20 and talks in Discord voice; the screen is his notes and trackers, never a battle map.
 
 ## 1. Get the plan first
 
-The story comes from the session plan (the Notion session page, or the "Prep Review" page exported from it). Never invent scenes, NPCs, clues or lines. If the plan is not in the conversation or on disk, ask for it and stop.
+The story comes from Tom's plan for the session: the plans marked `ready` for it in the Ossë vault (`python3 tools/osse/osse.py plans`, then `card` on each), and any prep Tom gives in the conversation. Look up who and what is involved with `osse.py brief`, `card` and `find`. Never invent scenes, NPCs, clues or lines. If there is no plan marked ready and none in the conversation, ask for it and stop.
 
 From the plan, pull:
 
@@ -28,21 +37,19 @@ From the plan, pull:
 - One movement per scene. Each names its lead PC, a job for every other PC, the flagged beats, and the pen questions.
 - Each movement also carries the stakes (`st`): for each PC who faces a decision in that scene, the decision in one line, then the considerations the game master can offer from that character's history. Use only facts from the plan and the campaign record. Keep sealed secrets out of it. A PC with no decision is left out. This feeds the Stakes view.
 - Set `order` on a movement when the plan fixes the order the PCs are taken in.
-- Group movements into two to four tabs by phase. `MVTAB` maps each movement to its tab, so Next in Spotlight changes tab by itself.
-- Pick each tab's panels by what the scene is:
+- Pick the views each movement offers by what the scene is (`TV`). Next in Spotlight moves to the next movement and its first view:
 
-| Scene type | Panels |
+| Scene type | Views |
 |---|---|
 | Combat | Stat blocks, Health (bars, statuses and resistances for everyone in the fight), Initiative (rolls, damage and healing, bench, add someone), Voices, Roll call |
 | Roleplay, investigation | Roll call, Evidence (full width), Voices, Sealed |
 | Speeches, endings | Speech view in large type with fill-ins from Roll call, Roll call, Evidence, Sealed |
 
-- Spotlight is the top row of every tab. Stakes is a strip right under it, showing each decision, with the considerations opening on a tap. Sealed is at the bottom and closed.
-- Retire panels the session does not need. Add a bespoke one when a scene has its own mechanic (S13: The Hand).
-- Every panel also works alone at `#panel=<name>`, and each tab at `#tabN`.
+- Spotlight is always on screen. Stakes opens from Spotlight, each decision with its considerations on a tap. Sealed is a view of its own, closed until tapped.
+- Retire views the session does not need. Add a bespoke one when a scene has its own mechanic (S13: The Hand).
 - Health and Initiative share one list of combatants (`CMB0`: side, initiative, hit points, AC, attack line, resistances, statuses, in the fight or on the bench). Initiative edits rolls and hit points and moves people to and from the bench; Health shows the result. Keep both, and keep + Add.
 - Keep the Export button. Its text must list every beat, clue, roll call state and the fight as plain Markdown, flag what was not reached or not found, and end with the board state so it can be restored. Tom gives it to Claude for the post-session sync, with the summary and transcript.
-- Keep the iPad view (`#ipad`, and automatic on a touch device in landscape): Spotlight on the left, one view at a time on the right, chosen per tab in `TV`. Combat pairs the foe tracker with Initiative. Built for 1024 by 740, tap only: targets 44px or larger, a number pad instead of a text field, nothing that needs hover.
+- Both layouts are tap first: targets 44px or larger, a number pad instead of a text field, nothing that needs hover. Combat pairs the foe tracker with Initiative. The base address picks the layout from the window's shape (portrait gives tall, landscape gives iPad); `#ipad` and `#tall` force it.
 
 ## Hand the pen prompts
 
@@ -64,7 +71,7 @@ Player characters: carry the blocks forward from the last screen and update them
 
 NPCs: every move must be a published mechanic, or a baseline rule with new flavour. Players should recognize what hit them.
 
-- Start from the closest published block (gladiator, warlord, assassin, a class feature, a spell) and rename. Check the wording against 5e.tools data, not memory: `https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/bestiary/bestiary-<source>.json`.
+- Start from the closest published block (gladiator, warlord, assassin, a class feature, a spell) and rename. Check the wording against the source, not memory: the Rules and items tab of the vault (`vault/#rules`, the SRD through Open5e) or the 5e.tools data at `https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/bestiary/bestiary-<source>.json`. Read the 5e.tools data to check; copy only SRD text onto the page.
 - End each entry with its source in double braces, for example `{{Command Ally, as the warlord.}}`. The page shows it as a small note.
 - Check the math: proficiency bonus fits the challenge rating; attack bonus is ability modifier plus proficiency; save DC is 8 plus modifier plus proficiency; hit points match the hit dice.
 - Table rules: normal attack rolls against AC. Do not use player-rolled defense. Show damage in stat-block form, the average with the dice in brackets, for example 14 (1d6 + 4 piercing plus 2d6 poison). Tom rolls damage for named NPCs such as Corvane and Cassian.
@@ -76,29 +83,26 @@ NPCs: every move must be a published mechanic, or a baseline rule with new flavo
 
 ## 4. Design rules
 
-- One file, no outside fonts, scripts or images. State lives in `localStorage` under a key unique to the session (`osse-sNN-v1`), so panels and tabs stay in step.
-- Built for one pane at about 1080 by 1800. The Spotlight row fits its content. Nothing the game master needs in the moment may sit behind a scroll in Spotlight.
-- The main control of a panel sits in its header and never scrolls away. Next names where it goes.
-- Small cells get the compact view (`mini`): names and titles only.
+- One file. The hub's Google Fonts link (Cinzel, Spectral, IBM Plex Mono) is the only outside resource; no other fonts, scripts or images. State lives in `localStorage` under a key unique to the session (`osse-sNN-v1`), so both layouts on one device stay in step. The iPad and the tall screen are separate devices and keep separate state.
+- The hub's tokens: `--ink:#0b0908`, `--panel:#16110e`, `--panel-2:#1d1612`, `--gold:#d2a851`, `--gold-hi:#f0d494`, `--gold-lo:#8d6829`, `--velvet:#6b1220`, `--text:#ece2cf`, `--muted:#a99a82`. Cinzel for headings, Spectral for text, Plex Mono for labels and numbers. Panels are the hub's cards; buttons are its gold buttons. Keep the PC colours from the last screen.
+- Nothing the game master needs in the moment may sit behind a scroll in Spotlight. The main control of a view sits in its header and never scrolls away. Next names where it goes.
 - Anything that wipes state needs a second tap. Numbers that change often get a typed field as well as buttons.
-- Keep the dark palette, PC colours and type scale from the reference build. Body text 15px or larger.
+- Body text 16px or larger on the iPad, 18px or larger on the tall screen.
 - Canadian English. No em dashes.
 
 ## 5. Test
 
 Run the `screen` preview server (`.claude/launch.json`) and check in the browser:
 
-1. Each tab at 1080 by 1800: nothing cut off in Spotlight, every panel readable.
-2. Spotlight and one other panel alone at 520 by 420.
-3. The iPad view at 1024 by 740: every tab and view, the number pad, no control under 44px.
-4. Click through: Next across all movements, damage entry, roll call taps, evidence ticks, sealed open and close, every stat block and voice.
-5. No console errors, and no `{{` left showing.
+1. `#ipad` at 1024 by 740 and `#tall` at 1080 by 1920: every movement and view, nothing cut off in Spotlight, the number pad, no control under 44px.
+2. The base address picks the right layout in portrait and in landscape.
+3. Click through: Next across all movements, damage entry, roll call taps, evidence ticks, sealed open and close, every stat block and voice.
+4. No console errors, and no `{{` left showing.
 
 ## 6. Publish
 
-1. Add a section for the session to `screen/README.md`. Base address: `https://alcubierrewarp.github.io/wilds-of-osse-homebrew/screen/sNN.html`.
-   Also add the session as a new group at the top of the `DM` list in `index.html` (the table hub), with its tabs and iPad view, using relative addresses (`screen/sNN.html#tab1`).
+1. Run `python3 tools/osse/pages.py`. It lists the screens in `vault/status.json`, and the hub's launchboard then shows the iPad and Tall buttons for the next session and ticks "screen built". Do not edit `index.html` for a new session.
 2. Run the pre-commit check from `CLAUDE.md`. If the build only changed timestamps in `wilds-of-osse.json`, do not commit that file.
 3. Commit to main and push.
-4. Wait for GitHub Pages, then confirm the base address returns 200 and matches the committed file.
+4. Wait for GitHub Pages, then confirm `https://osse.thomashuet.ca/screen/sNN.html` returns 200 and matches the committed file.
 5. Tell Tom the address, what he will see, and anything he must do. Old test state clears with Reset, tapped twice.

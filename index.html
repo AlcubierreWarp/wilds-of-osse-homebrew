@@ -59,27 +59,47 @@ h2 small{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:upp
   color:var(--gold-hi);background:#0b0908;border:1px solid var(--gold-lo);border-radius:4px}
 .lock input::placeholder{color:rgba(210,168,81,.3)}
 .msg{min-height:1.4em;margin:0;font:500 12px/1.4 var(--f-mono);letter-spacing:.06em;color:var(--bad)}
-.group{margin-top:14px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:0 14px}
-.group[open]{padding-bottom:14px}
-.group summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:13px 0}
-.group summary::-webkit-details-marker{display:none}
-.group summary::before{content:"▸";color:var(--gold);font-size:14px;transition:transform .15s}
-.group[open] summary::before{transform:rotate(90deg)}
-.group summary:focus-visible{outline:2px solid var(--arcane);outline-offset:2px;border-radius:3px}
 .gtext{margin:0 0 10px;color:var(--muted);font-size:15px}
 .cnote{flex-basis:100%;font-size:14px;color:var(--muted);font-style:italic}
 .code{margin-bottom:10px}
 .links li{display:flex;gap:8px;align-items:center}
 .links li a{flex:1;min-width:0}
-.group h3.g{margin:0;font:500 12px/1.4 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .links{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
 .links a{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 12px;border:1px solid transparent;border-radius:4px;text-decoration:none;color:var(--text);background:rgba(255,255,255,.025)}
 .links a:hover{border-color:var(--line);background:rgba(210,168,81,.06)}
 .links a span{font:12px/1.4 var(--f-mono);color:var(--muted);text-align:right}
-.dm-head{display:flex;justify-content:flex-end;margin:-6px 0 6px}
+.dm-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:-4px 0 16px}
+.next{font:500 12px/1.5 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.next b{color:var(--gold-hi);font-weight:500}
+.board{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:10px}
+.tile{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+.tile.wide{grid-column:1/-1}
+.tile h3{margin:0;font:600 16px/1.25 var(--f-display);letter-spacing:.04em;color:var(--text)}
+.tile p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.4;flex:1}
+.tile .row{margin-top:4px}
+.tile .code{margin:4px 0 0;padding:6px 10px}.tile .code b{font-size:16px}
+.warn{color:var(--bad);font-style:italic}
+.check{padding:16px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+.check h3{margin:0 0 4px;font:600 16px/1.25 var(--f-display);letter-spacing:.04em}
+.check .prog{font:500 11px/1.4 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.check ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;border-radius:4px;cursor:pointer;font-size:15.5px;line-height:1.35}
+.check label:hover{background:rgba(210,168,81,.06)}
+.check input{appearance:none;flex:none;width:18px;height:18px;margin-top:1px;border:1px solid var(--gold-lo);border-radius:3px;display:grid;place-items:center;background:#0b0908}
+.check input:checked{background:var(--gold);border-color:var(--gold-hi)}
+.check input:checked::after{content:"✓";color:#1c1206;font-size:13px;line-height:1}
+.check li.done span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gold-lo)}
+.check small{display:block;font-size:13px;color:var(--muted);text-decoration:none}
+.check .auto{font:500 10px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lo);margin-left:4px}
+.check .foot{display:flex;justify-content:flex-end;margin-top:8px}
+.quiet{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+.quiet .k{font:500 11px/1.4 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;margin-right:8px}
+.quiet a{color:var(--muted)}.quiet a:hover{color:var(--gold-hi)}
+.quiet button{all:unset;cursor:pointer;color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
+@media (max-width:760px){.board{grid-template-columns:1fr}}
 footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 [hidden]{display:none!important}
-@media (max-width:520px){.links a{flex-direction:column;gap:2px}.links a span{text-align:left}}
 </style>
 </head>
 <body>
@@ -110,7 +130,7 @@ footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-
       <p class="msg" id="dm-msg" role="alert"></p>
     </div>
     <div id="dm" hidden>
-      <div class="dm-head"><button type="button" class="btn ghost small" id="dm-out">Lock this section</button></div>
+      <div class="dm-head"><span class="next" id="dm-next">Loading</span><button type="button" class="btn ghost small" id="dm-out">Lock this section</button></div>
       <div id="dm-body"></div>
     </div>
   </section>
@@ -120,7 +140,7 @@ footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-
 
 <script>
 "use strict";
-/* Links live here. Addresses are relative, so the page works on GitHub Pages and on a custom domain alike.
+/* Links live here (PLAYER below; the game master launchboard is TOOLS and CHECKLIST). Addresses are relative, so the page works on GitHub Pages and on a custom domain alike.
    Codes are not: the player codes come from the Gus relay, so no code sits in this public repository. */
 const RAW = "https://raw.githubusercontent.com/AlcubierreWarp/wilds-of-osse-homebrew/main/wilds-of-osse.json";
 const PLAYER = [
@@ -130,40 +150,34 @@ const PLAYER = [
    text: "The virtual table, maps and tokens.", href: "https://app.roll20.net/campaigns/details/21638976/wilds-of-osse", open: "Open Roll20"},
   {title: "The Chronicle", who: "Everyone",
    text: "Every session so far: the summary, quest lines, the people you met and the items you found.", href: "chronicle/", open: "Read the chronicle"},
+  {title: "The Codex", who: "Everyone",
+   text: "Everyone and everything the party has met, as far as play has shown, plus a rules and items lookup.", href: "codex/", open: "Open the codex"},
   {title: "Gus's memory archive", who: "Shane · Gus",
    text: "Gus's documents from Marshal Intelligence. Open it on your own device and enter the code your game master gave you.",
    href: "screen/gus.html", open: "Open the archive"},
 ];
-/* Game master groups. Sessions are folded except the newest; put a new session first. */
-const DM = [
-  {group: "Gus's memory archive", id: "gus", links: [
-    {label: "Game master view", href: "screen/gus.html", note: "opens unlocked", gm: true},
-  ], code: {key: "gus", label: "Shane's code", note: "Give this to Shane. He enters it once on his device."}},
-  {group: "The Ossë vault", id: "vault", links: [
-    {label: "Every entry", href: "vault/", note: "people, places, secrets, plans"},
-  ], text: "A DM page for every vault note, rebuilt after each session. Game secrets and plans are on these pages: never show them to players."},
-  {group: "Session 13 · The Last Bell", id: "s13", session: true, links: [
-    {label: "Whole screen", href: "screen/s13.html", note: "s13.html"},
-    {label: "Tab 1 · Last Bell", href: "screen/s13.html#tab1", note: "movement 1"},
-    {label: "Tab 2 · Aftermath", href: "screen/s13.html#tab2", note: "movements 2 and 3"},
-    {label: "Tab 3 · Hard Out", href: "screen/s13.html#tab3", note: "movements 4 and 5"},
-    {label: "iPad, landscape", href: "screen/s13.html#ipad", note: "tap only"},
-  ]},
-  {group: "Session 12 · The Toast", id: "s12", session: true, links: [
-    {label: "All seven in one", href: "screen/all.html", note: "all.html"},
-    {label: "Round clock", href: "screen/clock.html", note: "clock.html"},
-    {label: "Champions", href: "screen/champions.html", note: "champions.html"},
-    {label: "Knives' turn", href: "screen/knives.html", note: "knives.html"},
-    {label: "Crowd die", href: "screen/crowd.html", note: "crowd.html"},
-    {label: "Voices", href: "screen/voices.html", note: "voices.html"},
-    {label: "Initiative", href: "screen/initiative.html", note: "initiative.html"},
-    {label: "Stat blocks", href: "screen/statblocks.html", note: "statblocks.html"},
-  ]},
-  {group: "Homebrew for 5e.tools", id: "brew", links: [
-    {label: "Combined file (raw link)", href: RAW, note: "wilds-of-osse.json", copy: RAW},
-    {label: "Repository on GitHub", href: "https://github.com/AlcubierreWarp/wilds-of-osse-homebrew", note: "source"},
-  ], text: "In 5e.tools: Bestiary, Manage Homebrew, Load from URL, then paste the raw link. Refresh there after an update."},
+/* Game master launchboard. The session, its screen and the automatic ticks come from vault/status.json (rebuilt by
+   tools/osse/build.py) and chronicle/chronicle.json, so nothing here changes from one session to the next. */
+const TOOLS = [
+  {title: "Ossë vault", text: "Every person, place, secret and plan, as DM pages.", links: [["Search", "vault/"], ["Rules and items", "vault/#rules"]]},
+  {title: "Gus's archive", text: "Game master view opens unlocked.", links: [["Open", "screen/gus.html", "gm"]], code: "gus"},
+  {title: "Roll20", text: "Maps, tokens and combat.", links: [["Open", "https://app.roll20.net/campaigns/details/21638976/wilds-of-osse"]]},
+  {title: "Discord", text: "Voice, and the transcript bot.", links: [["Open", "https://discord.com/app"]]},
+  {title: "D&D Beyond", text: "Character sheets and the campaign.", links: [["Open", "https://www.dndbeyond.com/campaigns/7874419"]]},
+  {title: "Player views", text: "What the players can see.", links: [["Codex", "codex/"], ["Chronicle", "chronicle/"]]},
 ];
+/* The set-up checklist. auto(s) ticks an item from the status file; the rest are ticked by hand and kept per session. */
+const CHECKLIST = [
+  {id: "synced", label: s => `S${s.current} synced: vault, chronicle and codex`, note: "post-session skill", auto: s => s.chronicle >= s.current},
+  {id: "plans", label: s => `Plans for S${s.next} marked ready`, note: s => s.ready.length ? s.ready.join(", ") : `${s.aimed} aimed at S${s.next}, none ready yet`, auto: s => s.ready.length > 0},
+  {id: "screen", label: s => `S${s.next} screen built`, note: "session-screen skill: iPad and tall", auto: s => s.screens.includes(s.next)},
+  {id: "glossary", label: () => "Names refreshed for the transcript bot", note: "glossary from the vault"},
+  {id: "gus", label: () => "Gus document ready, if any", note: "gus-document skill"},
+  {id: "roll20", label: () => "Roll20 maps, tokens and stat blocks"},
+  {id: "open", label: () => "Screens open: iPad and the tall monitor"},
+  {id: "bot", label: () => "Transcript bot recording in voice"},
+];
+const RAW_REPO = "https://github.com/AlcubierreWarp/wilds-of-osse-homebrew";
 
 const RELAY = (location.hostname === "localhost" && new URLSearchParams(location.search).get("relay"))
   || "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws";
@@ -190,24 +204,55 @@ async function loadCodes(code){
   dmBody();
 }
 
-function folded(g, i){
-  const saved = store.get("osse-hub-open-" + g.id);
-  if (saved !== null) return saved === "0";
-  return g.session && DM.filter(x => x.session).indexOf(g) > 0;
+let status = null;
+async function loadStatus(){
+  try {
+    const [s, c] = await Promise.all([fetch("vault/status.json", {cache: "no-store"}).then(r => r.json()),
+      fetch("chronicle/chronicle.json", {cache: "no-store"}).then(r => r.json()).catch(() => ({sessions: []}))]);
+    s.chronicle = Math.max(0, ...(c.sessions || []).map(x => +x.n || 0));
+    status = s;
+  } catch(e) { status = {current: 0, next: 0, screens: [], titles: {}, ready: [], aimed: 0, chronicle: 0, error: true}; }
+  dmBody();
 }
+const ticks = n => { try { return JSON.parse(store.get("osse-hub-check-S" + n) || "{}"); } catch(e) { return {}; } };
 function dmBody(){
-  $("#dm-body").innerHTML = DM.map((g, i) => {
-    const code = g.code ? (codes === null ? "…" : codes[g.code.key] || "Not set") : "";
-    return `<details class="group" data-id="${esc(g.id)}"${folded(g, i) ? "" : " open"}><summary><h3 class="g">${esc(g.group)}</h3></summary>
-    ${g.text ? `<p class="gtext">${esc(g.text)}</p>` : ""}
-    ${g.code ? `<div class="code"><span class="k">${esc(g.code.label)}</span><b>${esc(code)}</b>
-      ${codes && codes[g.code.key] ? `<button type="button" class="btn ghost small" data-copy="${esc(codes[g.code.key])}">Copy code</button>` : ""}
-      <span class="cnote">${esc(g.code.note)}</span></div>` : ""}
-    <ul class="links">${g.links.map(l =>
-      `<li><a href="${esc(l.href)}" target="_blank" rel="noopener"${l.gm ? ' data-gm="1"' : ""}>${esc(l.label)}<span>${esc(l.note || "")}</span></a>
-      ${l.copy ? `<button type="button" class="btn ghost small" data-copy="${esc(l.copy)}">Copy</button>` : ""}</li>`).join("")}</ul></details>`;
-  }).join("");
+  const s = status;
+  if (!s) { $("#dm-body").innerHTML = ""; return; }
+  const n = s.next, built = s.screens.includes(n), mine = ticks(n);
+  $("#dm-next").innerHTML = s.error ? "The status file can't be read" : `Next up <b>Session ${n}</b> · after S${s.current}${s.titles[s.current] ? ", " + esc(s.titles[s.current]) : ""} · ${s.open_threads} open threads`;
+  const code = codes === null ? "…" : codes.gus || "Not set";
+  const tiles = [`<article class="tile wide"><h3>DM screen · Session ${n}</h3>
+      <p>${built ? "One page, two layouts. Open the iPad layout on the iPad and the tall layout on the vertical monitor."
+                 : `<span class="warn">Not built yet.</span> Build it with the session-screen skill.`}</p>
+      ${built ? `<div class="row"><a class="btn" href="screen/s${n}.html#ipad" target="_blank" rel="noopener">iPad</a>
+        <a class="btn" href="screen/s${n}.html#tall" target="_blank" rel="noopener">Tall 1080p</a></div>` : ""}</article>`]
+    .concat(TOOLS.map(t => `<article class="tile"><h3>${esc(t.title)}</h3><p>${esc(t.text)}</p>
+      ${t.code ? `<div class="code"><span class="k">Shane's code</span><b>${esc(code)}</b>${codes && codes.gus ? `<button type="button" class="btn ghost small" data-copy="${esc(codes.gus)}">Copy</button>` : ""}</div>` : ""}
+      <div class="row">${t.links.map(([l, h, gm], i) => `<a class="btn${i ? " ghost" : ""} small" href="${esc(h)}" target="_blank" rel="noopener"${gm ? ' data-gm="1"' : ""}>${esc(l)}</a>`).join("")}</div></article>`));
+  const items = CHECKLIST.map(c => {
+    const auto = c.auto ? !!c.auto(s) : null, on = auto === true || !!mine[c.id];
+    const note = typeof c.note === "function" ? c.note(s) : c.note;
+    return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-check="${c.id}"${on ? " checked" : ""}${auto === true ? " disabled" : ""}>
+      <span>${esc(c.label(s))}${auto === true ? '<i class="auto">auto</i>' : ""}${note ? `<small>${esc(note)}</small>` : ""}</span></label></li>`;
+  });
+  const done = items.filter(x => x.startsWith('<li class="done"')).length;
+  const past = s.screens.filter(x => x !== n).sort((a, b) => b - a);
+  $("#dm-body").innerHTML = `<div class="board"><div class="tiles">${tiles.join("")}</div>
+    <div class="check"><h3>Set up Session ${n}</h3><div class="prog">${done} of ${items.length} done</div><ul>${items.join("")}</ul>
+      <div class="foot"><button type="button" class="btn ghost small" id="check-reset">Clear my ticks</button></div></div></div>
+    <div class="quiet">
+      <div><span class="k">Past screens</span>${past.length ? past.map(x => `<a href="screen/s${x}.html" target="_blank" rel="noopener">S${x}${s.titles[x] ? " · " + esc(s.titles[x]) : ""}</a>`).join(" · ") : "none yet"}</div>
+      <div><span class="k">Homebrew</span><a href="${esc(RAW)}" target="_blank" rel="noopener">combined file</a> · <button type="button" data-copy="${esc(RAW)}">copy raw link</button> · <a href="${RAW_REPO}" target="_blank" rel="noopener">repository</a></div>
+    </div>`;
 }
+document.addEventListener("change", e => {
+  const c = e.target.closest && e.target.closest("[data-check]");
+  if (!c || !status) return;
+  const m = ticks(status.next); m[c.dataset.check] = c.checked; store.set("osse-hub-check-S" + status.next, JSON.stringify(m)); dmBody();
+});
+document.addEventListener("click", e => {
+  if (e.target.id === "check-reset" && status) { store.del("osse-hub-check-S" + status.next); dmBody(); }
+});
 
 /* Same code style as Gus's login: abcd efgh is read as ABCD-EFGH. */
 function normCode(v){
@@ -220,12 +265,8 @@ async function check(code){
 }
 function showDm(on){
   $("#dm").hidden = !on; $("#dm-lock").hidden = on;
-  if (on) { codes = null; dmBody(); loadCodes(store.get("osse-hub-dm")); }
+  if (on) { codes = null; loadStatus(); loadCodes(store.get("osse-hub-dm")); }
 }
-document.addEventListener("toggle", e => {
-  const d = e.target.closest && e.target.closest("details.group");
-  if (d) store.set("osse-hub-open-" + d.dataset.id, d.open ? "1" : "0");
-}, true);
 
 $("#dm-form").addEventListener("submit", async e => {
   e.preventDefault();
