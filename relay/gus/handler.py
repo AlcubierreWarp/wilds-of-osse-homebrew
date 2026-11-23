@@ -4,6 +4,7 @@ Storage is one private S3 bucket:
   vault.json   every document, with game master notes (game master key only)
   public.json  revealed copies and the last push (player key or game master key)
   hub.json     the player codes the table hub shows to the game master
+  paths.json   the Paths ahead planning boards, as JSON Canvas (game master only)
   assets/<id>  attachments, served through short-lived signed links
 
 Access keys are never stored here. SSM Parameter Store holds only their SHA-256 hashes.
@@ -30,7 +31,8 @@ S3 = boto3.client(
 )
 SSM = boto3.client("ssm", region_name=REGION)
 
-VAULT, PUBLIC, HUB = "vault.json", "public.json", "hub.json"
+VAULT, PUBLIC, HUB, PATHS = "vault.json", "public.json", "hub.json", "paths.json"
+PATHS_LIMIT = 2_000_000
 DOC_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,59}$")
 ASSET_ID = re.compile(r"^[a-f0-9]{32}$")
 TYPES = {"image/png", "image/jpeg", "image/gif", "image/webp", "application/pdf"}
@@ -155,6 +157,29 @@ def handler(event, _context):
         if who != "gm":
             return reply(403, {"error": "game master only"})
         return reply(200, load(HUB, {"codes": {}}))
+    if parts == ["paths"]:
+        # Paths ahead: the game master's planning boards. Stored whole; the page sends every board on each save.
+        if who != "gm":
+            return reply(403, {"error": "game master only"})
+        if method == "GET":
+            return reply(200, load(PATHS, {"lanes": {}}))
+        if method != "PUT":
+            return reply(405, {"error": "use GET or PUT"})
+        raw = event.get("body") or "{}"
+        if event.get("isBase64Encoded"):
+            raw = base64.b64decode(raw).decode()
+        if len(raw) > PATHS_LIMIT:
+            return reply(413, {"error": "too big"})
+        try:
+            body = json.loads(raw)
+        except ValueError:
+            return reply(400, {"error": "bad json"})
+        if not isinstance(body, dict) or not isinstance(body.get("lanes"), dict) or \
+                not all(isinstance(v, dict) and isinstance(v.get("nodes", []), list) for v in body["lanes"].values()):
+            return reply(400, {"error": "expected {lanes: {name: {nodes, edges}}}"})
+        body["saved_at"] = now()
+        save(PATHS, body)
+        return reply(200, {"saved_at": body["saved_at"]})
 
     pub = load(PUBLIC, {"rev": 0, "shelf": {}, "signal": None})
 

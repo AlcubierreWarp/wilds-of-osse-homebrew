@@ -52,6 +52,10 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | secret | any | `schema:Claim` |
 | thread | any | `osse:Thread` |
 | plan | any | `schema:PlanAction` |
+| plan | scene | `schema:PlanAction` |
+| plan | decision | `schema:ChooseAction` |
+| plan | pressure | `osse:Pressure` |
+| plan | bottleneck | `osse:Bottleneck` |
 | session | any | `osse:PlaySession` |
 | chronicle | any | `schema:Article` |
 
@@ -96,6 +100,14 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | `in_world` | `osse:inWorldDate` |
 | `thread` | `schema:about` |
 | `session` | `schema:about` |
+| `for` | `osse:pathOf` |
+| `hp` | `osse:hitPoints` |
+| `hp_max` | `osse:hitPoints` |
+| `hp_temp` | `osse:hitPoints` |
+| `slots` | `osse:spellSlots` |
+| `conditions` | `osse:conditions` |
+| `sheet_at` | `osse:sheetAt` |
+| `ddb` | `schema:sameAs` |
 | `type` | vault bookkeeping |
 | `importance_set` | vault bookkeeping |
 | `pruned` | vault bookkeeping |
@@ -299,6 +311,13 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | `osse:wants` | `schema:additionalProperty` | What the NPC wants. |
 | `osse:fear` | `schema:additionalProperty` | What the NPC fears. |
 | `osse:planStatus` | `schema:actionStatus` | draft, ready, played, dropped or pruned. |
+| `osse:Pressure` | `schema:PlanAction` | What the world does if the party does not act: a front's grim portent. Fires when they stall. |
+| `osse:Bottleneck` | `schema:PlanAction` | A beat most branches reach, where paths meet again (branch and bottleneck). |
+| `osse:pathOf` | `schema:about` | The player character, or The Party, whose path a plan sits on in Paths ahead. |
+| `osse:hitPoints` | `schema:additionalProperty` | Hit points at the end of the last session: current, maximum, temporary. |
+| `osse:spellSlots` | `schema:additionalProperty` | Spell slots left at the end of the last session, by level. |
+| `osse:conditions` | `schema:additionalProperty` | Conditions and lasting effects at the end of the last session. |
+| `osse:sheetAt` | `prov:wasGeneratedBy` | The session whose end the hit points and spell slots were read at. |
 | `osse:targetSession` | `schema:startTime` | The session a plan is aimed at. |
 | `osse:requires` | `schema:additionalProperty` | A plan requirement checked against canon by the build. |
 | `osse:inWorldDate` | `schema:startDate` | An in-world date, when known. |

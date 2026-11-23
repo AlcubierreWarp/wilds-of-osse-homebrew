@@ -261,6 +261,39 @@ def parse_plan(n):
                 links_raw.append(s)
     return reqs, links, links_raw
 
+KINDS = {"", "scene", "decision", "pressure", "bottleneck"}
+
+def parse_options(text):
+    """A decision's `## Options`: `- [[Plan]] · what the character chooses`. Returns [(plan, choice)]."""
+    out = []
+    for sec, s in sections(text):
+        if sec == "Options" and s.startswith("- "):
+            m = LINK.search(s)
+            out.append((m.group(1).strip() if m else None, s.split("·", 1)[1].strip() if "·" in s else ""))
+    return out
+
+def plan_shape_checks(notes, problems):
+    """Plan kinds, decision options and `for:` lanes (docs/osse/branching.md)."""
+    for nm, n in notes.items():
+        if n["type"] != "plan":
+            continue
+        fm = n["fm"]
+        kind = str(fm.get("kind") or "").strip().lower()
+        if kind not in KINDS:
+            problems.append(f"{nm}: kind '{kind}' is not scene, decision, pressure or bottleneck")
+        opts = parse_options(n["text"])
+        for target, choice in opts:
+            if not target:
+                problems.append(f"{nm}: option without a [[plan]]: write - [[Plan]] · what they choose")
+            elif target not in notes or notes[target]["type"] != "plan":
+                problems.append(f"{nm}: option [[{target}]] is not a plan note")
+        if opts and kind != "decision":
+            problems.append(f"{nm}: has Options, so set kind: decision")
+        for v in (fm.get("for") or []) if isinstance(fm.get("for"), list) else [fm.get("for")] if fm.get("for") else []:
+            who = link_name(v) or str(v).strip()
+            if not who or who not in notes or notes[who]["type"] not in ("pc", "party"):
+                problems.append(f"{nm}: for '{v}' must name a player character or The Party")
+
 def evaluate(req, notes, edges, current, status_of):
     """Return (result, why): result is True, False, None (unknown) or 'manual'."""
     kind, arg = req
@@ -612,6 +645,7 @@ if __name__ == "__main__":
     edges, problems, session_note = build_graph(notes, vocab, current)
     plans, status_of, parsed, report, newly, revived, repruned = check_plans(notes, edges, current, problems)
     note_checks(notes, edges, parsed, status_of, problems)
+    plan_shape_checks(notes, problems)
     draft_edges = []
     for nm, (reqs, links, raw) in parsed.items():
         for l in links:
@@ -628,7 +662,8 @@ if __name__ == "__main__":
     for n in notes.values():
         node = {"id": n["name"], "path": n["path"], "type": n["type"], "aliases": n["aliases"]}
         for k in ("summary", "importance", "stage", "state", "state_since", "first_seen", "location", "holder", "in",
-                  "status", "target", "revealed", "race", "role", "kind", "player", "number", "pronouns"):
+                  "status", "target", "revealed", "race", "role", "kind", "player", "number", "pronouns",
+                  "for", "hp", "hp_max", "hp_temp", "slots", "conditions", "sheet_at", "ddb", "class", "played"):
             v = n["fm"].get(k)
             if v not in (None, "", []):
                 node[k] = LINK.sub(r"\1", v) if isinstance(v, str) else v

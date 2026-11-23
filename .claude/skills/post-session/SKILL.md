@@ -45,12 +45,16 @@ For each plan from Step 2, propose one of:
 - **overtaken**: `status: pruned`, `pruned: S<n>`, `pruned_by: "overtaken by S<n>: <why>"`. Suggest the requirement that would have caught it.
 - **untouched**: stays live; propose a new `target` or `dropped`.
 
+## Step 4b: Character sheets
+Hit points and spell slots come from D&D Beyond, where the players keep their sheets. Open each player character's sheet in Claude's browser (the `ddb` property on the character note is its address; if it is empty, find the character on the campaign page and record the address). Tom signs in to D&D Beyond there once; never type his password. Read current, maximum and temporary hit points, spell slots left by level, and conditions or lasting effects. Propose them as properties on the character note: `hp`, `hp_max`, `hp_temp`, `slots` (like `1st 2/4 · 2nd 1/3`), `conditions`, and `sheet_at: S<n>`. They are canon for the end of that session. If the sheets were reset after the session (a long rest), say so and ask Tom for the end-of-session values.
+
 ## Step 5: Propose
 Grouped by note, phone-sized:
 - The new session note (`Sessions/S<n> - <title>.md`), in full.
 - Each entity: the Session Log row, property changes quoted, link lines to add or end.
 - New notes, with their front matter.
 - Plans: played, overtaken, retargeted.
+- Character sheets: hit points, slots and conditions per character.
 - Conflicts for a ruling. Clues that did not land. Anything held back.
 Then preview the automatic pruning: `python3 tools/osse/build.py --dry` with one `--assume "Note: key=value"` per proposed property change, and list what it would prune and why. Link changes cannot be assumed; reason those out from the plans' `## Requires`. Tom should never be surprised by what the build drops.
 

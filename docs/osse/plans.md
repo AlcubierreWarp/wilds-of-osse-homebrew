@@ -7,6 +7,8 @@ A plan is one idea for the future: a scene, a reveal, a twist, an NPC's next mov
 type: plan
 stage: draft
 status: draft        # draft | ready | played | dropped | pruned
+kind: scene          # scene | decision | pressure | bottleneck (docs/osse/branching.md)
+for: "[[Mira Holt]]"  # optional: the player character (or The Party) whose board it sits on
 summary: "one line"
 target: S14          # optional: the session it is aimed at
 thread: "[[The Grey Patron]]"   # optional
@@ -32,6 +34,8 @@ What happens and why it is interesting.
 
 ## Log
 ```
+
+**Kinds and options.** A `decision` lists its choices under `## Options`, one per line: `- [[Plan]] · what they choose`; each option is its own plan. Kinds, boards and the research behind them: [branching.md](branching.md).
 
 **Statuses.** `draft`: an idea. `ready`: Tom wants it at the next table. `played`: it happened (set `played: S14`). `dropped`: Tom set it aside. `pruned`: the build found it impossible. Only `draft` and `ready` are live.
 

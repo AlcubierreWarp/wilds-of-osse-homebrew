@@ -31,7 +31,7 @@ Plan requirements are checked against these, so keep them current.
 - `location`: `"[[Place]]"` where a person or thing is now. `holder`: `"[[Who]]"` for a thing someone carries or owns.
 - When any of these change: update the property, add a Session Log row, and keep the old value in it (`Taken to the Guild's cells (was at the docks).`).
 - Kind-specific, only when known:
-  - **pc** `player`, `class`, `race`
+  - **pc** `player`, `class`, `race`; at the end of each session (post-session sync, from D&D Beyond): `hp`, `hp_max`, `hp_temp`, `slots`, `conditions`, `sheet_at`; `ddb` is the sheet's address
   - **npc** `race`, `role`, `story_role` (ally, mentor, antagonist, intermediate antagonist, neutral, quest giver), `voice`, `wants`, `fear`
   - **faction** `kind` (house, guild, gang, order, government, people, church), `leader`
   - **place** `kind` (region, city, district, building, ship, landmark, plane), `in` (`"[[Parent place]]"`)
