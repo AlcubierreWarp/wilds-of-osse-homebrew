@@ -231,7 +231,7 @@ let codes = null;
 function playerCards(){
   $("#player-cards").innerHTML = PLAYER.map(c => `<article class="card">
     <span class="who">${esc(c.who)}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
-    <div class="row"><a class="btn" href="${esc(c.href)}" target="_blank" rel="noopener">${esc(c.open || "Open")}</a></div>
+    <div class="row"><a class="btn" href="${esc(c.href)}">${esc(c.open || "Open")}</a></div>
   </article>`).join("");
 }
 
@@ -262,11 +262,11 @@ function dmBody(){
   const tiles = [`<article class="tile wide"><h3>DM screen · Session ${n}</h3>
       <p>${built ? "One page, two layouts. Open the iPad layout on the iPad and the tall layout on the vertical monitor."
                  : `<span class="warn">Not built yet.</span> Build it with the session-screen skill.`}</p>
-      ${built ? `<div class="row"><a class="btn" href="screen/s${n}.html#ipad" target="_blank" rel="noopener">iPad</a>
-        <a class="btn" href="screen/s${n}.html#tall" target="_blank" rel="noopener">Tall 1080p</a></div>` : ""}</article>`]
+      ${built ? `<div class="row"><a class="btn" href="screen/s${n}.html#ipad">iPad</a>
+        <a class="btn" href="screen/s${n}.html#tall">Tall 1080p</a></div>` : ""}</article>`]
     .concat(TOOLS.map(t => `<article class="tile"><h3>${esc(t.title)}</h3><p>${esc(t.text)}</p>
       ${t.code ? `<div class="code"><span class="k">Shane's code</span><b>${esc(code)}</b>${codes && codes.gus ? `<button type="button" class="btn ghost small" data-copy="${esc(codes.gus)}">Copy</button>` : ""}</div>` : ""}
-      <div class="row">${t.links.map(([l, h, gm], i) => `<a class="btn${i ? " ghost" : ""} small" href="${esc(h)}" target="_blank" rel="noopener"${gm ? ' data-gm="1"' : ""}>${esc(l)}</a>`).join("")}</div></article>`));
+      <div class="row">${t.links.map(([l, h, gm], i) => `<a class="btn${i ? " ghost" : ""} small" href="${esc(h)}"${gm ? ' data-gm="1"' : ""}>${esc(l)}</a>`).join("")}</div></article>`));
   const items = CHECKLIST.map(c => {
     const auto = c.auto ? !!c.auto(s) : null, on = auto === true || !!mine[c.id];
     const note = typeof c.note === "function" ? c.note(s) : c.note;
@@ -279,8 +279,8 @@ function dmBody(){
     <div class="check"><h3>Set up Session ${n}</h3><div class="prog">${done} of ${items.length} done</div><ul>${items.join("")}</ul>
       <div class="foot"><button type="button" class="btn ghost small" id="check-reset">Clear my ticks</button></div></div></div>
     <div class="quiet">
-      <div><span class="k">Past screens</span>${past.length ? past.map(x => `<a href="screen/s${x}.html" target="_blank" rel="noopener">S${x}${s.titles[x] ? " · " + esc(s.titles[x]) : ""}</a>`).join(" · ") : "none yet"}</div>
-      <div><span class="k">Homebrew</span><a href="${esc(RAW)}" target="_blank" rel="noopener">combined file</a> · <button type="button" data-copy="${esc(RAW)}">copy raw link</button> · <a href="${RAW_REPO}" target="_blank" rel="noopener">repository</a></div>
+      <div><span class="k">Past screens</span>${past.length ? past.map(x => `<a href="screen/s${x}.html">S${x}${s.titles[x] ? " · " + esc(s.titles[x]) : ""}</a>`).join(" · ") : "none yet"}</div>
+      <div><span class="k">Homebrew</span><a href="${esc(RAW)}">combined file</a> · <button type="button" data-copy="${esc(RAW)}">copy raw link</button> · <a href="${RAW_REPO}">repository</a></div>
     </div>`;
 }
 document.addEventListener("change", e => {

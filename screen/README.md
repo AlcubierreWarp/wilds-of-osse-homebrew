@@ -1,6 +1,6 @@
 # Table hub
 
-The site's home page, `index.html`, gathers every link: https://osse.thomashuet.ca once its DNS record is in place, https://alcubierrewarp.github.io/wilds-of-osse-homebrew/ until then. Every link opens in a new tab.
+The site's home page, `index.html`, gathers every link: https://osse.thomashuet.ca once its DNS record is in place, https://alcubierrewarp.github.io/wilds-of-osse-homebrew/ until then. Links open in the same tab; Command-click opens one in a new tab.
 
 - **Theme**: the footer switches between Original and Cover poster (the campaign poster, `assets/poster.webp`). Each browser remembers its choice.
 - **For the players**: D&D Beyond, Roll20, the chronicle, the codex (what the party knows, with a rules lookup) and Gus's archive. No codes here.
