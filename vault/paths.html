@@ -1176,8 +1176,7 @@ function open(id, m) {
       (p.req.some(r => r.imp) ? `<small>* named in its links, so it needs them standing.</small>` : "") +
       (p.links.length ? `<h4>Would change</h4><ul>${p.links.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : "") +
       (here ? sessPick(here.s, "pv-sess") : "") +
-      `<div class="acts"><a href="${esc(p.href)}">Open the plan</a>` +
-      (here ? `<button data-back>Back to the tray</button>` : `<button data-place>Place in ${esc(T())}</button>`) +
+      `<div class="acts">${here ? "" : `<button data-place>Place in ${esc(T())}</button>`}` +
       `<button data-drop>${ov.drop[pid] ? "Keep this plan" : "What if I set it aside?"}</button><button class="del" data-dropplan>Drop this plan</button></div>`;
   }
   const d = frame(`<div class="ey">${esc(KINDS[p.kind] || "Beat")} · ${esc(p.status)}${p.target ? " · vault says " + esc(p.target) : ""}${p.edited ? " · edited here" : ""}</div><h3>${esc(pid)}</h3>${tabs}${body}`);
@@ -1207,7 +1206,6 @@ function open(id, m) {
   }
   d.querySelectorAll("[data-i]").forEach(b => b.onclick = () => flip(p.req[+b.dataset.i]));
   optsBind(d, id);
-  const back = d.querySelector("[data-back]"); if (back) back.onclick = () => unplace(pid);
   const pl = d.querySelector("[data-place]"); if (pl) pl.onclick = () => { place(pid, T()); open(id); };
   d.querySelector("[data-dropplan]").onclick = () => { if (confirm(`Drop “${pid}”? It leaves this board and the tray. Claude marks it dropped in the vault when you bring the board in; until then you can undo it from the tray.`)) dropPlan(pid); };
   d.querySelector("[data-drop]").onclick = () => { if (ov.drop[pid]) delete ov.drop[pid]; else ov.drop[pid] = true; refresh(); };
