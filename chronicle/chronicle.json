@@ -158,7 +158,7 @@
    "n": 2,
    "title": "Mission Under Fire",
    "summary": [
-    "The session opened with the party trapped inside the mission in the poor quarter, surrounded by a hostile mob led by a gang leader who called himself **Bram**. While **Lieutenant Wrent** sent up a distress flare, **Gabriele** methodically searched the mission rooms for exits and clues about **Father Barichello**, finding a cache of rusty rapiers and a wooden shield. **Belaskro**, watching from the window, recognised a symbol on Bram's chest (a crescent moon encased in a sun) as the same mark that had been on the wagon that took his uncle and cousin to **Althon's Gate** when he was twelve.",
+    "The session opened with the party trapped inside the mission in the poor quarter, surrounded by a hostile mob led by a gang leader who called himself **Bram**. While **Lieutenant Wrent** sent up a distress flare, **Gabriele** methodically searched the mission rooms for exits and clues about **Father Barichello**, finding a cache of rusty rapiers and a wooden shield. **Belaskro**, watching from the window, recognised a symbol on Bram's chest (a crescent moon encased in a sun) as the same mark that had been on the wagon that took his uncle and aunt to **Althon's Gate** when he was twelve.",
     "The siege escalated when **Bram**'s thugs began piling hay and wood against the building to burn the party out. **Gus** leapt through a window and doused the kindling with caustic acid, buying precious time, but Bram countered with a firebolt that ignited the structure anyway. As flames spread and combat erupted, Gus and his steel defender fought in the street while **Belaskro** and **Lieutenant Wrent** provided covering fire from the windows. **Gabriele**, still searching for answers, discovered **Father Barichello**'s personal prayer book in the temple area, heavily annotated in the priest's own hand and marked up in ways Gabriele had never seen before. In the same room, Gus detected an unusual magical signature and retrieved a rosary from the altar, storing it in his evidence compartment.",
     "With the fire consuming the building and **Bram**'s gang breaking through the front door, the party made their escape. Bram, shouting \"For the **Pyreborn**!\", shattered the barricaded entrance as **Gabriele** and **Belaskro** fought a desperate rearguard action. **Lieutenant Wrent** discovered the secret exit **Lux Corstane** had been protecting: a hidden passage behind a tapestry, opened by pressing a brick in the wall. The party fled through underground tunnels while Belaskro cast fog cloud to cover their retreat, emerging two streets over near a grand basilica.",
     "Waiting at the basilica were **Lux Corstane** and a young woman named **Rosalia**, approximately thirty years old with sharp features. After confirming the party hadn't been followed, Lux introduced Rosalia as someone who had been helping at the mission, and someone who claimed to know what happened to the person they were looking for."
@@ -183,7 +183,7 @@
     {
      "id": "investigate-the-pyreborn",
      "status": "new",
-     "text": "**Bram** leads a gang called the **Pyreborn** operating in the poor quarter. Their symbol, a crescent moon encased in a sun, matches the mark on the wagon that took **Belaskro**'s uncle and cousin to **Althon's Gate** years ago.",
+     "text": "**Bram** leads a gang called the **Pyreborn** operating in the poor quarter. Their symbol, a crescent moon encased in a sun, matches the mark on the wagon that took **Belaskro**'s uncle and aunt to **Althon's Gate** years ago.",
      "clues": [
       "**Bram** wears the crescent moon and sun symbol.",
       "He rallied the mob by railing against the **Arcane Marshals** and noble houses.",
@@ -292,7 +292,7 @@
     {
      "id": "investigate-the-pyreborn",
      "status": "changed",
-     "text": "**Bram** leads a gang called the **Pyreborn** operating in the poor quarter. Their symbol, a crescent moon encased in a sun, matches the mark on the wagon that took **Belaskro**'s uncle and cousin to **Althon's Gate** years ago.",
+     "text": "**Bram** leads a gang called the **Pyreborn** operating in the poor quarter. Their symbol, a crescent moon encased in a sun, matches the mark on the wagon that took **Belaskro**'s uncle and aunt to **Althon's Gate** years ago.",
      "clues": [
       "**Belaskro**'s childhood memory revealed the symbol represents the union of his Uncle **Corvane**'s family (sun) and Aunt **Maribel**'s family (moon).",
       "**Corvane** became **Lord Cassian Aerrowyn**'s father after winning a tournament.",
@@ -380,7 +380,7 @@
    "title": "Interrogations and Conspiracies",
    "summary": [
     "Combat erupted in the dockyard alley as the party confronted the three **Seranthis** sailors. **Gus** led with shocking grasp against **Dask**, while **Belaskro**'s crossbow struck true, though one wild shot punctured a beer keg, creating hazardous terrain. **Krill**, the third sailor, proved less committed to the fight and fled over barrels to escape. The party focused fire on the remaining two: **Gabriele** summoned a spectral cavalryman (Saint Peter on horseback) as his spiritual weapon, slashing at the sailors' backs, while attempting to grapple Dask with a natural 20 tackle that left the leader prone and pinned. Gus's acid splash burned **Ivo**'s eyes, leaving him screaming and helpless. Belaskro finished the fight by whipping Dask's legs out from under him, knocking him unconscious against the cobblestones.",
-    "The interrogation that followed tested the party's methods. **Ivo** initially refused to cooperate, defiant even when threatened. **Gabriele** healed his acid burns with cure wounds, only to have **Gus** spray acid in his eyes again at Gabriele's prompting: a calculated act of torture that eventually broke the sailor's resistance. Under duress, Ivo confirmed that they had kidnapped **Father Barichello** approximately two weeks ago and handed him to a merchant caravan bound for **Seranthis**. Payment was still pending, expected to arrive with another caravan from the south. Searching **Dask**'s pockets, the party discovered a letter from someone named **Ilna**, signed with initials \"DV\" and sealed with a raised fist. The letter revealed that the kidnapping was orchestrated to provide \"seed money\" for a larger operation aimed at keeping the poor quarter \"hungry\" and \"angry,\" using the **Sundermark Brides** song to direct blame at the noble houses. The letter mentioned the **Old Tallow Yard** as a handoff point.",
+    "The interrogation that followed tested the party's methods. **Ivo** initially refused to cooperate, defiant even when threatened. **Gabriele** healed his acid burns with cure wounds, only to have **Gus** spray acid in his eyes again at Gabriele's prompting: a calculated act of torture that eventually broke the sailor's resistance. Under duress, Ivo confirmed that they had kidnapped **Father Barichello** approximately two weeks ago and handed him to a merchant caravan bound for **Seranthis**. Payment was still pending, expected to arrive with another caravan from the south. Searching **Dask**'s pockets, the party discovered a letter addressed to someone named **Ilna**, signed with the initials \"DV\" and sealed with a raised fist. The letter revealed that the kidnapping was orchestrated to provide \"seed money\" for a larger operation aimed at keeping the poor quarter \"hungry\" and \"angry,\" using the **Sundermark Brides** song to direct blame at the noble houses. The letter mentioned the **Old Tallow Yard** as a handoff point.",
     "**Gus**'s steel defender hauled both captured sailors to the Arcane Marshal station while the exhausted party returned to **The Glowing Goat** for the night. **Gabriele** collapsed into immediate sleep, while Gus powered down in the tavern's main room, his unblinking brass form inadvertently becoming the establishment's overnight security, much to the bartender's entrepreneurial delight. The party took a much-needed long rest after a gruelling day that had started in a jail cell and included two pitched battles.",
     "The next morning, the party sought out **Lieutenant Wrent** and instead found themselves summoned to meet the Arcane Marshal Captain at the **Sanctuary**. The imposing captain laid out a grim picture: the city was a powder keg with the **Royal Tournament** approaching in one month, noble houses manoeuvring against each other, and two gangs, the **Pyreborn** and the **Unbowed**, creating coordinated unrest in the dockyards and poor quarter. The captain believed one of **Varenthal**'s noble houses was directing the Pyreborn and had connections to **Seranthis**, but lacked actionable intelligence to prove it. His official requests for resources had been blocked by the very noble houses he suspected. Desperate, he offered the party 25 gold immediately and 30 more upon delivery of actionable intelligence to investigate off the books. He confirmed the Pyreborn attacked the party at the mission and that both gangs were using the **Sundermark Brides** song to stoke anti-noble sentiment. The captain suspected the conspiracy aimed at disrupting the Royal Tournament (the mageraft competition that would confirm the crown prince) but couldn't determine how. **Gabriele** attempted to negotiate access to classified documents in lieu of payment but was firmly refused; the captain's loyalty to the city and distrust of unknown civilians won out, even with a persuasive appeal. The party accepted the contract, taking the gold and the mission to uncover which noble house was betraying Varenthal."
    ],
@@ -394,7 +394,7 @@
       "Payment was to come from another caravan from **Seranthis**.",
       "The letter reveals the kidnapping provided \"seed money\" for a larger conspiracy.",
       "The handoff occurred at the **Old Tallow Yard** before the caravan turned south for **Sundermark**.",
-      "The conspiracy is signed by someone with initials \"DV\" and involves a person named **Ilna**."
+      "The conspiracy letter is signed with the initials \"DV\" and addressed to a person named **Ilna**."
      ]
     },
     {
@@ -420,7 +420,7 @@
      "text": "A second gang causing chaos among dockworkers and the working class. The **Arcane Marshals** suspect they are connected to the **Pyreborn** and receiving direction from within **Varenthal** with ties to **Seranthis**.",
      "clues": [
       "**The Unbowed** operate in the dockyards and among the working class.",
-      "The letter from **Ilna** instructs keeping the quarter \"hungry\" and \"angry\" while blaming the houses.",
+      "The letter to **Ilna** instructs keeping the quarter \"hungry\" and \"angry\" while blaming the houses.",
       "The conspiracy involves someone with initials \"DV\".",
       "**Dask**, **Ivo**, and **Krill** were **Unbowed** operatives working the kidnapping job."
      ]
@@ -516,10 +516,10 @@
    ],
    "items": [
     {
-     "name": "Letter from Ilna to Dask",
+     "name": "Letter from DV to Ilna",
      "homebrew": "",
      "new": true,
-     "text": "Conspiracy letter recovered from **Dask**'s jacket. It details kidnapping instructions, payment arrangements, and a broader strategy to destabilize the poor quarter; it mentions the **Old Tallow Yard**, payment from a **Seranthis** caravan, and keeping unrest directed at the noble houses. Signed by **Ilna** with initials \"DV\" and sealed with a raised fist; the party keeps it."
+     "text": "Conspiracy letter recovered from **Dask**'s jacket. It details kidnapping instructions, payment arrangements, and a broader strategy to destabilize the poor quarter; it mentions the **Old Tallow Yard**, payment from a **Seranthis** caravan, and keeping unrest directed at the noble houses. Addressed to **Ilna**, signed with the initials \"DV\" and sealed with a raised fist; the party keeps it."
     }
    ]
   },
@@ -1236,7 +1236,7 @@
      "status": "changed",
      "text": "**Princess Timbit**'s interrogation of **Nessa Ruhl** yielded critical intelligence about **Pyreborn** leadership and goals.",
      "clues": [
-      "**Nessa Ruhl** revealed the **Pyreborn** are led by someone named \"**Bram**\" (or possibly \"Ram\")",
+      "Believing **Bram** had sent **Princess Timbit**, **Nessa Ruhl** let slip that the rune sabotage is part of \"the plan\" and that \"the boss\" means to control the city.",
       "Their ultimate goal is for \"the boss\" to control **Althon's Gate**",
       "The rune sabotage was part of a larger plan to ensure runes \"kept coming\"",
       "Ledger pages recovered from **Alma Marrow** contain names, dates, payments, and the **Pyreborn** sun-and-moon crest"
@@ -1289,7 +1289,7 @@
      "role": "Pyreborn lieutenant",
      "state": "Imprisoned",
      "new": false,
-     "text": "Interrogated by **Princess Timbit**; initially deceived into believing Princess Timbit was a **Pyreborn** operative; revealed the organization is led by \"**Bram**\" with the goal of controlling the city; resisted Charm Person and ended the interrogation."
+     "text": "Interrogated by **Princess Timbit**; fooled into believing **Bram** had sent Princess Timbit, she let slip that the rune sabotage is part of \"the plan\" and that \"the boss\" means to control the city; resisted Charm Person and ended the interrogation."
     },
     {
      "name": "Alma Marrow",
