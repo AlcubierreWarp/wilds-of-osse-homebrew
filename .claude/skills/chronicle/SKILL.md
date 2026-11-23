@@ -10,17 +10,17 @@ The page is `chronicle/index.html`; it reads `chronicle/chronicle.json` and the 
 ## Where the truth lives
 
 ```
-Notion player summary ──(for now)──▶ Ossë vault: Chronicle/S<n> - <title>.md ──export──▶ chronicle/chronicle.json ──▶ site
+Ossë vault session note ──(player words)──▶ Ossë vault: Chronicle/S<n> - <title>.md ──export──▶ chronicle/chronicle.json ──▶ site
                                      Ossë vault: Chronicle/Quest lines.md     ─┘
 ```
 
 - The Ossë vault (iCloud Obsidian, game master only) is canon. Its `Chronicle/` folder is the one part written for the players, and the export reads nothing else, so unrevealed secrets and plans cannot reach a player screen.
-- For now each session's recap is pulled from its Notion player summary into the vault. Once the vault's own session notes carry everything, write the chronicle note from the vault session note instead (only what the table saw).
+- Each session's recap is written from the vault's session note, which the `post-session` skill writes from the Discord transcript. Take only what the table saw, retold in player words. Sessions up to S13 were taken from Notion summaries; leave them as they are.
 - A `[[link]]` in a chronicle note shows as **bold** on the site: that is how names with a vault entry are marked. Only the shown text is published, never the link target.
 
 ## Add a session
 
-1. Get the recap as JSON in the session scratchpad (the shape is in the docstring of `tools/chronicle.py`): from the Notion page (the `<meeting-notes-section-summary>` part only; the notes part can hold the previous session), using the rules below.
+1. Get the recap as JSON in the session scratchpad (the shape is in the docstring of `tools/chronicle.py`): from the vault's session note (`osse.py card "S<n>"`, What happened and What changed) and, for detail, the transcript, using the rules below. Never copy DM callouts or prep lines from the session note.
 2. `python3 tools/chronicle.py note <file.json>` writes `Chronicle/S<n> - <title>.md` in the vault and links the first mention of each name per paragraph. It refuses to replace an existing note (Tom may have edited it); add `--force` only when Tom asked to rebuild it.
 3. New quest line? Add it to `Chronicle/Quest lines.md`: a `### Name` heading, one short sentence on what the quest is for (player knowledge only), and `- also called: other name; other name` for wordings the summaries use.
 4. `python3 tools/chronicle.py export`, then fix every `!` line it prints.
