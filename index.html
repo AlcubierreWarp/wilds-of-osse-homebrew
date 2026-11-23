@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Wilds of Ossë · Table Links</title>
 <meta name="robots" content="noindex">
+<script>try{var th=localStorage.getItem("osse-theme");if(th)document.documentElement.dataset.theme=th}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -98,13 +99,47 @@ h2 small{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:upp
 .quiet a{color:var(--muted)}.quiet a:hover{color:var(--gold-hi)}
 .quiet button{all:unset;cursor:pointer;color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 @media (max-width:760px){.board{grid-template-columns:1fr}}
-footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+footer{margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.themes{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.themes span{margin-right:4px}
+.themes button{all:unset;cursor:pointer;padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+.themes button:hover{color:var(--gold-hi);border-color:var(--gold-lo)}
+.themes button[aria-pressed=true]{color:var(--gold-hi);border-color:var(--gold)}
+.themes button:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
+.poster{display:none}
+
+/* Cover poster theme: the campaign's poster leads; stone silver, the construct's bronze, violet lightning. */
+[data-theme=poster]{
+  --ink:#09090c; --panel:rgba(13,13,17,.86); --panel-2:rgba(27,27,33,.82); --line:rgba(198,200,218,.17);
+  --gold:#c99a5b; --gold-hi:#ebe8e1; --gold-lo:#6f6b7d; --velvet:#33246e; --velvet-hi:#6b50d6;
+  --text:#e7e4de; --muted:#a19fa9; --arcane:#a58bff; --bad:#ff9fb0;
+}
+[data-theme=poster] body{background:var(--ink)}
+[data-theme=poster] body::before{content:"";position:fixed;inset:-60px;z-index:-1;background:url(assets/poster.webp) center 30%/cover no-repeat;filter:blur(26px) saturate(.8) brightness(.32)}
+[data-theme=poster] body::after{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 60% at 50% 0%,transparent,rgba(9,9,12,.75) 70%),linear-gradient(180deg,transparent 40%,rgba(9,9,12,.7))}
+[data-theme=poster] .wrap{max-width:960px}
+[data-theme=poster] header{margin-bottom:clamp(20px,4vw,34px)}
+[data-theme=poster] .poster{display:block;width:100%;height:auto;aspect-ratio:1672/941;object-fit:cover;border-radius:8px;margin:0 0 18px;
+  box-shadow:0 0 0 1px rgba(198,200,218,.16),0 24px 60px rgba(0,0,0,.7),0 0 70px rgba(107,80,214,.18)}
+[data-theme=poster] header h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+[data-theme=poster] .rule{color:var(--arcane)}
+[data-theme=poster] .rule::before,[data-theme=poster] .rule::after{background:linear-gradient(90deg,transparent,var(--velvet-hi),transparent)}
+[data-theme=poster] h2{color:var(--gold-hi);text-shadow:0 0 18px rgba(165,139,255,.35);border-bottom-color:rgba(165,139,255,.28)}
+[data-theme=poster] .card,[data-theme=poster] .tile,[data-theme=poster] .check{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+[data-theme=poster] .btn{color:#170f06;background:linear-gradient(180deg,#ecca90,#c79150 55%,#7f5528);border-color:#ecca90;box-shadow:inset 0 1px 0 rgba(255,244,220,.55),0 0 0 1px rgba(0,0,0,.3)}
+[data-theme=poster] .btn.ghost{color:var(--gold-hi);background:rgba(255,255,255,.03);border-color:var(--gold-lo);box-shadow:none}
+[data-theme=poster] .btn.ghost:hover{border-color:var(--arcane)}
+[data-theme=poster] .lock .seal{color:#f1eefe;background:radial-gradient(circle at 40% 35%,#8f78ff,var(--velvet-hi) 45%,#1d1440);box-shadow:0 0 0 2px var(--gold-lo),0 0 0 4px rgba(0,0,0,.5),0 0 26px rgba(143,120,255,.55)}
+[data-theme=poster] .lock input,[data-theme=poster] .check input{background:rgba(0,0,0,.45)}
+[data-theme=poster] .check input:checked{background:var(--gold);border-color:#ecca90}
+[data-theme=poster] .code{background:rgba(0,0,0,.35)}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
+    <img class="poster" src="assets/poster.webp" width="1672" height="941" alt="The Wilds of Ossë cover poster: a priest, a brass construct, a man in a white coat and a bounty hunter before a ruined castle under violet lightning" loading="lazy" decoding="async">
     <span class="eyebrow">A campaign table</span>
     <h1>Wilds of Ossë</h1>
     <p class="sub">Everything you need at the table, in one place.</p>
@@ -135,7 +170,10 @@ footer{margin-top:48px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-
     </div>
   </section>
 
-  <footer>Wilds of Ossë</footer>
+  <footer><span>Wilds of Ossë</span>
+    <div class="themes" role="group" aria-label="Theme"><span>Theme</span>
+      <button type="button" data-theme-set="original">Original</button><button type="button" data-theme-set="poster">Cover poster</button></div>
+  </footer>
 </div>
 
 <script>
@@ -293,6 +331,15 @@ document.addEventListener("click", async e => {
   const g = e.target.closest("a[data-gm]");
   if (g) { const code = store.get("osse-hub-dm"); if (code) { store.set("gus-key-gm", code); } }
 });
+
+function theme(name){
+  const t = name === "poster" ? "poster" : "original";
+  if (t === "poster") document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  document.querySelectorAll("[data-theme-set]").forEach(b => b.setAttribute("aria-pressed", b.dataset.themeSet === t));
+  return t;
+}
+document.querySelectorAll("[data-theme-set]").forEach(b => b.addEventListener("click", () => store.set("osse-theme", theme(b.dataset.themeSet))));
+theme(store.get("osse-theme"));
 
 playerCards();
 const saved = store.get("osse-hub-dm");
