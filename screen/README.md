@@ -3,7 +3,7 @@
 The site's home page, `index.html`, gathers every link: https://osse.thomashuet.ca once its DNS record is in place, https://alcubierrewarp.github.io/wilds-of-osse-homebrew/ until then. Every link opens in a new tab.
 
 - **For the players**: D&D Beyond, Roll20 and Gus's archive. No codes here.
-- **Game master**: behind a passcode (Keychain service `osse-dm-passcode`; change it with `relay/gus/deploy.sh --new-dm-passcode`). It keeps players from wandering in; it is not strong security. Inside:
+- **Game master**: behind a passcode (Keychain service `osse-dm-passcode`; change it with `relay/gus/deploy.sh --new-dm-passcode`, or pipe a chosen one into `--set-dm-passcode`). It keeps players from wandering in; it is not strong security. Inside:
   - Gus's archive: the game master view (opens already unlocked) and Shane's code to hand him. The code comes from the relay (`hub.json`, game master only), so it never sits in this repository. `relay/gus/deploy.sh --new-player-code` changes the code and the hub at once.
   - One folding group per session. Only the newest session starts open; the page remembers what you fold. Put a new session first in the `DM` list.
   - The 5e.tools homebrew raw link, with a Copy button and load steps.

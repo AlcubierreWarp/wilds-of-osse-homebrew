@@ -3,7 +3,8 @@
 # First run creates the bucket, role, function, public address and both access keys.
 # Later runs only update the function code. Pass --new-keys to replace both keys,
 # --new-player-code to give the player a new short code (like ABCD-EFGH) that can be typed on the login screen
-# (it also updates the code the table hub shows), or --new-dm-passcode for the hub's game master passcode.
+# (it also updates the code the table hub shows), or --new-dm-passcode for the hub's game master passcode
+# (--set-dm-passcode reads a chosen one from standard input instead).
 # The keys go to the macOS Keychain (services osse-gus-gm and osse-gus-player), never to a file.
 set -euo pipefail
 export AWS_PROFILE=default AWS_REGION=ca-central-1 AWS_PAGER=""
@@ -40,8 +41,14 @@ if [ "${1:-}" = "--new-player-code" ]; then
     --environment "Variables={BUCKET=$BUCKET,KEYS_AT=$(date +%s)}" >/dev/null
   aws lambda wait function-updated-v2 --function-name osse-gus-relay
 fi
-if [ "${1:-}" = "--new-dm-passcode" ]; then
-  code=$(python3 -c 'import secrets; a="ABCDEFGHJKMNPQRSTUVWXYZ23456789"; c="".join(secrets.choice(a) for _ in range(8)); print(c[:4]+"-"+c[4:])')
+if [ "${1:-}" = "--new-dm-passcode" ] || [ "${1:-}" = "--set-dm-passcode" ]; then
+  if [ "$1" = "--set-dm-passcode" ]; then
+    # Reads the passcode from standard input so it never lands in shell history or the repository.
+    IFS= read -r code
+    [ -n "$code" ] || { echo "No passcode given on standard input." >&2; exit 1; }
+  else
+    code=$(python3 -c 'import secrets; a="ABCDEFGHJKMNPQRSTUVWXYZ23456789"; c="".join(secrets.choice(a) for _ in range(8)); print(c[:4]+"-"+c[4:])')
+  fi
   aws ssm put-parameter --name /osse/gus/dm-pass-sha256 --type SecureString --overwrite \
     --value "$(printf %s "$code" | shasum -a 256 | cut -d' ' -f1)" >/dev/null
   security add-generic-password -U -a osse -s osse-dm-passcode -w "$code"
