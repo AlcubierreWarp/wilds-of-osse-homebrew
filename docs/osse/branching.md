@@ -23,13 +23,15 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | --- | --- | --- |
 | **Start cards** | The first session tab starts from **Now**. Each later tab starts from "After S14", listing what is planned for the session before. A link from an earlier session comes in through the start card, dotted | Now is canon; the later start cards are only the board's plan |
 | **Now** | Where the character stands at the end of the last played session: location, status, hit points, spell slots, what happened to them lately | The character note: `location`, `state`, `conditions`, `hp`, `hp_max`, `hp_temp`, `slots`, `sheet_at`; the `## Now` lines stamped with the latest session |
-| **Session tabs** | One tab and canvas per session: S14, S15, S16… then Later. Tom plans one session at a time; cards can lead to each other within a session. + Session adds the next one; the × on the open tab deletes it (its plans go back to the tray, his cards move to Later, later sessions move up one). Drag a card onto a tab to move it | `target: S15`; Later means no target |
+| **Session tabs** | One tab and canvas per session: S14, S15, S16… then Later. Tom plans one session at a time; cards can lead to each other within a session. + Session adds the next one; the × on the open tab deletes it on every board (its plans go back to the tray, his cards move to Later, later sessions move up one). Drag a card onto a tab to move it | `target: S15`; Later means no target |
 | **Tray** | Live plans for this board not placed yet. At first, every plan with no session target | Live plans; placing one sets its `target` when Tom asks Claude to bring the board in |
 | **Cards** | Live plans, by kind (below) | Plan notes |
 | **Links** | Solid: the vault already joins them. Dashed red: Tom's, not in the vault yet | `plan: [[X]]` in the later plan's Requires, or a decision's `## Options` |
 | **Secret chips** | A secret a card needs hidden or revealed. Tap to try a what-if | `hidden:` / `revealed:` requirements |
 | **Scenes on the board** | A scene is a box with its details in a header: where, who is present, the situation. Drag it by the header and the cards inside move with it; drag the corner to resize it. Drop a card inside to set it in the scene. Where and who are picked from the vault's places and people, or typed | `where:`, `present:`; `scene:` on the cards inside |
-| **Session plan** | The first button above the boards. Per session, every board's scenes as small cards in running order: drag one by its ⠿ to move it; tap it to list the beats, decisions, clocks and pressures inside. Each card shows where, who else is there, and the player characters in the session screens' colours: filled when listed as present, outlined when it is their board's scene but they are not listed. A side list shows that session's cards outside every scene. Built live from the character boards, so a change there shows here | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
+| **One copy** | Every plan, card, scene and link exists once, however many boards show it: change it on one and it changes on all. Session tabs are shared too. Only a thing's place on each canvas is its own; a card inside a scene keeps the same place in the box everywhere | |
+| **Scenes on several boards** | A scene shows, with its cards, on the board of every player character listed as present (The Party: every character's board and The Party's), and on any board it was put on. The × on it takes it off that board only, and takes that character off who is present | `present:` |
+| **Session plan** | The first button above the boards. Per session, its scenes as small cards in running order: drag one by its ⠿ to move it, or onto another session's tab. Tap it to list its cards as a tree: each sits under the card whose arrow leads to it. Drag a card onto another to make it follow that one, between two to sit beside them, onto a scene to add it there, or back to "Not in a scene". Arrows and places on the canvas follow, and a card with others under it takes them along. Drag in plans not placed yet from the list on the right. Tap a card to open its panel. Name pills use the session screens' colours (filled: listed as present; outlined: on their board only); tap one to open the scene on that board | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
 | **Zoom** | + and − at the top right of the canvas, beside Fit and Key; also pinch or Command-scroll | |
 | **Tom's own cards** | New ideas drawn on the board | Become plan notes when Tom asks (the `paths` skill) |
 | **Edits** | Tom changes a plan's kind, summary or idea on the board, or leaves Claude a note. The card says "edited · not in vault" | Written into the plan note when Tom asks; the plan keeps its name |
@@ -87,12 +89,12 @@ Each option is its own plan note. An option plan names the decision under `## Re
 
 ## Which board a plan is on
 1. `for:` names one or more player characters, or The Party.
-2. Else the characters named in its Links or Requires.
+2. Else the characters named in its Links or Requires. A scene is also on the board of everyone in its `present:`.
 3. Else a character tied at weight 5 to someone it names (shown as "through Corvane Aerrowyn").
 4. Else The Party when it names The Party; else Around the party.
 
 ## Rules
-- The board never changes the vault. Tom's placing, linking and cards wait on the Gus relay (`paths.json`, JSON Canvas 1.0, game master only) until Tom asks Claude to bring them in (the `paths` skill).
+- The board never changes the vault. Tom's placing, linking and cards wait on the Gus relay (`paths.json`: one store of `items`, `cards`, `edits`, `edges` and `order`, plus each board as JSON Canvas 1.0 under `lanes`; game master only) until Tom asks Claude to bring them in (the `paths` skill).
 - Nothing on the board is canon. The Now card is canon (it reads stamped lines and the sheet values the post-session sync records).
 - Keep branches short and bring them back together. Two or three options per decision, and a bottleneck within a few sessions, beat a wide tree.
 - Every secret a card needs should have at least three ways it could come out.

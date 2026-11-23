@@ -4,7 +4,7 @@
 .ptop{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px}
 .lanes{display:flex;flex-wrap:wrap;gap:4px}
 .lanes button{font:600 13px/1 var(--f-display);letter-spacing:.06em;color:var(--vmuted);background:rgba(255,255,255,.35);border:1px solid var(--vline);border-radius:999px;padding:9px 13px;cursor:pointer}
-.lanes button small{font:500 11px var(--f-mono);margin-left:5px;opacity:.75}
+.lanes button small{color:inherit;font:500 11px var(--f-mono);margin-left:5px;opacity:.75}
 .lanes button[aria-selected=true]{background:var(--vink);color:var(--vellum);border-color:var(--vink)}
 .bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin:12px 0 10px}
 .whatif{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:14.5px}
@@ -149,21 +149,38 @@
 .rc .rw{font-size:13px;color:var(--vmuted);margin-top:1px}
 .pcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
 .pcx{font:700 10.5px/1.55 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:0 7px;border-radius:4px;border:2px solid var(--c);color:#1b1410;background:color-mix(in srgb,var(--c) 18%,#fbf5e6);white-space:nowrap}
-.pcx.in{background:var(--c)}
+.pcx.in{background:var(--c)}button.pcx{cursor:pointer}button.pcx:hover{outline:2px solid var(--vink);outline-offset:1px}
 .ch.who.pc{border:2px solid var(--c);background:color-mix(in srgb,var(--c) 30%,#fbf5e6);color:#1b1410}
 .rc .rx{font:600 11px var(--f-mono);letter-spacing:.06em;border:1px solid var(--vline);background:rgba(255,255,255,.5);color:var(--vink);border-radius:4px;padding:6px 8px;cursor:pointer;white-space:nowrap}
 .rc .rx[aria-expanded=true]{background:var(--vink);color:var(--vellum)}
 .rc .rm{grid-column:3/5;border-top:1px dashed var(--vline);margin-top:6px;padding-top:6px;font-size:14px}
 .rc .rm p{margin:0 0 6px}
-.rc .rm ul{list-style:none;margin:0 0 6px;padding:0}
-.rc .rm li{display:flex;align-items:center;gap:8px;padding:4px 4px;border-radius:4px;cursor:pointer}.rc .rm li:hover{background:rgba(124,22,34,.07)}
+#meas{position:absolute;left:-9999px;top:0;width:900px;visibility:hidden}
+.tree{list-style:none;margin:0;padding:0}.rm>.tree{margin-bottom:6px}
+.tree .tree{margin-left:13px;padding-left:15px;border-left:1.5px solid rgba(42,29,18,.28)}
+.tree li{position:relative}.tree .tree>li::before{content:"";position:absolute;left:-15px;top:15px;width:11px;border-top:1.5px solid rgba(42,29,18,.28)}
+.tree .tree>li:last-child::after{content:"";position:absolute;left:-17px;top:17px;bottom:0;width:4px;background:#fbf5e6}
+.tr{display:flex;align-items:baseline;gap:8px;padding:5px 6px 5px 2px;border-radius:4px;cursor:pointer;position:relative}
+.tr:hover{background:rgba(124,22,34,.07)}.tr.on,.li.on{box-shadow:0 0 0 2px rgba(124,22,34,.35)}.tr.cut{opacity:.45;text-decoration:line-through}
+.tr .rg,.li .rg{flex:none;width:16px;color:var(--vmuted);font-size:15px;line-height:1.1;cursor:grab;touch-action:none;text-align:center}
+.tr .tt{min-width:0;flex:1}.tr .el{color:var(--vred);font-size:13px}.tr .el::after{content:" →"}.tr .rng{align-self:center}
+.tr small{color:var(--vmuted);font-size:12px}
+.tr.in-on{background:rgba(124,22,34,.16);box-shadow:inset 0 0 0 2px var(--vred)}
+.tr.in-before::before,.tr.in-after::before,.rc.in-before::before{content:"";position:absolute;left:0;right:0;height:3px;border-radius:2px;background:var(--vred);top:-2px}
+.tr.in-after::before{top:auto;bottom:-2px}.rc.in-before{position:relative}.rc.in-before::before{top:-7px}
+.rc.hot{border-color:var(--vred);box-shadow:0 0 0 2px rgba(124,22,34,.35)}
+#loose.over{background:rgba(124,22,34,.1);border-style:dashed}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;max-width:min(560px,calc(100vw - 32px));background:var(--vink);color:var(--vellum);border-radius:8px;padding:12px 16px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.bn.flash,.bn.scene.flash{outline:3px solid var(--vred);outline-offset:4px}
 .mk{flex:none;min-width:74px;font:500 10px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--vmuted);border-left:4px solid var(--vmuted);padding-left:6px}
 .mk.k-decision{border-left-color:var(--vred);color:var(--vred)}.mk.k-pressure{border-left-color:#b8860b;color:#7a5a08}.mk.k-clock{border-left-color:#3d5a80;color:#3d5a80}
 .mk.k-bottleneck{border-left:4px double var(--vink);color:var(--vink)}.mk.k-note{border-left-color:#c9a400}
-.rc .rm small{color:var(--vmuted);margin-left:auto;white-space:nowrap}
 .rc .rm .acts{margin-top:6px}
 .loose h4{margin:12px 0 4px;display:flex;align-items:center;gap:6px}
-.loose .li{padding:6px 8px;margin:0 0 5px;border:1px solid var(--vline);border-left:4px solid var(--vmuted);border-radius:5px;background:#fbf5e6;cursor:pointer;font-size:14px}
+.loose p{font-size:13.5px;margin:6px 0 0}.loose .free{margin-top:16px;border-top:1px dashed var(--vline);padding-top:10px}.loose summary{cursor:pointer}.loose summary b{font:600 11.5px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--vred)}
+#run-q{width:100%;font:15px var(--f-body);padding:8px 10px;margin:8px 0;border:1px solid var(--vline);border-radius:4px;background:rgba(255,255,255,.6);color:var(--vink)}
+.loose .li{display:flex;gap:6px;align-items:baseline;user-select:none;-webkit-user-select:none}.loose .li small{display:block;color:var(--vmuted);font-size:12px}
+.loose .li{padding:6px 8px 6px 4px;margin:0 0 5px;border:1px solid var(--vline);border-left:4px solid var(--vmuted);border-radius:5px;background:#fbf5e6;cursor:pointer;font-size:14px}
 .loose .li:hover{border-color:var(--vred)}
 @media (max-width:900px){.runw{grid-template-columns:1fr;grid-template-rows:1fr 30vh;height:calc(100vh - 170px)}}
 @media (max-width:900px){.work{grid-template-columns:1fr;grid-template-rows:1fr 34vh;height:calc(100vh - 170px)}}
@@ -188,51 +205,116 @@ const KDESC = {scene: "Where, and who is there: it sets the stage. A box on the 
   pressure: "What the world does if no one acts: a portent that fires when they stall.",
   bottleneck: "A beat most paths reach, where branches meet again.",
   note: "A loose idea. Claude turns it into a plan when you ask."};
-let doc = {lanes: {}, order: {}}, lane = null, view = {x: 0, y: 0, k: 1}, views = {}, hs = {}, hsh = {};
+let doc = {sessions: [], items: {}, cards: {}, edits: {}, edges: [], order: {}, seeded: []};
+let lane = null, view = {x: 0, y: 0, k: 1}, views = {}, hs = {}, hsh = {};
 const tabOf = {};   // board -> open session tab
 
-/* ---------- state ---------- */
+/* ---------- state: one copy of everything, shown on as many boards as it belongs to ----------
+   items[id]: s (session), homes (boards it was put on), at {board: {x,y}}, w and h (a scene's size),
+   scene with rx, ry (a card inside a scene: its place in the box, the same on every board) */
 const sessNum = s => +(String(s).match(/^S(\d+)$/i) || [])[1] || 0;
 function defaults() { return [1, 2, 3].map(i => "S" + (CUR + i)).concat("Later"); }
-function seed(key) {
-  const s = {sessions: defaults(), placed: {}, cards: {}, edits: {}, edges: []}, next = {};
-  const want = Object.values(P).filter(p => p.lanes.includes(key) && sessNum(p.target) > CUR);
-  const tabFor = p => { const t = "S" + sessNum(p.target);
-    if (!s.sessions.includes(t)) { s.sessions.splice(s.sessions.length - 1, 0, t); s.sessions.sort((a, b) => (sessNum(a) || 1e9) - (sessNum(b) || 1e9)); }
-    return t; };
-  const inner = p => want.filter(q => q.scene === p.id && q.target === p.target);
-  want.filter(p => p.kind === "scene").forEach(p => {   // scenes first, sized for what the vault puts in them
-    const t = tabFor(p), y = next[t] || SY, h = Math.max(SCH, 132 + inner(p).length * 176);
-    s.placed[p.id] = {s: t, x: FIRSTX, y, w: SCW, h}; next[t] = y + h + 44;
-    inner(p).forEach((q, i) => { s.placed[q.id] = {s: t, x: FIRSTX + 22, y: y + 132 + i * 176}; });
-  });
-  want.filter(p => !s.placed[p.id]).forEach(p => {
-    const t = tabFor(p), y = next[t] || SY; s.placed[p.id] = {s: t, x: FIRSTX, y}; next[t] = y + 176;
-  });
-  return s;
-}
-function L() {
-  if (!doc.lanes[lane]) doc.lanes[lane] = seed(lane);
-  const s = doc.lanes[lane];
-  for (const id of Object.keys(s.placed)) if (!P[id]) delete s.placed[id];   // played, pruned or dropped since
-  s.edits ||= {};
-  return s;
-}
-const T = () => { const s = L(); if (!s.sessions.includes(tabOf[lane])) tabOf[lane] = s.sessions[0]; return tabOf[lane]; };
-const where = id => { const s = L(); return id.startsWith("p:") ? s.placed[id.slice(2)] : id.startsWith("c:") ? s.cards[id.slice(2)] : null; };
-const sessOf = id => { const o = where(id); return o ? o.s : null; };
-const view_of = id => { const p = P[id], e = L().edits[id] || {}; return {...p, summary: e.summary ?? p.summary, kind: e.kind ?? p.kind, ideaText: e.idea ?? p.ideaText,
+const L = () => doc;
+const it = id => doc.items[id];
+const live = id => !!it(id) && (id.startsWith("p:") ? !!P[id.slice(2)] : !!doc.cards[id.slice(2)]);   // a played or dropped plan stays stored, unseen
+const T = () => { if (runMode) return runTab; if (!doc.sessions.includes(tabOf[lane])) tabOf[lane] = doc.sessions[0]; return tabOf[lane]; };
+const view_of = id => { const p = P[id], e = doc.edits[id] || {}; return {...p, summary: e.summary ?? p.summary, kind: e.kind ?? p.kind, ideaText: e.idea ?? p.ideaText,
   where: e.where ?? p.where, present: e.present ?? p.present, clock: e.clock ?? p.clock, edited: Object.keys(e).some(k => k !== "drop")}; };
-const kindOf = id => id.startsWith("p:") ? (P[id.slice(2)] ? view_of(id.slice(2)).kind : "") : (L().cards[id.slice(2)] || {}).kind;
+const objOf = id => id.startsWith("p:") ? (P[id.slice(2)] ? view_of(id.slice(2)) : null) : doc.cards[id.slice(2)] || null;
+const kindOf = id => (objOf(id) || {}).kind || "";
 const isScene = id => kindOf(id) === "scene";
-const inTab = t => { const s = L(); return [...Object.keys(s.placed).filter(k => s.placed[k].s === t).map(k => "p:" + k), ...Object.keys(s.cards).filter(k => s.cards[k].s === t).map(k => "c:" + k)]; };
-function sceneOf(id) {   // the smallest scene box holding the card's top middle
+const sceneOf = id => { const sc = (it(id) || {}).scene; return sc && live(sc) && isScene(sc) && !isScene(id) ? sc : null; };
+const sessOf = id => it(id) ? it(sceneOf(id) || id).s : null;
+const membersOf = sid => Object.keys(doc.items).filter(i => live(i) && sceneOf(i) === sid);
+function castLanes(id) {   // the boards of the player characters a scene lists as present
+  const out = new Set();
+  ((objOf(id) || {}).present || []).forEach(n => { const p = pcOf(n);
+    if (p === "party") D.lanes.forEach(l => { if (l.kind !== "world") out.add(l.key); }); else if (p) out.add(p); });
+  return [...out];
+}
+function lanesOf(id) {   // the boards an item shows on
+  const sc = sceneOf(id); if (sc) return lanesOf(sc);
+  const o = it(id), ks = isScene(id) ? [...new Set([...o.homes, ...castLanes(id)])] : o.homes;
+  return ks.length ? ks : [o.born || D.lanes[0].key];
+}
+const inTab = (t, k = lane) => Object.keys(doc.items).filter(i => live(i) && sessOf(i) === t && lanesOf(i).includes(k));
+function measure(ids) {   // card heights, off screen: needed for boards not drawn yet
+  const m = $("#meas"); m.innerHTML = ids.map(cardHtml).join("");
+  m.querySelectorAll(".bn").forEach(el => { hs[el.dataset.id] = el.offsetHeight; const h = el.querySelector(".sh"); if (h) hsh[el.dataset.id] = h.offsetHeight; });
+  m.innerHTML = "";
+}
+function box(id, k = lane) {
+  if (id === "start") return {x: SX, y: SY, w: 300, h: hs.start || 200};
+  if (!live(id)) return null;
+  const o = it(id), sc = sceneOf(id);
+  if (sc) { const b = box(sc, k); return b && {x: b.x + (o.rx ?? 22), y: b.y + (o.ry ?? 132), w: CARDW, h: hs[id] || 110}; }
+  const a = (o.at ||= {})[k]; if (!a) return null;
+  return isScene(id) ? {x: a.x, y: a.y, w: o.w || SCW, h: o.h || SCH, hh: hsh[id] || 96, sc: 1} : {x: a.x, y: a.y, w: CARDW, h: hs[id] || 110};
+}
+function freeSpot(t, k = lane) {
+  const bs = inTab(t, k).map(i => box(i, k)).filter(b => b && b.x < FIRSTX + CARDW && b.x + b.w > FIRSTX);
+  return {x: FIRSTX, y: bs.length ? snap(Math.max(...bs.map(b => b.y + b.h)) + 44) : SY};
+}
+function ensureAt(t, k = lane) {   // everything that belongs on board k has a place there
+  const ids = inTab(t, k), miss = ids.filter(i => hs[i] === undefined);
+  if (miss.length) withLane(k, () => measure(miss));
+  ids.filter(i => !sceneOf(i) && !(it(i).at ||= {})[k]).sort((a, b) => isScene(b) - isScene(a)).forEach(i => { it(i).at[k] = freeSpot(t, k); });
+}
+function setPos(id, x, y) {
+  const o = it(id), sc = sceneOf(id);
+  if (sc) { const b = box(sc); o.rx = x - b.x; o.ry = y - b.y; } else (o.at ||= {})[lane] = {x, y};
+}
+function sceneAt(id) {   // the smallest scene box on this board holding the card's top middle
   const b = box(id); if (!b || isScene(id)) return null;
   const px = b.x + b.w / 2, py = b.y + Math.min(b.h / 2, 40);
-  return inTab(sessOf(id)).filter(isScene).map(x => [x, box(x)]).filter(([, r]) => px > r.x && px < r.x + r.w && py > r.y + 20 && py < r.y + r.h)
+  return inTab(sessOf(id)).filter(isScene).map(x => [x, box(x)]).filter(([, r]) => r && px > r.x && px < r.x + r.w && py > r.y + 20 && py < r.y + r.h)
     .sort((a, c) => a[1].w * a[1].h - c[1].w * c[1].h).map(x => x[0])[0] || null;
 }
-const membersOf = sid => inTab(sessOf(sid)).filter(i => sceneOf(i) === sid);
+function join(id, sid, rx, ry) { const o = it(id); o.scene = sid; o.rx = rx; o.ry = ry; o.at = {}; o.s = it(sid).s; }
+function release(id, k) {   // out of its scene: it stays on its own boards, and on board k where it was taken out, where it stood
+  const o = it(id), so = it(o.scene), hs0 = o.homes.length ? o.homes : [o.born || D.lanes[0].key];
+  o.homes = [...new Set([...hs0, ...(k ? [k] : [])])]; o.at = {};
+  if (so) { o.s = so.s; o.homes.forEach(ln => { const a = (so.at || {})[ln]; if (a) o.at[ln] = {x: a.x + (o.rx || 0), y: a.y + (o.ry || 0)}; }); }
+  delete o.scene; delete o.rx; delete o.ry;
+}
+function capture(sid) {   // after a scene is moved or resized on this board: what it encloses is in it, what it leaves out is not
+  const sb = box(sid);
+  inTab(sessOf(sid)).filter(i => !isScene(i)).forEach(i => {
+    const at = sceneAt(i);
+    if (sceneOf(i) === sid && at !== sid) { const b = box(i), inside = b.x + b.w / 2 > sb.x && b.x + b.w / 2 < sb.x + sb.w && b.y + 20 > sb.y && b.y + 20 < sb.y + sb.h; if (!inside) release(i, lane); }
+    else if (!sceneOf(i) && at === sid) { const b = box(i); join(i, sid, b.x - sb.x, b.y - sb.y); }
+  });
+}
+function growScene(sid, w, h, except) {   // a scene got bigger: make room around it on every board it is on
+  const o = it(sid), ow = o.w || SCW, oh = o.h || SCH; o.w = Math.max(ow, snap(w + 10)); o.h = Math.max(oh, snap(h + 10));
+  makeRoom(sid, ow, oh, except);
+}
+function makeRoom(sid, ow, oh, except) {
+  const o = it(sid), dw = o.w - ow, dh = o.h - oh; if (dw <= 0 && dh <= 0) return;
+  lanesOf(sid).filter(k => k !== except && (o.at || {})[k]).forEach(k => {
+    const a = o.at[k];
+    inTab(o.s, k).filter(i => i !== sid && !sceneOf(i) && (it(i).at || {})[k]).forEach(i => {
+      const b = box(i, k), p = it(i).at[k];
+      if (dh > 0 && b.y >= a.y + oh - 1 && b.x < a.x + o.w && b.x + b.w > a.x) p.y += dh;
+      else if (dw > 0 && b.x >= a.x + ow - 1 && b.y < a.y + o.h && b.y + b.h > a.y) p.x += dw;
+    });
+  });
+}
+function seed(key) {   // a board's first look: the vault's plans aimed at a coming session
+  const want = Object.values(P).filter(p => p.lanes.includes(key) && sessNum(p.target) > CUR), next = {};
+  const tabFor = p => { const t = "S" + sessNum(p.target); if (!doc.sessions.includes(t)) { doc.sessions.push(t); sortSessions(); } return t; };
+  const put = (p, extra) => { const id = "p:" + p.id, o = it(id);
+    if (o) { if (!o.homes.includes(key)) o.homes.push(key); return o; }
+    return doc.items[id] = {s: tabFor(p), homes: [key], born: key, at: {}, ...extra}; };
+  want.filter(p => p.kind === "scene").forEach(p => {
+    const inner = Object.values(P).filter(q => q.scene === p.id && q.target === p.target), was = it("p:" + p.id);
+    put(p, {w: SCW, h: Math.max(SCH, 132 + inner.length * 176)});
+    if (!was) inner.forEach((q, i) => { if (!it("p:" + q.id)) doc.items["p:" + q.id] = {s: tabFor(q), homes: [key], born: key, at: {}, scene: "p:" + p.id, rx: 22, ry: 132 + i * 176}; });
+  });
+  want.filter(p => p.kind !== "scene").forEach(p => { const o = it("p:" + p.id); if (!(o && o.scene)) put(p); });
+  doc.seeded.push(key);
+}
+function sortSessions() { doc.sessions = [...new Set(doc.sessions)].sort((a, b) => (sessNum(a) || 1e9) - (sessNum(b) || 1e9)); if (!doc.sessions.includes("Later")) doc.sessions.push("Later"); }
 const parseClock = c => { const m = String(c || "").match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/); return m ? [Math.min(+m[1], +m[2]), +m[2]] : [0, 4]; };
 function ring(f, n, sz) {
   const r = sz / 2 - 2, c = sz / 2, pt = a => `${(c + r * Math.cos(a)).toFixed(2)},${(c + r * Math.sin(a)).toFixed(2)}`;
@@ -253,7 +335,7 @@ function extras(o) {   // what a scene or clock adds to its card
   return h;
 }
 
-/* ---------- session plan: every board's scenes for a session, in running order ---------- */
+/* ---------- session plan: every scene of a session, in running order ---------- */
 const RUN = "@session", PCS = D.lanes.filter(l => l.kind === "pc");
 let runMode = false, runTab = null;
 const opened = new Set();
@@ -264,110 +346,231 @@ function pcOf(name) {   // a player character's key, "party", or null
   const p = PCS.find(q => lc(q.key) === n || (q.aliases || []).some(a => lc(a) === n));
   return p ? p.key : null;
 }
-const pcChip = (p, inn, tip) => `<span class="pcx${inn ? " in" : ""}" style="--c:${esc(p.colour)}" title="${esc(tip)}">${esc(p.short)}</span>`;
 function withLane(k, fn) { const keep = lane; lane = k; try { return fn(); } finally { lane = keep; } }
 const shortOf = k => (D.lanes.find(l => l.key === k) || {}).short || k;
 const boardName = k => k === "world" ? "Around the party" : shortOf(k) + "’s board";
-function runSessions() {
-  const set = new Set();
-  D.lanes.forEach(l => withLane(l.key, () => L().sessions.forEach(t => { if (t !== "Later") set.add(t); })));
-  return [...set].sort((a, b) => sessNum(a) - sessNum(b));
+const runSessions = () => doc.sessions.filter(t => t !== "Later");
+const scenesIn = t => {
+  const all = Object.keys(doc.items).filter(i => live(i) && isScene(i) && sessOf(i) === t), ord = (doc.order || {})[t] || [];
+  return ord.filter(i => all.includes(i)).concat(all.filter(i => !ord.includes(i)));
+};
+const looseIn = t => Object.keys(doc.items).filter(i => live(i) && !isScene(i) && !sceneOf(i) && sessOf(i) === t);
+function runOrder() { const o = {}; runSessions().forEach(t => { const s = scenesIn(t); if (s.length) o[t] = s; }); return o; }
+function pills(id) {   // the boards a scene is on: filled, listed as present; outlined, on their board only
+  const ks = lanesOf(id), cast = castLanes(id);
+  return D.lanes.filter(l => ks.includes(l.key)).map(l => `<button class="pcx${cast.includes(l.key) ? " in" : ""}" style="--c:${esc(l.colour || "#b9ab95")}" data-go="${esc(l.key)}" data-id="${esc(id)}" ` +
+    `title="${esc(cast.includes(l.key) || l.kind !== "pc" ? "" : "Not listed as present. ")}Open this scene on ${esc(boardName(l.key))}">${esc(l.short)}</button>`).join("");
 }
-function runScenes(t) {   // the scenes every board places in session t, in Tom's order; and the cards outside every scene
-  const m = new Map(), loose = [], seenLoose = new Set();
-  D.lanes.forEach(l => withLane(l.key, () => {
-    const k = l.key, ids = inTab(t);
-    ids.filter(isScene).forEach(id => {
-      const plan = id.startsWith("p:"), uid = plan ? id : k + "|" + id;
-      const o = plan ? view_of(id.slice(2)) : L().cards[id.slice(2)];
-      let s = m.get(uid);
-      if (!s) m.set(uid, s = {uid, id, boards: [], title: titleOf(id), where: o.where || "", present: o.present || [], text: (plan ? o.summary : o.text) || "",
-        ready: plan && o.status === "ready", mine: !plan, edited: plan && o.edited, cut: plan && !!cut[id.slice(2)], members: [], seen: new Set()});
-      if (!s.boards.includes(k)) s.boards.push(k);
-      membersOf(id).sort((a, b) => where(a).y - where(b).y).forEach(x => {
-        const mu = x.startsWith("p:") ? x : k + "|" + x; if (s.seen.has(mu)) return; s.seen.add(mu);
-        const mo = x.startsWith("p:") ? view_of(x.slice(2)) : L().cards[x.slice(2)], kd = kindOf(x) || "beat";
-        s.members.push({id: x, board: k, kind: kd, title: titleOf(x), clock: kd === "clock" ? parseClock(mo.clock) : null});
-      });
-    });
-    ids.filter(x => !isScene(x) && !sceneOf(x)).forEach(x => {
-      const u = x.startsWith("p:") ? x : k + "|" + x; if (seenLoose.has(u)) return; seenLoose.add(u);
-      loose.push({id: x, board: k, kind: kindOf(x) || "beat", title: titleOf(x)});
-    });
-  }));
-  const ord = (doc.order || {})[t] || [], all = [...m.values()];
-  return {scenes: ord.filter(u => m.has(u)).map(u => m.get(u)).concat(all.filter(x => !ord.includes(x.uid))), loose};
+function treeOf(sid) {   // a scene's cards under the cards that lead to them, by the arrows
+  const pos = m => [it(m).ry || 0, it(m).rx || 0];
+  const ms = membersOf(sid).sort((a, b) => pos(a)[0] - pos(b)[0] || pos(a)[1] - pos(b)[1]), inn = new Set(ms);
+  const es = genEdges().filter(e => inn.has(e.to) && e.from !== e.to), par = {}, lab = {}, also = {}, kids = {};
+  ms.forEach(m => {
+    const cands = es.filter(e => e.to === m && inn.has(e.from)), own = cands.filter(e => e.own).reverse();   // Tom's latest arrow wins
+    const pick = [...own, ...cands.filter(e => !e.own)].find(e => { for (let x = e.from; x; x = par[x]) if (x === m) return false; return true; });
+    if (pick) { par[m] = pick.from; lab[m] = pick.label === "then" ? "" : pick.label; }
+    else { const top = es.find(e => e.to === m && e.from === sid); if (top) lab[m] = top.label; }
+    also[m] = cands.filter(e => e !== pick).map(e => e.from);
+    (kids[par[m] || ""] ||= []).push(m);
+  });
+  return {ms, par, lab, also, kids, under: m => { const out = [m]; for (let i = 0; i < out.length; i++) out.push(...(kids[out[i]] || [])); return out; }};
 }
-function runOrder() { const o = {}; runSessions().forEach(t => { const sc = runScenes(t).scenes; if (sc.length) o[t] = sc.map(x => x.uid); }); return o; }
-function scenePcs(s) {   // filled: listed as present; outlined: on their board, not listed as present
-  const inn = new Set(), thread = new Set();
-  s.present.forEach(n => { const p = pcOf(n); if (p === "party") PCS.forEach(x => inn.add(x.key)); else if (p) inn.add(p); });
-  s.boards.forEach(k => { if (k === "The Party") PCS.forEach(x => thread.add(x.key)); else if (PCS.some(x => x.key === k)) thread.add(k); });
-  return PCS.filter(p => inn.has(p.key) || thread.has(p.key))
-    .map(p => pcChip(p, inn.has(p.key), inn.has(p.key) ? `${p.key}: present` : `${p.key}: their thread, not listed as present`)).join("");
+function treeHtml(sid, tr, root) {
+  const list = tr.kids[root] || []; if (!list.length) return "";
+  return `<ul class="tree">` + list.map(m => {
+    const k = kindOf(m) || "beat", o = objOf(m), [f, n] = parseClock(o.clock);
+    return `<li><div class="tr${m.startsWith("p:") && cut[m.slice(2)] ? " cut" : ""}" data-card="${esc(m)}"><span class="rg" title="Drag to move it">⠿</span><span class="mk k-${esc(k)}">${esc(KINDS[k] || "Beat")}</span>` +
+      `<span class="tt">${tr.lab[m] ? `<i class="el">${esc(tr.lab[m])}</i> ` : ""}${esc(titleOf(m))}</span>${k === "clock" ? `<span class="rng">${ring(f, n, 18)}</span>` : ""}` +
+      (tr.also[m].length ? `<small>also after ${esc(tr.also[m].map(titleOf).join(", "))}</small>` : "") + `</div>${treeHtml(sid, tr, m)}</li>`;
+  }).join("") + `</ul>`;
 }
-function runCard(s, i) {
-  const others = s.present.filter(n => !pcOf(n)), op = opened.has(s.uid);
-  return `<div class="rc${s.mine ? " mine" : ""}${s.cut ? " cut" : ""}" data-uid="${esc(s.uid)}">` +
+function runCard(id, i) {
+  const o = objOf(id), mine = id.startsWith("c:"), op = opened.has(id), tr = treeOf(id), others = (o.present || []).filter(n => !pcOf(n)), text = (mine ? o.text : o.summary) || "";
+  return `<div class="rc${!mine && cut[id.slice(2)] ? " cut" : ""}" data-uid="${esc(id)}">` +
     `<span class="rg" title="Drag to move it in the running order">⠿</span><span class="rn">${i + 1}</span>` +
-    `<div class="rb"><div class="rt"><b>${esc(s.title)}</b>${s.ready ? '<span class="ch ready">ready</span>' : ""}` +
-    `${s.mine ? '<span class="ch ed">yours · not in vault</span>' : s.edited ? '<span class="ch ed">edited</span>' : ""}</div>` +
-    `<div class="rw">${s.where ? "At " + esc(s.where) : "<i>Where not set</i>"}${others.length ? " · with " + others.map(esc).join(", ") : ""}</div>` +
-    `<div class="pcs">${scenePcs(s)}</div></div>` +
-    `<button class="rx" aria-expanded="${op}" title="${op ? "Hide" : "Show"} what happens in this scene">${op ? "▾" : "▸"} ${s.members.length}</button>` +
-    (op ? `<div class="rm">${s.text ? `<p>${esc(s.text)}</p>` : ""}` +
-      (s.members.length ? `<ul>${s.members.map(m => `<li data-go="${esc(m.board)}" data-id="${esc(m.id)}" title="Open it on ${esc(boardName(m.board))}"><span class="mk k-${esc(m.kind)}">${esc(KINDS[m.kind] || "Beat")}</span>` +
-        `<span>${esc(m.title)}</span>${m.clock ? `<span class="rng">${ring(m.clock[0], m.clock[1], 18)}</span>` : ""}<small>${esc(shortOf(m.board))}</small></li>`).join("")}</ul>`
-        : `<p class="muted">Nothing set in this scene yet. Drag beats, decisions and clocks into it on ${esc(boardName(s.boards[0]))}.</p>`) +
-      `<div class="acts">${s.boards.map(k => `<button data-go="${esc(k)}" data-id="${esc(s.id)}">Open on ${esc(boardName(k))}</button>`).join("")}</div></div>` : "") + `</div>`;
+    `<div class="rb"><div class="rt"><b>${esc(titleOf(id))}</b>${!mine && o.status === "ready" ? '<span class="ch ready">ready</span>' : ""}` +
+    `${mine ? '<span class="ch ed">yours · not in vault</span>' : o.edited ? '<span class="ch ed">edited</span>' : ""}</div>` +
+    `<div class="rw">${o.where ? "At " + esc(o.where) : "<i>Where not set</i>"}${others.length ? " · with " + others.map(esc).join(", ") : ""}</div>` +
+    `<div class="pcs">${pills(id)}</div></div>` +
+    `<button class="rx" aria-expanded="${op}" title="Show or hide what happens in this scene">${op ? "▾" : "▸"} ${tr.ms.length}</button>` +
+    `<div class="rm"${op ? "" : " hidden"}>${text ? `<p>${esc(text)}</p>` : ""}` + (treeHtml(id, tr, "") || `<p class="muted">Nothing in this scene yet. Drag a card here.</p>`) +
+    `<div class="acts"><button data-edit="${esc(id)}">Edit scene</button></div></div></div>`;
 }
+let runQ = "", runTray = false;
 function drawRun() {
   const ts = runSessions(); if (!ts.includes(runTab)) runTab = ts[0];
-  const t = runTab, {scenes, loose} = runScenes(t), all = scenes.length && scenes.every(x => opened.has(x.uid));
-  $("#rsess").innerHTML = ts.map(x => `<button role="tab" data-rtab="${esc(x)}" aria-selected="${x === t}">${esc(x)}${sessNum(x) === CUR + 1 ? " · next" : ""}<small>${runScenes(x).scenes.length}</small></button>`).join("");
-  $$("#rsess [data-rtab]").forEach(b => b.onclick = () => { runTab = b.dataset.rtab; drawRun(); $("#run").scrollTop = 0; });
-  $("#run").innerHTML = `<div class="runh"><span><b>Running order · ${esc(t)}</b> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"} from every board</span>` +
-    (scenes.length ? `<span>Drag a scene by its ⠿ to move it. Tap it to see what happens in it. <button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button></span>` : "") + `</div>` +
-    (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add a scene on a character's board (+ Scene) and drag its beats, decisions and clocks inside; it shows up here.</p>`);
-  const by = {}; loose.forEach(x => (by[x.board] ||= []).push(x));
-  $("#loose").innerHTML = `<div class="trayh"><b>Not in a scene</b></div><p class="muted" style="font-size:13.5px;margin:6px 0 0">Cards in ${esc(t)} outside every scene. Tap one to open it on its board.</p><div class="tlist loose">` +
-    (Object.keys(by).length ? Object.entries(by).map(([k, xs]) => { const p = PCS.find(q => q.key === k);
-      return `<h4>${p ? pcChip(p, true, k) : esc(shortOf(k))}</h4>` + xs.map(x => `<div class="li k-${esc(x.kind)}" data-go="${esc(k)}" data-id="${esc(x.id)}"><span class="mk k-${esc(x.kind)}">${esc(KINDS[x.kind] || "Beat")}</span> ${esc(x.title)}</div>`).join(""); }).join("")
-      : `<p class="empty">Every card in ${esc(t)} sits in a scene.</p>`) + `</div>`;
-  $$("#runw [data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); goto(b.dataset.go, t, b.dataset.id); });
+  const t = runTab, scenes = scenesIn(t), all = scenes.length && scenes.every(x => opened.has(x)), top = $("#run").scrollTop;
+  $("#rsess").innerHTML = ts.map(x => `<button role="tab" data-rtab="${esc(x)}" aria-selected="${x === t}">${esc(x)}${sessNum(x) === CUR + 1 ? " · next" : ""}<small>${scenesIn(x).length}</small></button>`).join("");
+  $$("#rsess [data-rtab]").forEach(b => b.onclick = () => { runTab = b.dataset.rtab; closeDrawer(); drawRun(); $("#run").scrollTop = 0; });
+  $("#run").innerHTML = `<div class="runh"><span><b>Running order · ${esc(t)}</b> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"}</span>` +
+    (scenes.length ? `<button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button>` : "") + `</div>` +
+    (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add one on a character's board (+ Scene), or drag a scene in from the plans on the right.</p>`);
+  $("#run").scrollTop = top;
+  drawLoose(t);
+  $$("#run [data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); goto(b.dataset.go, t, b.dataset.id); });
+  $$("#run [data-edit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openHere(b.dataset.edit); });
   $$("#run .rx").forEach(b => b.onclick = ev => { ev.stopPropagation(); toggleRun(b.closest(".rc").dataset.uid); });
-  const ax = $("#run [data-allx]"); if (ax) ax.onclick = () => { scenes.forEach(x => all ? opened.delete(x.uid) : opened.add(x.uid)); drawRun(); };
+  const ax = $("#run [data-allx]"); if (ax) ax.onclick = () => { scenes.forEach(x => all ? opened.delete(x) : opened.add(x)); drawRun(); };
   $$("#run .rc").forEach(el => runDrag(el, t));
+  $$("#run .tr").forEach(el => cardDrag(el, el.dataset.card));
+  if (shown) $$(`[data-card]`).forEach(x => x.classList.toggle("on", x.dataset.card === shown));
 }
-function toggleRun(u) { if (opened.has(u)) opened.delete(u); else opened.add(u); drawRun(); }
-function runDrag(el, t) {
+function drawLoose(t) {
+  const loose = looseIn(t), by = {}; loose.forEach(i => (by[lanesOf(i)[0]] ||= []).push(i));
+  const row = (id, sub) => `<div class="li k-${esc(kindOf(id) || "beat")}" data-card="${esc(id)}"><span class="rg" title="Drag it into a scene">⠿</span><div><span class="mk k-${esc(kindOf(id) || "beat")}">${esc(KINDS[kindOf(id)] || "Beat")}</span> ${esc(titleOf(id))}${sub ? `<small>${esc(sub)}</small>` : ""}</div></div>`;
+  const q = lc(runQ), free = Object.values(P).filter(p => !it("p:" + p.id) && !(doc.edits[p.id] || {}).drop && (!q || lc(p.id + " " + p.summary).includes(q))).sort((a, b) => a.id.localeCompare(b.id));
+  $("#loose").innerHTML = `<div class="tlist loose"><div class="trayh"><b>Not in a scene</b></div><p class="muted">Cards in ${esc(t)} outside every scene. Drag one into a scene.</p>` +
+    (loose.length ? D.lanes.filter(l => by[l.key]).map(l => `<h4>${l.kind === "pc" ? `<span class="pcx in" style="--c:${esc(l.colour)}">${esc(l.short)}</span>` : esc(l.short)}</h4>` + by[l.key].map(i => row(i)).join("")).join("")
+      : `<p class="empty">Every card in ${esc(t)} sits in a scene.</p>`) +
+    `<details class="free"${runTray || q ? " open" : ""}><summary><b>Plans not placed</b> <small>${free.length}</small></summary><input type="search" id="run-q" placeholder="Find a plan" autocomplete="off" value="${esc(runQ)}">` +
+    (free.map(p => row("p:" + p.id, p.lanes.map(shortOf).join(", "))).join("") || `<p class="empty">No unplaced plans${q ? " match" : ""}.</p>`) + `</details></div>`;
+  $("#loose details").ontoggle = e => { runTray = e.target.open; };
+  $("#run-q").oninput = e => { runQ = e.target.value; runTray = true; const at = e.target.selectionStart; drawLoose(t); const n = $("#run-q"); n.focus(); n.setSelectionRange(at, at); };
+  $$("#loose [data-card]").forEach(el => cardDrag(el, el.dataset.card));
+}
+function toggleRun(u) {
+  const on = !opened.has(u); if (on) opened.add(u); else opened.delete(u);
+  const el = $$("#run .rc").find(x => x.dataset.uid === u); if (el) expand(el, on);
+}
+function expand(el, on) {
+  el.querySelector(".rm").hidden = !on; const x = el.querySelector(".rx"); x.setAttribute("aria-expanded", on); x.textContent = (on ? "▾ " : "▸ ") + x.textContent.slice(2);
+}
+function openHere(id) {   // its panel, without leaving the session plan
+  const ks = it(id) ? lanesOf(id) : P[id.slice(2)].lanes; if (!ks.includes(lane)) lane = ks[0] || D.lanes[0].key;
+  open(id); $$("[data-card]").forEach(x => x.classList.toggle("on", x.dataset.card === id));
+}
+const rtabUnder = e => $$("#rsess [data-rtab]").find(b => inRect(e, b));
+function edgeScroll(e) { const l = $("#run"), r = l.getBoundingClientRect(); if (e.clientY < r.top + 40) l.scrollTop -= 14; else if (e.clientY > r.bottom - 40) l.scrollTop += 14; }
+function watch(mv, up) {   // follow the pointer until it lifts; cancel undoes
+  const end = e => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", end); window.removeEventListener("pointercancel", end); up(e, e.type === "pointercancel"); };
+  window.addEventListener("pointermove", mv); window.addEventListener("pointerup", end); window.addEventListener("pointercancel", end);
+}
+let dragEnd = 0;
+function runDrag(el, t) {   // a scene card: in the running order, or onto another session's tab
+  el.addEventListener("click", ev => { if (Date.now() - dragEnd > 300 && !ev.target.closest("button,a,.rm,.rg")) toggleRun(el.dataset.uid); });
   el.addEventListener("pointerdown", ev => {
-    if (ev.button > 0 || ev.target.closest("button,li,a")) return;
-    const grip = !!ev.target.closest(".rg");
-    if (!grip && ev.pointerType !== "mouse") { const u = el.dataset.uid; el.addEventListener("click", () => toggleRun(u), {once: true}); return; }   // touch: the grip drags, a tap opens
+    if (ev.button > 0 || ev.target.closest("button,a,.rm")) return;
+    if (!ev.target.closest(".rg") && ev.pointerType !== "mouse") return;   // touch: the grip drags
     ev.preventDefault();
-    const list = $("#run"), st = ev.clientY; let moved = false;
-    const mv = e => {
-      if (!moved && Math.abs(e.clientY - st) < 5) return;
+    const st = {x: ev.clientX, y: ev.clientY}; let moved = false;
+    watch(e => {
+      if (!moved && Math.hypot(e.clientX - st.x, e.clientY - st.y) < 5) return;
       moved = true; el.classList.add("drag");
-      const after = $$("#run .rc").filter(x => x !== el).find(x => { const r = x.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; });
-      if (after) { if (el.nextElementSibling !== after) list.insertBefore(el, after); } else if (list.lastElementChild !== el) list.append(el);
+      const tb = rtabUnder(e); $$("#rsess button").forEach(x => x.classList.toggle("drop", x === tb && tb.dataset.rtab !== t)); if (tb) return;
+      const mid = x => { const r = x.getBoundingClientRect(); return r.top + r.height / 2; };   // the others move round it, so a touch drag keeps its target
+      for (let p; (p = el.previousElementSibling) && p.matches(".rc") && e.clientY < mid(p);) el.after(p);
+      for (let n; (n = el.nextElementSibling) && n.matches(".rc") && e.clientY > mid(n);) el.before(n);
       $$("#run .rc .rn").forEach((n, i) => { n.textContent = i + 1; });
-      const r = list.getBoundingClientRect(); if (e.clientY < r.top + 40) list.scrollTop -= 14; else if (e.clientY > r.bottom - 40) list.scrollTop += 14;
-    };
-    const up = () => {
-      window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); window.removeEventListener("pointercancel", up);
-      el.classList.remove("drag");
-      if (!moved) { if (!grip) toggleRun(el.dataset.uid); return; }
-      (doc.order ||= {})[t] = $$("#run .rc").map(x => x.dataset.uid); changed(); drawRun();
-    };
-    window.addEventListener("pointermove", mv); window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up);
+      edgeScroll(e);
+    }, (e, off) => {
+      el.classList.remove("drag"); $$("#rsess button").forEach(x => x.classList.remove("drop"));
+      if (!moved) return;
+      dragEnd = Date.now(); const tb = rtabUnder(e);
+      if (off) { drawRun(); return; }
+      if (tb && tb.dataset.rtab !== t) { moveTo(el.dataset.uid, tb.dataset.rtab); return; }
+      doc.order[t] = $$("#run .rc").map(x => x.dataset.uid); changed(); drawRun();
+    });
   });
 }
-function goto(k, t, id) {
-  pick(k);
-  if (L().sessions.includes(t) && T() !== t) openTab(t);
-  if (id && where(id)) open(id);
+function cardDrag(el, id) {   // a card: into a scene, under or beside another card, back out, or onto another session's tab
+  el.addEventListener("click", () => { if (Date.now() - dragEnd > 300) openHere(id); });
+  el.addEventListener("pointerdown", ev => {
+    if (ev.button > 0 || (!ev.target.closest(".rg") && ev.pointerType !== "mouse")) return;
+    ev.preventDefault(); ev.stopPropagation();
+    const st = {x: ev.clientX, y: ev.clientY}, from = it(id) ? sceneOf(id) : null, mine = from ? treeOf(from).under(id) : [id], scene = isScene(id);
+    let ghost = null, spot = null, timer = null, over = null;
+    const clear = () => { $$(".in-on,.in-before,.in-after,.rc.hot,#loose.over").forEach(x => x.classList.remove("in-on", "in-before", "in-after", "hot", "over")); $$("#rsess button").forEach(x => x.classList.remove("drop")); };
+    watch(e => {
+      if (!ghost) {
+        if (Math.hypot(e.clientX - st.x, e.clientY - st.y) < 5) return;
+        ghost = document.createElement("div"); ghost.className = `bn ghost k-${kindOf(id) || "beat"}`;
+        ghost.innerHTML = `<div class="t">${esc(titleOf(id))}${mine.length > 1 ? ` <small>+ ${mine.length - 1} under it</small>` : ""}</div><div class="s"></div>`; document.body.append(ghost);
+      }
+      ghost.style.left = e.clientX + 12 + "px"; ghost.style.top = e.clientY + 10 + "px";
+      clear(); spot = null; let say = "";
+      const tb = rtabUnder(e), hit = document.elementFromPoint(e.clientX, e.clientY), row = hit && hit.closest("#run .tr"), rc = hit && hit.closest("#run .rc");
+      if (tb) { if (tb.dataset.rtab !== runTab) { tb.classList.add("drop"); spot = {tab: tb.dataset.rtab}; say = `move to ${tb.dataset.rtab}`; } }
+      else if (hit && hit.closest("#loose")) { if (it(id) && from) { $("#loose").classList.add("over"); spot = {out: 1}; say = "take it out of its scene"; } }
+      else if (scene) { if (hit && hit.closest("#run")) { spot = {scene: 1, before: rc ? rc.dataset.uid : null}; if (rc) rc.classList.add("in-before"); say = `a scene in ${runTab}`; } }
+      else if (row && !mine.includes(row.dataset.card)) {
+        const to = row.dataset.card, r = row.getBoundingClientRect(), f = (e.clientY - r.top) / r.height, sid = rc.dataset.uid, tr = treeOf(sid), up = tr.par[to];
+        if (f < .28) { spot = {sid, parent: up, before: to}; row.classList.add("in-before"); }
+        else if (f > .72) { spot = {sid, parent: up, after: to}; row.classList.add("in-after"); }
+        else { spot = {sid, parent: to}; row.classList.add("in-on"); }
+        say = spot.parent ? `follows “${titleOf(spot.parent)}”` : "starts in this scene";
+      } else if (rc && !row) { spot = {sid: rc.dataset.uid}; rc.classList.add("hot"); say = `in “${titleOf(rc.dataset.uid)}”`; }
+      ghost.querySelector(".s").textContent = say;
+      if (rc !== over) { clearTimeout(timer); over = rc; if (rc && !opened.has(rc.dataset.uid)) timer = setTimeout(() => { opened.add(rc.dataset.uid); expand(rc, true); }, 550); }
+      edgeScroll(e);
+    }, (e, off) => {
+      clearTimeout(timer); clear(); if (!ghost) return;
+      ghost.remove(); dragEnd = Date.now();
+      if (off || !spot) return;
+      if (spot.tab) { if (it(id)) moveTo(id, spot.tab); else { putPlan(id, spot.tab); changed(); drawRun(); } }
+      else if (spot.out) { mine.forEach(m => release(m)); changed(); drawRun(); }
+      else if (spot.scene) {
+        putPlan(id, runTab); const ord = scenesIn(runTab).filter(x => x !== id), i = spot.before ? ord.indexOf(spot.before) : -1;
+        ord.splice(i < 0 ? ord.length : i, 0, id); doc.order[runTab] = ord; changed(); drawRun();
+      } else dropInto(id, spot, mine);
+    });
+  });
+}
+function putPlan(id, t) {   // an unplaced plan joins session t, on the boards it is tied to
+  const p = P[id.slice(2)], homes = p.lanes.length ? [...p.lanes] : [D.lanes[0].key];
+  doc.items[id] = {s: t, homes, born: homes[0], at: {}, ...(isScene(id) ? {w: SCW, h: SCH} : {})};
+}
+function dropInto(id, spot, block) {   // put a card (and what follows it) into a scene, joined and placed the way it was dropped
+  const sid = spot.sid, from = it(id) ? sceneOf(id) : null, old = from ? treeOf(from) : null;
+  if (!it(id)) putPlan(id, sessOf(sid));
+  withLane(lanesOf(sid)[0], () => { ensureAt(sessOf(sid)); measure([sid, ...membersOf(sid), ...block]); });
+  const H = m => hs[m] || 110, inBlock = new Set(block), tr = treeOf(sid), o = it(sid);
+  const rel = block.map(m => from ? [m, (it(m).rx || 0) - (it(id).rx || 0), (it(m).ry || 0) - (it(id).ry || 0)] : [m, 0, 0]);
+  /* arrows: the one it hung from goes, the one it was dropped on comes. Dropped on the scene as a whole, it keeps the arrows it has */
+  const oldPar = old && old.par[id], members = new Set(membersOf(sid)), whole = !spot.before && !spot.after && !spot.parent;
+  if (whole && from !== sid) { const e = genEdges().filter(x => x.to === id && members.has(x.from)).pop(); if (e) spot.parent = e.from; }
+  else doc.edges = doc.edges.filter(e => e.to !== id || e.from === spot.parent || !(e.from === oldPar || (!spot.parent && (members.has(e.from) || (old && old.ms.includes(e.from))))));
+  if (spot.parent) {
+    const i = doc.edges.findIndex(e => e.from === spot.parent && e.to === id);
+    if (i >= 0) doc.edges.push(doc.edges.splice(i, 1)[0]);   // the latest arrow is the one the list follows
+    else addEdge(spot.parent, id);
+  }
+  /* place */
+  const others = tr.ms.filter(m => !inBlock.has(m)), bottom = ms => Math.max(...ms.map(m => it(m).ry + H(m)));
+  const branch = m => tr.under(m).filter(x => !inBlock.has(x)), kids = p => (tr.kids[p] || []).filter(x => !inBlock.has(x));
+  let x, y;
+  if (spot.before) { x = it(spot.before).rx; y = it(spot.before).ry; }
+  else if (spot.after) { x = it(spot.after).rx; y = bottom(branch(spot.after)) + 22; }
+  else if (spot.parent) { const ks = kids(spot.parent); x = ks.length ? it(ks[0]).rx : it(spot.parent).rx + CARDW + 80; y = ks.length ? bottom(ks.flatMap(branch)) + 22 : it(spot.parent).ry; }
+  else { const top = kids(""); x = top.length ? Math.min(...top.map(m => it(m).rx)) : 22; y = others.length ? bottom(others) + 22 : (hsh[sid] || 96) + 22; }
+  const minY = Math.min(...rel.map(r => r[2])), minX = Math.min(...rel.map(r => r[1]));
+  x = snap(Math.max(22, x)) - Math.min(0, minX + 0); y = snap(y + 5) - minY;
+  const wasScene = from === sid;
+  block.forEach(m => { if (!wasScene) { if (it(m).scene) release(m); } });
+  rel.forEach(([m, dx, dy]) => join(m, sid, snap(x + dx), snap(y + dy)));
+  /* nothing overlaps: whatever is in the way moves down */
+  const hit = (a, b) => it(a).rx < it(b).rx + CARDW + 10 && it(a).rx + CARDW + 10 > it(b).rx && it(a).ry < it(b).ry + H(b) + 10 && it(a).ry + H(a) + 10 > it(b).ry;
+  const fixed = [...block];
+  others.sort((a, b) => it(a).ry - it(b).ry).forEach(m => {
+    for (let n = 0, c; n < 60 && (c = fixed.find(f => hit(m, f))); n++) it(m).ry = snap(it(c).ry + H(c) + 22 + 10);
+    fixed.push(m);
+  });
+  const ms = membersOf(sid), needW = Math.max(...ms.map(m => it(m).rx + CARDW)) + 22, needH = bottom(ms) + 22;
+  if (needW > (o.w || SCW) || needH > (o.h || SCH)) growScene(sid, needW, needH);
+  opened.add(sid);
+  const want = spot.parent || "", got = treeOf(sid).par[id] || "";
+  changed(); drawRun();
+  if (want !== got && got) toast(`The vault already says “${titleOf(id)}” follows “${titleOf(got)}”, so it stays under it. Ask Claude to change that in the plan.`);
+}
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 6500); }
+function goto(k, t, id) {   // a scene on one character's board
+  pick(k); if (T() !== t) openTab(t);
+  if (id) reveal(id);
+}
+function reveal(id) {
+  const b = box(id); if (!b) return;
+  const r = board.getBoundingClientRect(), k = Math.min(1, Math.max(.3, Math.min((r.width - 60) / b.w, (r.height - 90) / b.h)));
+  view = {k, x: (r.width - b.w * k) / 2 - b.x * k, y: Math.max(50, (r.height - b.h * k) / 2) - b.y * k}; applyView();
+  const el = $$("#nodes .bn").find(x => x.dataset.id === id); if (el) { el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 1800); }
 }
 
 /* ---------- what-ifs (the same rules as build.py) ---------- */
@@ -414,8 +617,8 @@ function flip(r) {
 /* ---------- drawing ---------- */
 const secReq = p => p.req.filter(r => (r.k === "hidden" || r.k === "revealed") && F[r.a]);
 function planCard(id) {
-  const p = view_of(id), o = L().placed[id];
-  const mv = p.target && o && o.s.toUpperCase() !== p.target.toUpperCase() ? `vault says ${p.target}` : "";
+  const p = view_of(id), o = it("p:" + id), at = o && sessOf("p:" + id);
+  const mv = p.target && o && at.toUpperCase() !== p.target.toUpperCase() ? `vault says ${p.target}` : "";
   const checks = p.req.filter(r => r.k === "check").length;
   return `<div class="k"><span>${esc(KINDS[p.kind] || "Beat")}</span><span>${p.edited ? "edited · not in vault" : esc(p.status)}</span></div><div class="t">${esc(p.id)}</div>` +
     extras(p) + `<div class="s">${esc(p.summary)}</div>` +
@@ -444,13 +647,11 @@ function nowCard(n, kind) {
     (rows.length ? `<dl>${rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("")}</dl>` : "") +
     (n.recent && n.recent.length ? `<div class="k"><span>${head}</span></div><ul>${n.recent.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : "");
 }
-function titleOf(id) { if (id.startsWith("p:")) return id.slice(2); const c = L().cards[id.slice(2)]; return c ? (c.title || "untitled card") : id; }
+function titleOf(id) { if (id.startsWith("p:")) return id.slice(2); const c = doc.cards[id.slice(2)]; return c ? (c.title || "untitled card") : id; }
 function startCard(tab, idx) {
-  const s = L(), ln = D.lanes.find(x => x.key === lane);
+  const ln = D.lanes.find(x => x.key === lane);
   if (idx === 0) return nowCard(ln.now, ln.kind);
-  const prev = s.sessions[idx - 1];
-  const items = [...Object.entries(s.placed).filter(([, o]) => o.s === prev).map(([id]) => "p:" + id),
-    ...Object.entries(s.cards).filter(([, c]) => c.s === prev).map(([id]) => "c:" + id)];
+  const prev = doc.sessions[idx - 1], items = inTab(prev);
   const later = tab === "Later";
   return `<div class="k"><span>${later ? "Later · no session yet" : `End of ${esc(prev)} · as planned`}</span></div>` +
     `<div class="t">${later ? "Whenever it fits" : `After ${esc(prev)}`}</div>` +
@@ -459,17 +660,19 @@ function startCard(tab, idx) {
         : `<div class="s">Nothing planned for ${esc(prev)} yet.</div>`);
 }
 function draw() {
-  const s = L(), tab = T(), idx = s.sessions.indexOf(tab);
+  if (runMode) { drawRun(); return; }
+  const tab = T(), idx = doc.sessions.indexOf(tab);
+  ensureAt(tab);
   const ids = inTab(tab).sort((a, b) => isScene(b) - isScene(a));   // scenes underneath
   $("#nodes").innerHTML = `<div class="bn now ${idx ? "start" : ""}" data-id="start" style="left:${SX}px;top:${SY}px">${startCard(tab, idx)}</div>` + ids.map(cardHtml).join("");
   $$("#nodes .bn").forEach(el => { hs[el.dataset.id] = el.offsetHeight; const h = el.querySelector(".sh"); if (h) hsh[el.dataset.id] = h.offsetHeight; });
   sessTabs(); wires(); bindNodes(); tray(); applyView();
 }
 function cardHtml(id) {
-  const o = where(id), sc = isScene(id), mine = id.startsWith("c:");
+  const b = box(id) || {x: 0, y: 0, w: (it(id) || {}).w || SCW, h: (it(id) || {}).h || SCH}, sc = isScene(id), mine = id.startsWith("c:");
   let inner, cls;
   if (mine) {
-    const c = L().cards[id.slice(2)];
+    const c = doc.cards[id.slice(2)];
     inner = `<div class="k"><span>${esc(KINDS[c.kind] || "Note")}</span><span>yours · not in vault</span></div><div class="t">${esc(c.title || "Untitled")}</div>` + extras(c) +
       (c.text ? `<div class="s">${esc(c.text.length > 220 ? c.text.slice(0, 220) + "…" : c.text)}</div>` : "");
     cls = `mine k-${c.kind}`;
@@ -477,68 +680,91 @@ function cardHtml(id) {
     const pid = id.slice(2), p = view_of(pid);
     inner = planCard(pid); cls = `k-${p.kind}${p.edited ? " edited" : ""}${cut[pid] ? " cut" : ""}`;
   }
-  const xt = mine ? "Delete this card" : "Take it off the board (back to the tray)";
-  return `<div class="bn ${esc(cls)}${sc ? " scene" : ""}" data-id="${esc(id)}" style="left:${o.x}px;top:${o.y}px${sc ? `;width:${o.w || SCW}px;height:${o.h || SCH}px` : ""}">` +
+  const several = it(id) && !sceneOf(id) && lanesOf(id).length > 1;
+  const xt = several ? "Take it off this board" : mine ? "Delete this card" : "Back to the tray";
+  return `<div class="bn ${esc(cls)}${sc ? " scene" : ""}" data-id="${esc(id)}" style="left:${b.x}px;top:${b.y}px${sc ? `;width:${b.w}px;height:${b.h}px` : ""}">` +
     (sc ? `<div class="sh">${inner}</div><span class="rz" title="Drag to resize the scene"></span>` : inner) +
     `<button class="xx" title="${xt}" aria-label="${xt}">×</button><span class="hd" title="Drag to another card to link them"></span></div>`;
 }
 function sessTabs() {
-  const s = L(), tab = T();
-  const count = t => Object.values(s.placed).filter(o => o.s === t).length + Object.values(s.cards).filter(c => c.s === t).length;
-  $("#sess").innerHTML = s.sessions.map((t, i) => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t === tab}">${esc(t)}${i === 0 && t !== "Later" ? " · next" : ""}<small>${count(t)}</small>` +
-    (t === tab && t !== "Later" && s.sessions.length > 2 ? `<span class="dx" data-delsess title="Delete this session" aria-label="Delete ${esc(t)}">×</span>` : "") + `</button>`).join("") +
-    `<button class="add" data-addsess title="Add the session after the last one">+ Session</button>`;
+  const tab = T();
+  $("#sess").innerHTML = doc.sessions.map((t, i) => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t === tab}">${esc(t)}${i === 0 && t !== "Later" ? " · next" : ""}<small>${inTab(t).length}</small>` +
+    (t === tab && t !== "Later" && doc.sessions.length > 2 ? `<span class="dx" data-delsess title="Delete this session" aria-label="Delete ${esc(t)}">×</span>` : "") + `</button>`).join("") +
+    `<button class="add" data-addsess title="Add the session after the last one, on every board">+ Session</button>`;
   $$("#sess [data-tab]").forEach(b => b.onclick = ev => { if (ev.target.closest("[data-delsess]")) delSession(b.dataset.tab); else openTab(b.dataset.tab); });
   $("#sess [data-addsess]").onclick = () => {
-    const nums = s.sessions.map(sessNum).filter(Boolean), n = "S" + ((nums.length ? Math.max(...nums) : CUR) + 1);
-    s.sessions.splice(s.sessions.indexOf("Later") < 0 ? s.sessions.length : s.sessions.indexOf("Later"), 0, n); changed(); openTab(n);
+    const n = "S" + (Math.max(CUR, ...doc.sessions.map(sessNum)) + 1);
+    doc.sessions.push(n); sortSessions(); changed(); openTab(n);
   };
 }
-function delSession(t) {
-  const s = L(), n = sessNum(t);
-  const plans = Object.values(s.placed).filter(o => o.s === t).length, cards = Object.values(s.cards).filter(c => c.s === t).length;
-  const what = [plans ? `its ${plans} plan${plans > 1 ? "s go" : " goes"} back to the tray` : "", cards ? `your ${cards} card${cards > 1 ? "s move" : " moves"} to Later` : ""].filter(Boolean).join(" and ");
-  const later = s.sessions.filter(x => sessNum(x) > n);
-  if (!confirm(`Delete ${t}?` + (what ? ` ${what[0].toUpperCase() + what.slice(1)}.` : "") + (later.length ? ` ${later.join(", ")} move up one.` : ""))) return;
-  for (const [id, o] of Object.entries(s.placed)) if (o.s === t) { delete s.placed[id]; s.edges = s.edges.filter(e => e.from !== "p:" + id && e.to !== "p:" + id); }
-  for (const c of Object.values(s.cards)) if (c.s === t) { c.s = "Later"; const f = freeSpot("Later"); c.x = f.x; c.y = f.y; }
-  s.edges = s.edges.filter(e => e.from !== "start:" + t);
-  s.sessions = s.sessions.filter(x => x !== t);
+function delSession(t) {   // on every board
+  const n = sessNum(t), ids = Object.keys(doc.items).filter(i => sessOf(i) === t);
+  const plans = ids.filter(i => i.startsWith("p:") && live(i)), cards = ids.filter(i => i.startsWith("c:"));
+  const what = [plans.length ? `its ${plans.length} plan${plans.length > 1 ? "s go" : " goes"} back to the tray` : "", cards.length ? `your ${cards.length} card${cards.length > 1 ? "s move" : " moves"} to Later` : ""].filter(Boolean).join(" and ");
+  const later = doc.sessions.filter(x => sessNum(x) > n);
+  if (!confirm(`Delete ${t} on every board?` + (what ? ` ${what[0].toUpperCase() + what.slice(1)}.` : "") + (later.length ? ` ${later.join(", ")} move up one.` : ""))) return;
+  plans.forEach(erase);
+  Object.values(doc.items).forEach(o => { if (o.s === t) { o.s = "Later"; o.at = {}; } });
+  Object.values(doc.items).forEach(o => { const so = o.scene && it(o.scene); if (so) o.s = so.s; });
+  doc.edges = doc.edges.filter(e => e.from !== "start:" + t);
   const down = x => sessNum(x) > n ? "S" + (sessNum(x) - 1) : x;
-  s.sessions = s.sessions.map(down);
-  [...Object.values(s.placed), ...Object.values(s.cards)].forEach(o => { o.s = down(o.s); });
-  s.edges.forEach(e => { if (e.from.startsWith("start:")) e.from = "start:" + down(e.from.slice(6)); });
-  const i = Math.max(0, s.sessions.indexOf(down(later[0] || "")));
-  tabOf[lane] = s.sessions[later.length ? i : Math.max(0, s.sessions.length - 2)];
+  doc.sessions = doc.sessions.filter(x => x !== t).map(down);
+  Object.values(doc.items).forEach(o => { o.s = down(o.s); });
+  doc.edges.forEach(e => { if (e.from.startsWith("start:")) e.from = "start:" + down(e.from.slice(6)); });
+  const ord = {}; for (const k in doc.order) if (k !== t) ord[down(k)] = doc.order[k]; doc.order = ord;
+  views = {}; tabOf[lane] = later.length ? t : doc.sessions[Math.max(0, doc.sessions.length - 2)];
   changed(); closeDrawer(); draw(); fit();
 }
-function removeCard(id) {
-  if (id.startsWith("p:")) { unplace(id.slice(2)); return; }
-  const s = L(), c = s.cards[id.slice(2)];
-  if (!c || ((c.title || c.text) && !confirm(`Delete “${c.title || "this card"}”? This cannot be undone.`))) return;
-  delete s.cards[id.slice(2)]; s.edges = s.edges.filter(e => e.from !== id && e.to !== id); changed(); closeDrawer(); draw();
+function erase(id) {   // off every board; what it held stays, on its home boards
+  if (isScene(id)) membersOf(id).forEach(m => release(m));
+  delete doc.items[id]; doc.edges = doc.edges.filter(e => e.from !== id && e.to !== id);
+  if (id.startsWith("c:")) delete doc.cards[id.slice(2)];
 }
-function dropPlan(pid) {
-  const s = L(); s.edits[pid] = {...(s.edits[pid] || {}), drop: true}; unplace(pid);
+function unplace(pid) { erase("p:" + pid); changed(); closeDrawer(); draw(); }
+const names = ks => ks.map(boardName).join(", ").replace(/, ([^,]*)$/, " and $1");
+function deleteCard(id) {
+  const c = doc.cards[id.slice(2)], ks = lanesOf(id);
+  if (!c || ((c.title || c.text || ks.length > 1) && !confirm(`Delete “${c.title || "this card"}”${ks.length > 1 ? ` from ${names(ks)}` : ""}? This cannot be undone.`))) return;
+  erase(id); changed(); closeDrawer(); draw();
 }
+function setPresent(id, list) {
+  if (id.startsWith("c:")) { doc.cards[id.slice(2)].present = list; return; }
+  const pid = id.slice(2), e = {...(doc.edits[pid] || {}), present: list}; doc.edits[pid] = e;
+}
+function takeOff(id, k = lane) {   // the × on a card, or a drag to the tray
+  const o = it(id), ks = sceneOf(id) ? [] : lanesOf(id);
+  if (ks.length > 1) {
+    const rest = ks.filter(x => x !== k);
+    if (isScene(id)) {
+      const cast = castLanes(id).includes(k), whole = D.lanes.find(l => l.key === k).kind === "party";
+      if (!confirm(`Take “${titleOf(id)}” off ${boardName(k)}?${cast && !whole ? ` ${shortOf(k)} comes off who is present.` : ""} It stays on ${names(rest)}.`)) return;
+      if (cast) {
+        const list = [...new Set((objOf(id).present || []).flatMap(n => pcOf(n) === "party" ? PCS.map(p => p.key) : [n]))];
+        setPresent(id, list.filter(n => pcOf(n) !== k));
+      }
+    }
+    o.homes = o.homes.filter(x => x !== k); delete o.at[k]; if (!o.born || o.born === k) o.born = rest[0];
+    changed(); closeDrawer(); draw(); return;
+  }
+  if (id.startsWith("p:")) unplace(id.slice(2)); else deleteCard(id);
+}
+const removeCard = id => { if (it(id)) takeOff(id); };
+function dropPlan(pid) { doc.edits[pid] = {...(doc.edits[pid] || {}), drop: true}; if (it("p:" + pid)) unplace(pid); else { changed(); closeDrawer(); draw(); } }
 function openTab(t) {
   views[lane + "|" + T()] = {...view}; tabOf[lane] = t; closeDrawer(); draw();
   const v = views[lane + "|" + t]; if (v) { view = {...v}; applyView(); } else fit();
 }
-function box(id) {
-  if (id === "start") return {x: SX, y: SY, w: 300, h: hs.start || 200};
-  const o = where(id); if (!o) return null;
-  return isScene(id) ? {x: o.x, y: o.y, w: o.w || SCW, h: o.h || SCH, hh: hsh[id] || 96, sc: 1} : {x: o.x, y: o.y, w: CARDW, h: hs[id] || 110};
-}
-function genEdges() {
-  const s = L(), out = [];
-  for (const id of Object.keys(s.placed)) {
-    const p = P[id];
-    p.req.forEach(r => { if ((r.k === "plan" || r.k === "played") && s.placed[r.a]) out.push({from: "p:" + r.a, to: "p:" + id, label: "then"}); });
-    if (p.kind === "decision") p.options.forEach(o => { if (s.placed[o.to]) out.push({from: "p:" + id, to: "p:" + o.to, label: o.label, opt: 1}); });
+function genEdges() {   // every link between placed items: the vault's, then Tom's own
+  const out = [];
+  for (const id of Object.keys(doc.items)) {
+    if (!id.startsWith("p:") || !live(id)) continue;
+    const p = view_of(id.slice(2));
+    p.req.forEach(r => { if ((r.k === "plan" || r.k === "played") && live("p:" + r.a)) out.push({from: "p:" + r.a, to: id, label: "then"}); });
+    if (p.kind === "decision") p.options.forEach(o => { if (live("p:" + o.to)) out.push({from: id, to: "p:" + o.to, label: o.label, opt: 1}); });
   }
-  const seen = new Set(out.map(e => e.from + ">" + e.to));
-  return out.concat(s.edges.filter(e => !seen.has(e.from + ">" + e.to)).map(e => ({...e, own: 1})));
+  const best = new Map();   // a decision's option line beats the bare "needs" between the same two
+  out.forEach(e => { const k = e.from + ">" + e.to; if (!best.has(k) || e.opt) best.set(k, e); });
+  return [...best.values()].concat(doc.edges.filter(e => !best.has(e.from + ">" + e.to)).map(e => ({...e, own: 1})));
 }
 function curve(a, b, inside) {
   if (inside) {   // a scene to a card inside it: down from the header
@@ -550,11 +776,12 @@ function curve(a, b, inside) {
   return {d: `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`, mx: (x1 + x2) / 2, my: (y1 + y2) / 2};
 }
 function wires(temp) {
-  const s = L(), tab = T(), ti = s.sessions.indexOf(tab), order = x => s.sessions.indexOf(x);
+  const tab = T(), ti = doc.sessions.indexOf(tab), order = x => doc.sessions.indexOf(x), here = id => live(id) && lanesOf(id).includes(lane);
   let svg = '<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="rgba(124,22,34,.75)"/></marker></defs>', labels = "";
   const carried = new Set();
   genEdges().forEach(e => {
-    if (e.from.startsWith("start")) e = {...e, from: "start"};
+    if (e.from.startsWith("start")) { if (e.lane && e.lane !== lane) return; e = {...e, from: "start"}; }
+    if (!here(e.to) || (e.from !== "start" && !here(e.from))) return;
     const fs = e.from === "start" ? tab : sessOf(e.from), ts = sessOf(e.to);
     if (ts !== tab) return;
     let from = e.from, lab = e.label, cls = e.own ? "own" : e.opt ? "opt" : "";
@@ -577,19 +804,21 @@ function wires(temp) {
 
 /* ---------- tray ---------- */
 function tray() {
-  const s = L(), all = $("#tray-all").checked, q = $("#tray-q").value.trim().toLowerCase();
-  const list = Object.values(P).filter(p => !s.placed[p.id] && !(s.edits[p.id] || {}).drop && (all || p.lanes.includes(lane)) &&
-    (!q || (p.id + " " + p.summary).toLowerCase().includes(q)));
+  const all = $("#tray-all").checked, q = $("#tray-q").value.trim().toLowerCase();
+  const list = Object.values(P).filter(p => { const id = "p:" + p.id, o = it(id);
+    return !(o && lanesOf(id).includes(lane)) && !(doc.edits[p.id] || {}).drop && (all || (!(o && sceneOf(id)) && p.lanes.includes(lane))) &&
+      (!q || (p.id + " " + p.summary).toLowerCase().includes(q)); });
+  const elsewhere = p => { const id = "p:" + p.id, sc = it(id) && sceneOf(id); return !it(id) ? "" : `<span class="ch move">${esc(sc ? `in “${titleOf(sc)}”` : `on ${names(lanesOf(id))}`)} · ${esc(sessOf(id))}</span>`; };
   let h = "";
   PLANKINDS.forEach(k => {
     const ps = list.filter(p => (view_of(p.id).kind || "beat") === k).sort((a, b) => (a.status !== "ready") - (b.status !== "ready") || a.id.localeCompare(b.id));
     if (!ps.length) return;
     h += `<h4>${KINDS[k]}s</h4>` + ps.map(p => `<div class="ti k-${esc(k)} ${cut[p.id] ? "cut" : ""}" data-plan="${esc(p.id)}"><span class="g" title="Drag onto the board or a session tab">⠿</span><div>` +
-      `<div class="t">${esc(p.id)}</div><div class="s">${esc(view_of(p.id).summary)}</div><div class="chips">${p.status === "ready" ? '<span class="ch ready">ready</span>' : ""}${p.target ? `<span class="ch">${esc(p.target)}</span>` : ""}` +
+      `<div class="t">${esc(p.id)}</div><div class="s">${esc(view_of(p.id).summary)}</div><div class="chips">${p.status === "ready" ? '<span class="ch ready">ready</span>' : ""}${p.target ? `<span class="ch">${esc(p.target)}</span>` : ""}${elsewhere(p)}` +
       secReq(p).map(r => `<span class="ch">secret: ${esc(r.a)}</span>`).join("") + `</div></div></div>`).join("");
   });
-  if (!h) h = `<p class="empty">${Object.keys(s.placed).length ? "Every plan for this board is placed." : "No live plans for this board yet."} ${all ? "" : "Tick “every live plan” to pull one from another board, or add a card."}</p>`;
-  const gone = Object.keys(s.edits).filter(id => s.edits[id].drop && P[id]);
+  if (!h) h = `<p class="empty">${Object.keys(doc.items).some(i => live(i) && lanesOf(i).includes(lane)) ? "Every plan for this board is placed." : "No live plans for this board yet."} ${all ? "" : "Tick “every live plan” to pull one from another board, or add a card."}</p>`;
+  const s = doc, gone = Object.keys(s.edits).filter(id => s.edits[id].drop && P[id]);
   if (gone.length) h += `<h4>Dropped here</h4>` + gone.map(id => `<div class="gone"><s>${esc(id)}</s><button class="mini" data-undrop="${esc(id)}">Undo</button></div>`).join("") +
     `<p class="empty" style="font-size:13px">Claude marks these dropped in the vault when you bring the board in.</p>`;
   $("#tray-list").innerHTML = h;
@@ -613,7 +842,7 @@ function zoomAt(k, cx, cy) {
   view.x = px - (px - view.x) * k / view.k; view.y = py - (py - view.y) * k / view.k; view.k = k; applyView();
 }
 function fit() {
-  const r = board.getBoundingClientRect(), bs = ["start", ...$$("#nodes .bn").map(e => e.dataset.id)].map(box).filter(Boolean);
+  const r = board.getBoundingClientRect(), bs = ["start", ...$$("#nodes .bn").map(e => e.dataset.id)].map(i => box(i)).filter(Boolean);
   const x0 = Math.min(...bs.map(b => b.x)) - 30, y0 = Math.min(...bs.map(b => b.y)) - 30;
   const x1 = Math.max(...bs.map(b => b.x + b.w)) + 40, y1 = Math.max(...bs.map(b => b.y + b.h)) + 40;
   const k = Math.min(1, Math.max(.3, Math.min((r.width - 20) / (x1 - x0), (r.height - 20) / (y1 - y0))));
@@ -664,18 +893,17 @@ function bindNodes() {
     el.addEventListener("pointerdown", ev => {
       if (ev.target.closest(".hd,.xx,.rz,.rng,.ch.sec,a")) return;
       ev.stopPropagation();
-      const b = box(id), st = {x: ev.clientX, y: ev.clientY}, o = where(id); let moved = false;
-      const els = $$("#nodes .bn"), elOf = m => els.find(x => x.dataset.id === m);
-      const mem = isScene(id) ? membersOf(id).map(m => [m, where(m), {...box(m)}, elOf(m)]) : [];
+      const b = box(id), st = {x: ev.clientX, y: ev.clientY}, sc = isScene(id); let moved = false, nx = b.x, ny = b.y;
+      const els = $$("#nodes .bn"), mem = sc ? membersOf(id).map(m => [m, els.find(x => x.dataset.id === m)]) : [];
       cap(el, ev.pointerId);
       const mv = e => {
         const dx = (e.clientX - st.x) / view.k, dy = (e.clientY - st.y) / view.k;
         if (!moved && Math.hypot(dx, dy) < 5) return;
         moved = true; el.classList.add("drag");
-        o.x = Math.round(b.x + dx); o.y = Math.round(b.y + dy);
-        el.style.left = o.x + "px"; el.style.top = o.y + "px";
-        mem.forEach(([, mo, mb, me]) => { mo.x = Math.round(mb.x + dx); mo.y = Math.round(mb.y + dy); if (me) { me.style.left = mo.x + "px"; me.style.top = mo.y + "px"; } });
-        if (!mem.length) { const hot = sceneOf(id); els.forEach(x => x.classList.toggle("hot", x.dataset.id === hot)); }
+        nx = Math.round(b.x + dx); ny = Math.round(b.y + dy); setPos(id, nx, ny);
+        el.style.left = nx + "px"; el.style.top = ny + "px";
+        mem.forEach(([m, me]) => { if (me) { const mb = box(m); me.style.left = mb.x + "px"; me.style.top = mb.y + "px"; } });
+        if (!sc) { const hot = sceneAt(id); els.forEach(x => x.classList.toggle("hot", x.dataset.id === hot)); }
         wires();
         $("#tray").classList.toggle("over", id.startsWith("p:") && inRect(e, $("#tray")));
         const tb = tabUnder(e); $$("#sess button").forEach(x => x.classList.toggle("drop", x === tb && tb.dataset.tab !== T()));
@@ -684,30 +912,33 @@ function bindNodes() {
         el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up); el.removeEventListener("pointercancel", up);
         $("#tray").classList.remove("over"); $$("#sess button").forEach(x => x.classList.remove("drop"));
         if (!moved) { open(id); return; }
-        if (id.startsWith("p:") && inRect(e, $("#tray"))) { unplace(id.slice(2)); return; }
+        if (id.startsWith("p:") && inRect(e, $("#tray"))) { setPos(id, b.x, b.y); draw(); takeOff(id); return; }
         const tb = tabUnder(e);
-        if (tb && tb.dataset.tab !== T()) { o.x = b.x; o.y = b.y; mem.forEach(([, mo, mb]) => { mo.x = mb.x; mo.y = mb.y; }); moveTo(id, tb.dataset.tab, mem.map(m => m[0])); return; }
-        o.x = snap(o.x); o.y = snap(o.y); mem.forEach(([, mo]) => { mo.x = snap(mo.x); mo.y = snap(mo.y); }); changed(); draw();
+        if (tb && tb.dataset.tab !== T()) { setPos(id, b.x, b.y); moveTo(id, tb.dataset.tab); return; }
+        nx = snap(nx); ny = snap(ny); setPos(id, nx, ny);
+        if (sc) capture(id); else settle(id, nx, ny);
+        changed(); draw();
       };
       el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
     });
   });
 }
-function freeSpot(t) {
-  const bs = inTab(t).map(box).filter(b => b && b.x < FIRSTX + CARDW && b.x + b.w > FIRSTX);
-  return {x: FIRSTX, y: bs.length ? snap(Math.max(...bs.map(b => b.y + b.h)) + 44) : SY};
+function settle(id, x, y) {   // a card let go at x, y on this board: into the scene it is in, or out of the one it left
+  const to = sceneAt(id), was = sceneOf(id);
+  if (to === was) return;
+  if (to) { const sb = box(to); join(id, to, x - sb.x, y - sb.y); }
+  else { release(id, lane); it(id).at[lane] = {x, y}; }
 }
 function insideSpot(sid) {   // the next free place inside a scene; the scene grows to fit
-  const sb = box(sid), ms = membersOf(sid).map(box), o = where(sid);
-  const y = ms.length ? Math.max(...ms.map(b => b.y + b.h)) + 22 : sb.y + sb.hh + 22;
-  if (y + 170 > sb.y + sb.h) { o.w = sb.w; o.h = snap(y + 170 - sb.y); }
-  return {x: snap(sb.x + 22), y: snap(y)};
+  const ms = membersOf(sid), o = it(sid);
+  const y = ms.length ? Math.max(...ms.map(m => it(m).ry + (hs[m] || 110))) + 22 : snap((hsh[sid] || 96) + 22);
+  if (y + 170 > (o.h || SCH)) growScene(sid, o.w || SCW, y + 170);
+  return {rx: 22, ry: snap(y)};
 }
-function moveTo(id, t, carry) {
-  const o = where(id), mem = carry || (isScene(id) ? membersOf(id) : []), f = freeSpot(t), dx = f.x - o.x, dy = f.y - o.y;
-  o.s = t; o.x = f.x; o.y = f.y;
-  mem.forEach(m => { const mo = where(m); mo.s = t; mo.x += dx; mo.y += dy; });
-  L().edges = L().edges.filter(e => !(e.from.startsWith("start") && e.to === id));
+function moveTo(id, t) {   // to another session, on every board it is on; a scene takes its cards along
+  if (sceneOf(id)) release(id, runMode ? undefined : lane);
+  const o = it(id); o.s = t; o.at = {}; if (isScene(id)) membersOf(id).forEach(m => { it(m).s = t; });
+  doc.edges = doc.edges.filter(e => !(e.from.startsWith("start") && e.to === id));
   changed(); draw();
 }
 function link(ev, from) {
@@ -720,20 +951,26 @@ function link(ev, from) {
     const hit = document.elementsFromPoint(e.clientX, e.clientY).map(x => x.closest && x.closest(".bn")).find(Boolean);
     const to = hit && hit.dataset.id;
     if (!to || to === from || to === "start") { wires(); return; }
-    const id = "e" + Math.random().toString(36).slice(2, 9);
-    L().edges.push({id, from: from === "start" ? "start:" + T() : from, to, label: ""}); changed(); wires(); edgeEditor(id);
+    const id = addEdge(from === "start" ? "start:" + T() : from, to); changed(); wires(); edgeEditor(id);
   };
   t.addEventListener("pointermove", mv); t.addEventListener("pointerup", up);
 }
-function place(pid, t, x, y) {
-  let f;
-  if (x !== undefined) f = {x: snap(x), y: snap(y)};
-  else { const sc = P[pid].scene, so = sc && L().placed[sc]; f = so && so.s === t ? insideSpot("p:" + sc) : freeSpot(t); }   // the vault's scene, when it is here
-  L().placed[pid] = {s: t, x: f.x, y: f.y}; changed(); draw();
+function addEdge(from, to, label) {
+  const id = "e" + Math.random().toString(36).slice(2, 9), e = {id, from, to, label: label || ""};
+  if (from.startsWith("start")) e.lane = lane;
+  doc.edges.push(e); return id;
 }
-function unplace(pid) {
-  const s = L(); delete s.placed[pid];
-  s.edges = s.edges.filter(e => e.from !== "p:" + pid && e.to !== "p:" + pid); changed(); closeDrawer(); draw();
+function place(pid, t, x, y) {
+  const id = "p:" + pid, sc = P[pid].scene && "p:" + P[pid].scene; let o = it(id);
+  if (o && sceneOf(id)) release(id, lane);
+  if (!o) o = doc.items[id] = {s: t, homes: [], born: lane, at: {}};
+  if (!o.homes.includes(lane)) o.homes.push(lane);
+  if (o.s !== t) { o.s = t; o.at = {}; }
+  if (isScene(id)) { o.w ||= SCW; o.h ||= SCH; }
+  if (x !== undefined) { o.at[lane] = {x: snap(x), y: snap(y)}; if (isScene(id)) capture(id); else settle(id, snap(x), snap(y)); }
+  else if (sc && live(sc) && sessOf(sc) === t && !isScene(id)) { const f = insideSpot(sc); join(id, sc, f.rx, f.ry); }   // the vault's scene, when it is here
+  else if (!runMode) o.at[lane] = freeSpot(t);
+  changed(); draw();
 }
 function trayDrag(el) {
   const pid = el.dataset.plan;
@@ -767,21 +1004,23 @@ function trayDrag(el) {
   });
 }
 function newCard(x, y, kind) {
-  const id = Math.random().toString(36).slice(2, 10);
-  L().cards[id] = {s: T(), x: snap(x), y: snap(y), kind: kind || "note", title: "", text: ""};
-  if (kind === "scene") Object.assign(L().cards[id], {w: SCW, h: SCH, where: "", present: []});
-  changed(); draw(); open("c:" + id);
+  const cid = Math.random().toString(36).slice(2, 10), id = "c:" + cid; x = snap(x); y = snap(y);
+  doc.cards[cid] = {kind: kind || "note", title: "", text: ""};
+  doc.items[id] = {s: T(), homes: [lane], born: lane, at: {[lane]: {x, y}}};
+  if (kind === "scene") { Object.assign(doc.items[id], {w: SCW, h: SCH}); Object.assign(doc.cards[cid], {where: "", present: lane === "world" ? [] : [lane]}); }
+  else settle(id, x, y);
+  changed(); draw(); open(id);
 }
 function resize(ev, el, id) {
   ev.stopPropagation(); ev.preventDefault();
-  const o = where(id), b = box(id), st = {x: ev.clientX, y: ev.clientY}, t = ev.target, minH = b.hh + 66;
+  const o = it(id), b = box(id), st = {x: ev.clientX, y: ev.clientY}, t = ev.target, minH = b.hh + 66;
   cap(t, ev.pointerId);
   const mv = e => {
     o.w = Math.max(300, Math.round(b.w + (e.clientX - st.x) / view.k)); o.h = Math.max(minH, Math.round(b.h + (e.clientY - st.y) / view.k));
     el.style.width = o.w + "px"; el.style.height = o.h + "px"; wires();
   };
   const up = () => { t.removeEventListener("pointermove", mv); t.removeEventListener("pointerup", up); t.removeEventListener("pointercancel", up);
-    o.w = snap(o.w); o.h = Math.max(snap(o.h), minH); changed(); draw(); };
+    o.w = snap(o.w); o.h = Math.max(snap(o.h), minH); makeRoom(id, b.w, b.h, lane); capture(id); changed(); draw(); };
   t.addEventListener("pointermove", mv); t.addEventListener("pointerup", up); t.addEventListener("pointercancel", up);
 }
 function setClock(id, v) {
@@ -831,15 +1070,16 @@ function clockBind(d, idp, c, cb) {
 }
 const inSceneLine = id => { const sc = sceneOf(id); return sc ? `<p class="inscene">During the scene <b>${esc(titleOf(sc))}</b>.</p>` : ""; };
 function sceneView(o, id) {
-  const mem = id && where(id) ? membersOf(id) : [];
+  const mem = id && it(id) ? membersOf(id) : [];
   return `<h4>Scene</h4><dl class="kv"><dt>Where</dt><dd>${o.where ? esc(o.where) : "<i>not set</i>"}</dd><dt>Present</dt><dd>${o.present && o.present.length ? o.present.map(esc).join(", ") : "<i>nobody listed</i>"}</dd></dl>` +
+    (id && it(id) ? `<p class="inscene">On ${esc(names(lanesOf(id)))}. It shows on the board of every player character present; there is one copy, so a change on one board is a change on all of them.</p>` : "") +
     (mem.length ? `<h4>In this scene</h4><ul>${mem.map(m => `<li>${esc(KINDS[kindOf(m)] || "Beat")}: ${esc(titleOf(m))}</li>`).join("")}</ul>` : `<p class="inscene">Drag beats, decisions, clocks and pressures into the box to set them in this scene.</p>`);
 }
 function open(id, m) {
   shown = id; mode = m || (id === shown ? mode : "view");
   $$(".bn").forEach(x => x.classList.toggle("on", x.dataset.id === id));
   if (id.startsWith("c:")) return cardEditor(id.slice(2));
-  const pid = id.slice(2), p = view_of(pid), here = L().placed[pid];
+  const pid = id.slice(2), p = view_of(pid), here = it(id) ? {s: sessOf(id)} : null;
   const tabs = `<div class="tabs2"><button data-m="view" aria-selected="${mode === "view"}">Plan</button><button data-m="edit" aria-selected="${mode === "edit"}">Edit</button></div>`;
   let body;
   if (mode === "edit") {
@@ -897,7 +1137,7 @@ function open(id, m) {
       if (Object.keys(e).length) L().edits[pid] = e; else delete L().edits[pid];
       changed();
     };
-    [s, i, n].forEach(x => x.oninput = sync); k.onchange = () => { sync(); draw(); open(id, "edit"); };
+    [s, i, n].forEach(x => x.oninput = sync); k.onchange = () => { sync(); toScene(id); changed(); draw(); open(id, "edit"); };
     if (w) { w.oninput = sync; w.onchange = () => { sync(); draw(); }; }
     if (d.querySelector(".whobox")) pres = whoPicker(d, [...(p.present || [])], () => { sync(); draw(); });
     clockBind(d, "pe", clk, x => { clk = x; sync(); draw(); });
@@ -913,8 +1153,13 @@ function open(id, m) {
   d.querySelector("[data-dropplan]").onclick = () => { if (confirm(`Drop “${pid}”? It leaves this board and the tray. Claude marks it dropped in the vault when you bring the board in; until then you can undo it from the tray.`)) dropPlan(pid); };
   d.querySelector("[data-drop]").onclick = () => { if (ov.drop[pid]) delete ov.drop[pid]; else ov.drop[pid] = true; refresh(); };
 }
+function toScene(id) {   // after its kind changes: a scene needs a box and sits in no other; anything else holds no cards
+  const o = it(id); if (!o) return;
+  if (isScene(id)) { if (o.scene) release(id, runMode ? undefined : lane); o.w ||= SCW; o.h ||= SCH; if (id.startsWith("c:")) { const c = doc.cards[id.slice(2)]; c.where ||= ""; c.present ||= lanesOf(id).filter(k => k !== "world"); } }
+  else Object.keys(doc.items).filter(i => it(i).scene === id).forEach(i => release(i));
+}
 function cardEditor(id) {
-  const c = L().cards[id];
+  const c = doc.cards[id];
   const d = frame(`<div class="ey">Your card · not in the vault yet</div><h3>${esc(c.title || "New card")}</h3>` +
     `<label for="ce-k">Kind</label><select id="ce-k">${Object.keys(KINDS).map(k => `<option value="${k}" ${k === c.kind ? "selected" : ""}>${KINDS[k]}</option>`).join("")}</select>` +
     `<small id="ce-kd">${esc(KDESC[c.kind])}</small>` +
@@ -922,20 +1167,20 @@ function cardEditor(id) {
     (c.kind === "scene" ? sceneFields(c.where, "ce") : "") + (c.kind === "clock" ? clockFields(c.clock, "ce") : "") +
     `<label for="ce-x">${c.kind === "scene" ? "The situation: what is going on when it opens" : c.kind === "clock" ? "What happens when it fills" : "What happens, or the choice"}</label><textarea id="ce-x" placeholder="A sentence or two: who, what, and why it matters.">${esc(c.text)}</textarea>` +
     (c.kind === "scene" ? sceneView(c, "c:" + id).replace(/<h4>Scene<\/h4><dl[\s\S]*?<\/dl>/, "") : inSceneLine("c:" + id)) +
-    sessPick(c.s, "ce-sess") +
+    sessPick(sessOf("c:" + id), "ce-sess") +
     `<p class="muted" style="font-size:14px">Link it with the + on its right edge, and label each link. When the board is ready, ask Claude to bring it into the vault.</p>` +
     `<div class="acts"><button data-done>Done</button><button class="del" data-del>Delete card</button></div>`);
   const t = d.querySelector("#ce-t"), x = d.querySelector("#ce-x"), k = d.querySelector("#ce-k");
   const w = d.querySelector("#ce-w");
   const sync = () => { c.title = t.value.trim(); c.text = x.value.trim(); c.kind = k.value; if (w) c.where = w.value.trim(); d.querySelector("#ce-kd").textContent = KDESC[c.kind]; changed(); };
   t.oninput = sync; x.oninput = sync;
-  k.onchange = () => { sync(); if (c.kind === "scene" && !c.w) Object.assign(c, {w: SCW, h: SCH, where: c.where || "", present: c.present || []}); changed(); draw(); open("c:" + id); };
+  k.onchange = () => { sync(); toScene("c:" + id); changed(); draw(); open("c:" + id); };
   if (w) { w.oninput = sync; w.onchange = () => { sync(); draw(); }; }
-  if (d.querySelector(".whobox")) { const pk = whoPicker(d, [...(c.present || [])], () => { c.present = pk.get(); changed(); draw(); }); }
+  if (d.querySelector(".whobox")) { const pk = whoPicker(d, [...(c.present || [])], () => { c.present = pk.get(); changed(); draw(); if (runMode) return; const on = d.querySelector(".inscene"); if (on && c.kind === "scene") on.textContent = `On ${names(lanesOf("c:" + id))}. One copy: a change on one board is a change on all of them.`; }); }
   clockBind(d, "ce", c.clock, v => { c.clock = v; changed(); draw(); });
-  d.querySelector("#ce-sess").onchange = e => { sync(); moveTo("c:" + id, e.target.value); open("c:" + id); };
+  d.querySelector("#ce-sess").onchange = e => { sync(); moveTo("c:" + id, e.target.value); if (it("c:" + id)) open("c:" + id); };
   d.querySelector("[data-done]").onclick = () => { sync(); closeDrawer(); draw(); };
-  d.querySelector("[data-del]").onclick = () => removeCard("c:" + id);
+  d.querySelector("[data-del]").onclick = () => deleteCard("c:" + id);
   if (!c.title) setTimeout(() => t.focus(), 50);
 }
 function edgeEditor(eid) {
@@ -957,9 +1202,9 @@ function legend() {
   k.innerHTML = `<button class="x" aria-label="Close">×</button><h3>Key</h3><dl>` +
     Object.keys(KINDS).map(x => `<dt>${KINDS[x]}</dt><dd>${esc(KDESC[x])}</dd>`).join("") +
     `<dt>Session tabs</dt><dd>One canvas per session. The first starts from the end of S${CUR} as played; each later one starts from the end of the one before, as planned. Later holds ideas with no session yet.</dd>` +
-    `<dt>Scenes</dt><dd>Drag a scene by its header: the cards inside move with it. Drag its bottom-right corner to resize it. Drop a card inside a scene to set it there.</dd>` +
+    `<dt>Scenes</dt><dd>Drag a scene by its header: the cards inside move with it. Drag its bottom-right corner to resize it. Drop a card inside a scene to set it there. A scene shows on the board of every player character listed as present, with its cards. There is one copy: change it on one board and it changes on all of them; only its place on each canvas is its own.</dd>` +
     `<dt>Moving a card</dt><dd>Drag it onto another session's tab, or pick the session in its panel.</dd>` +
-    `<dt>Deleting</dt><dd>The × on a card: a plan goes back to the tray, your own card is deleted. Select a card and press Delete to do the same. To drop a plan for good, open it and choose Drop this plan. The × on the open session's tab deletes that session.</dd>` +
+    `<dt>Deleting</dt><dd>The × on a card: a plan goes back to the tray, your own card is deleted; a scene on several boards comes off this one only. Select a card and press Delete to do the same. To drop a plan for good, open it and choose Drop this plan. The × on the open session's tab deletes that session.</dd>` +
     `<dt>Tray</dt><dd>This board's plans that are not placed. Drag one onto the canvas or onto a session tab (on a touch screen, by its ⠿ grip). Drag a card back onto the tray to take it off.</dd>` +
     `<dt>Links</dt><dd>Solid: the vault already joins them, or it is a decision's option. Dashed red: yours, not in the vault yet; drag from a card's + to add one, tap its label to edit it. Dotted grey: it follows something in an earlier session.</dd>` +
     `<dt>Secret chips</dt><dd>A secret the card needs. Tap one to try a what-if: cards it closes fade and say why.</dd>` +
@@ -970,74 +1215,86 @@ function legend() {
 }
 
 /* ---------- saving: JSON Canvas on the Gus relay ---------- */
-function toCanvas(key) {
-  const keep = lane; lane = key;
-  try { return canvasOf(doc.lanes[key]); } finally { lane = keep; }
-}
-function canvasOf(s) {
-  const nodes = [], edges = [], off = t => Math.max(0, s.sessions.indexOf(t)) * TABW;
-  const geo = (id, o) => { const b = box(id), sc = sceneOf(id), g = {}; if (o.w) { g.w = o.w; g.h = o.h; } if (sc) g.scene = sc; return [b, g]; };
-  s.sessions.forEach((t, i) => nodes.push({id: "tab-" + t, type: "group", x: i * TABW, y: 0, width: TABW - 200, height: 2400, label: t}));
-  nodes.push({id: "now", type: "text", x: SX, y: SY, width: 300, height: 220, text: `End of S${CUR}`, osse: {now: true, sessions: s.sessions}});
-  for (const [id, o] of Object.entries(s.placed)) {
-    const [b, g] = geo("p:" + id, o);
-    const n = {id: "p:" + id, type: "file", file: (P[id] || {}).path || `Plans/${id}.md`, x: off(o.s) + o.x, y: o.y, width: b.w, height: Math.round(b.h),
-      osse: {plan: id, session: o.s, lx: o.x, ly: o.y, ...g}};
-    if (s.edits[id]) n.osse.edit = s.edits[id];
+function toCanvas(k) { return withLane(k, () => canvasOf(k)); }
+function canvasOf(k) {   // one board as JSON Canvas (for Obsidian); the store itself is items, cards, edits and edges
+  const nodes = [], edges = [], off = t => Math.max(0, doc.sessions.indexOf(t)) * TABW, shown = new Set();
+  doc.sessions.forEach((t, i) => { ensureAt(t, k); nodes.push({id: "tab-" + t, type: "group", x: i * TABW, y: 0, width: TABW - 200, height: 2400, label: t}); });
+  nodes.push({id: "now", type: "text", x: SX, y: SY, width: 300, height: 220, text: `End of S${CUR}`, osse: {now: true, sessions: doc.sessions}});
+  doc.sessions.flatMap(t => inTab(t, k)).sort((a, b) => isScene(b) - isScene(a)).forEach(id => {
+    const b = box(id, k), o = it(id), t = sessOf(id), sc = sceneOf(id); if (!b) return;
+    shown.add(id);
+    const g = {session: t, lx: b.x, ly: b.y, ...(isScene(id) ? {w: b.w, h: b.h} : {}), ...(sc ? {scene: sc} : {})};
+    const n = {id, x: off(t) + b.x, y: b.y, width: b.w, height: Math.round(b.h)};
+    if (id.startsWith("p:")) {
+      const pid = id.slice(2);
+      Object.assign(n, {type: "file", file: P[pid].path, osse: {plan: pid, ...g}});
+      if (doc.edits[pid]) n.osse.edit = doc.edits[pid];
+    } else {
+      const c = doc.cards[id.slice(2)], more = [c.where ? `At ${c.where}` : "", c.present && c.present.length ? `Present: ${c.present.join(", ")}` : "", c.clock ? `Clock ${c.clock}` : ""].filter(Boolean);
+      Object.assign(n, {type: "text", text: `## ${c.title || "Untitled"}\n\n${more.length ? more.join("\n") + "\n\n" : ""}${c.text || ""}`, osse: {card: true, kind: c.kind, title: c.title, body: c.text, ...g}});
+      for (const f of ["where", "present", "clock"]) if (c[f] && c[f].length) n.osse[f] = c[f];
+      const col = {decision: "1", pressure: "2", note: "3", scene: "4", clock: "5"}[c.kind]; if (col) n.color = col;
+    }
     nodes.push(n);
-  }
-  for (const [id, pid] of Object.keys(s.edits).filter(x => !s.placed[x]).map(x => [x, x]))
-    nodes.push({id: "e:" + id, type: "file", file: (P[id] || {}).path || `Plans/${id}.md`, x: -400, y: 0, width: CARDW, height: 140, osse: {plan: pid, tray: true, edit: s.edits[id]}});
-  for (const [id, c] of Object.entries(s.cards)) {
-    const [b, g] = geo("c:" + id, c), more = [c.where ? `At ${c.where}` : "", c.present && c.present.length ? `Present: ${c.present.join(", ")}` : "", c.clock ? `Clock ${c.clock}` : ""].filter(Boolean);
-    const n = {id: "c:" + id, type: "text", x: off(c.s) + c.x, y: c.y, width: b.w, height: Math.round(b.h), text: `## ${c.title || "Untitled"}\n\n${more.length ? more.join("\n") + "\n\n" : ""}${c.text || ""}`,
-      osse: {card: true, kind: c.kind, title: c.title, body: c.text, session: c.s, lx: c.x, ly: c.y, ...g}};
-    for (const f of ["where", "present", "clock"]) if (c[f] && c[f].length) n.osse[f] = c[f];
-    const col = {decision: "1", pressure: "2", note: "3", scene: "4", clock: "5"}[c.kind]; if (col) n.color = col;
-    nodes.push(n);
-  }
-  s.edges.forEach(e => { const x = {id: e.id, fromNode: e.from.startsWith("start") ? "now" : e.from, fromSide: "right", toNode: e.to, toSide: "left", osse: {own: true, from: e.from}}; if (e.label) x.label = e.label; edges.push(x); });
+  });
+  doc.edges.forEach(e => {
+    const start = e.from.startsWith("start"); if (!shown.has(e.to) || (start ? e.lane !== k : !shown.has(e.from))) return;
+    const x = {id: e.id, fromNode: start ? "now" : e.from, fromSide: "right", toNode: e.to, toSide: "left", osse: {own: true, from: e.from}}; if (e.label) x.label = e.label; edges.push(x);
+  });
   return {nodes, edges};
 }
-function fromCanvas(cv, after) {
-  const s = {sessions: null, placed: {}, cards: {}, edits: {}, edges: []};
-  let cols = 3;
-  const oldCol = (n, col) => ({s: col, x: snap(FIRSTX + Math.max(0, (n.x - 340) % 300)), y: snap(n.y)});   // the earlier column layout
-  const pos = (o, n) => o.session ? {s: o.session, x: o.lx, y: o.ly, ...(o.w ? {w: o.w, h: o.h} : {})} : oldCol(n, o.column || "Later");
-  (cv.nodes || []).forEach(n => {
-    const o = n.osse || {};
-    if (o.now) { if (o.sessions) s.sessions = o.sessions; cols = o.cols || 3; }
-    else if (o.plan) {
-      if (o.edit) s.edits[o.plan] = o.edit;
-      if (o.tray) return;
-      s.placed[o.plan] = pos(o, n);
-    } else if (o.card) {
-      const c = {...pos(o, n), kind: o.kind || "note", title: o.title || "", text: o.body || ""};
-      for (const f of ["where", "present", "clock"]) if (o[f]) c[f] = o[f];
-      s.cards[n.id.replace(/^c:/, "")] = c;
-    }
-  });
-  if (!s.sessions) { s.sessions = []; for (let i = 1; i <= cols; i++) s.sessions.push("S" + ((after || CUR) + i)); s.sessions.push("Later"); }
-  const used = [...Object.values(s.placed), ...Object.values(s.cards)].map(o => o.s);
-  used.forEach(t => { if (t && !s.sessions.includes(t)) s.sessions.splice(s.sessions.length - 1, 0, t); });
-  (cv.edges || []).forEach(e => { if ((e.osse || {}).own) s.edges.push({id: e.id, from: e.osse.from || e.fromNode, to: e.toNode, label: e.label || ""}); });
-  return s;
+function migrate(got) {   // boards saved before everything had one copy: merge them
+  const lists = [], at = {};
+  const keys = [...D.lanes.map(l => l.key).filter(k => got.lanes[k]), ...Object.keys(got.lanes).filter(k => !D.lanes.some(l => l.key === k))];
+  const oldCol = (n, col) => ({s: col, x: snap(FIRSTX + Math.max(0, (n.x - 340) % 300)), y: snap(n.y)});   // the first, column layout
+  for (const k of keys) {
+    const cv = got.lanes[k]; let sess = null, cols = 3;
+    (cv.nodes || []).forEach(n => { const o = n.osse || {}; if (o.now) { sess = o.sessions || null; cols = o.cols || 3; } });
+    if (!sess) sess = Array.from({length: cols}, (_, i) => "S" + ((got.after || CUR) + 1 + i)).concat("Later");
+    lists.push(sess);
+    (cv.nodes || []).forEach(n => {
+      const o = n.osse || {}, id = o.plan ? "p:" + o.plan : o.card ? n.id : null; if (!id) return;
+      if (o.plan && o.edit) doc.edits[o.plan] = {...o.edit, ...(doc.edits[o.plan] || {})};
+      if (o.plan && o.tray) return;
+      const p = o.session ? {s: o.session, x: o.lx, y: o.ly} : oldCol(n, o.column || "Later");
+      (at[k] ||= {})[id] = p;
+      if (o.card) { const c = doc.cards[id.slice(2)] = {kind: o.kind || "note", title: o.title || "", text: o.body || ""}; for (const f of ["where", "present", "clock"]) if (o[f]) c[f] = o[f]; }
+      const was = it(id);
+      if (was) { if (!was.homes.includes(k)) was.homes.push(k); if (!was.scene && was.s === p.s) was.at[k] = {x: p.x, y: p.y}; return; }
+      doc.items[id] = {s: p.s, homes: [k], born: k, at: {[k]: {x: p.x, y: p.y}}, ...(o.w ? {w: o.w, h: o.h} : {}), ...(o.scene ? {scene: o.scene} : {})};
+    });
+    (cv.edges || []).forEach(e => { const o = e.osse || {}; if (!o.own || doc.edges.some(x => x.id === e.id)) return;
+      const from = o.from || e.fromNode, start = from === "now" || from.startsWith("start");
+      doc.edges.push({id: e.id, from: from === "now" ? "start:S" + ((got.after || CUR) + 1) : from, to: e.toNode, label: e.label || "", ...(start ? {lane: k} : {})}); });
+  }
+  for (const [id, o] of Object.entries(doc.items)) {
+    if (!o.scene) continue;
+    const k = o.homes[0], a = (at[k] || {})[id], b = (at[k] || {})[o.scene];
+    if (a && b) { o.rx = a.x - b.x; o.ry = a.y - b.y; o.at = {}; } else delete o.scene;
+  }
+  for (const pid in doc.edits) if (doc.edits[pid].drop) delete doc.items["p:" + pid];
+  const used = new Set(Object.values(doc.items).map(o => o.s));
+  doc.sessions = [...new Set(lists.flat())].filter(t => used.has(t) || lists.every(l => l.includes(t))).concat([...used]);
+  for (const t in got.order || {}) doc.order[t] = got.order[t].map(u => u.includes("|c:") ? u.slice(u.lastIndexOf("|") + 1) : u);
+  doc.seeded = keys;
 }
 function pack() {
   doc.order = runOrder();
-  const lanes = {}; for (const k in doc.lanes) lanes[k] = toCanvas(k);
-  return {format: "jsoncanvas-1.0 per board, sessions side by side; order: each session's scenes in running order", after: CUR, lanes, order: doc.order};
+  const lanes = {}; D.lanes.forEach(l => { lanes[l.key] = toCanvas(l.key); });
+  return {format: "osse-paths-3: one store (sessions, items, cards, edits, edges, order); lanes are the same boards as JSON Canvas 1.0", after: CUR, ...doc, lanes};
 }
-let timer = null, dirty = false;
+let timer = null, dirty = false, unread = false;
 function status(t, bad) { const el = $("#save"); el.textContent = t; el.classList.toggle("bad", !!bad); }
 function changed() {
   dirty = true; store.set("osse-paths-local", JSON.stringify(pack()));
+  if (unread) { status("Not saving: the relay could not be read when this page opened. Reload before you change more.", true); return; }
   status(KEY ? "Saving…" : "Saved on this device only");
-  clearTimeout(timer); if (KEY) timer = setTimeout(save, 800);
+  clearTimeout(timer); if (KEY) timer = setTimeout(() => save(), 800);
 }
-async function save() {
+async function save(leaving) {
   try {
-    const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body: JSON.stringify(pack()), keepalive: true});
+    const body = JSON.stringify(pack());   // keepalive only when leaving: browsers allow 64 KB of it in all, then refuse
+    const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body, keepalive: leaving === true && new Blob([body]).size < 60000});
     if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status);
     dirty = false; status("Saved");
   } catch (e) { status("Not saved: " + e.message + ". This device keeps a copy.", true); }
@@ -1048,15 +1305,20 @@ async function load() {
     try {
       const r = await fetch(RELAY + "/paths", {headers: {"x-gus-key": KEY}, cache: "no-store"});
       if (r.ok) { got = await r.json(); status("Saved"); }
-      else status(r.status === 401 ? "Hub passcode refused: unlock the hub again to save." : "The relay said " + r.status + ": showing this device's copy.", true);
-    } catch (e) { status("Relay unreachable: showing this device's copy.", true); }
+      else unread = true, status(r.status === 401 ? "Hub passcode refused: unlock the hub again to save." : "The relay said " + r.status + ": showing this device's copy.", true);
+    } catch (e) { unread = true; status("Relay unreachable: showing this device's copy. Reload before you change anything.", true); }
   } else status("Unlock the game master section on the hub to save to the relay. Until then this device keeps your changes.");
-  if (!got || !got.lanes || !Object.keys(got.lanes).length) { try { const loc = JSON.parse(store.get("osse-paths-local") || "null"); if (loc && loc.lanes) { got = loc; if (KEY) dirty = true; } } catch (e) {} }
-  if (got && got.lanes) for (const k in got.lanes) doc.lanes[k] = fromCanvas(got.lanes[k], got.after);
-  if (got && got.order) doc.order = got.order;
-  if (dirty) save();
+  const some = g => g && (g.items || (g.lanes && Object.keys(g.lanes).length));
+  if (!some(got)) { try { const loc = JSON.parse(store.get("osse-paths-local") || "null"); if (some(loc)) { got = loc; if (KEY && !unread) dirty = true; } } catch (e) {} }
+  if (got && got.items) for (const f of ["sessions", "items", "cards", "edits", "edges", "order", "seeded"]) { if (got[f]) doc[f] = got[f]; }
+  else if (some(got)) { migrate(got); dirty = true; }
+  doc.sessions = (doc.sessions.length ? doc.sessions : defaults()).filter(t => t === "Later" || sessNum(t) > CUR || Object.values(doc.items).some(o => o.s === t));
+  sortSessions();
+  recut();
+  D.lanes.forEach(l => { if (!doc.seeded.includes(l.key)) seed(l.key); });
+  if (dirty && KEY && !unread) save();
 }
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && dirty && KEY) save(); });
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && dirty && KEY && !unread) save(true); });
 
 /* ---------- boards ---------- */
 function pick(key) {
@@ -1066,11 +1328,11 @@ function pick(key) {
   store.set("osse-paths-lane", key); history.replaceState(null, "", "#" + encodeURIComponent(key));
   $$("#lanes button").forEach(b => b.setAttribute("aria-selected", b.dataset.lane === key));
   closeDrawer();
-  if (runMode) { drawRun(); return; }
+  if (runMode) { if (!lane) lane = D.lanes[0].key; drawRun(); return; }
   lane = key; draw();
   const v = views[key + "|" + T()]; if (v) { view = {...v}; applyView(); } else fit();
 }
-function refresh() { recut(); if (runMode) { drawRun(); return; } draw(); if (shown) open(shown, mode); }
+function refresh() { recut(); draw(); if (shown) open(shown, mode); }
 $("#lanes").innerHTML = `<button role="tab" class="runb" data-lane="${RUN}" title="Every board's scenes for a session, in running order">Session plan</button>` + D.lanes.map(l => `<button role="tab" data-lane="${esc(l.key)}">${esc(l.short)}<small>${l.count}</small></button>`).join("");
 $$("#lanes button").forEach(b => b.onclick = () => pick(b.dataset.lane));
 $("#wi-reset").onclick = () => { ov.out = {}; ov.dead = {}; ov.drop = {}; refresh(); };
@@ -1089,10 +1351,9 @@ $$(".float button").forEach(b => b.onpointerdown = ev => ev.stopPropagation());
 document.addEventListener("keydown", e => {
   if ((e.key === "Delete" || e.key === "Backspace") && shown && !e.target.closest("input,textarea,select")) { e.preventDefault(); removeCard(shown); return; }
   if (e.key === "Escape") { if (!$("#drawer").hidden) closeDrawer(); else if (!$("#keyp").hidden) legend(); } });
-document.body.insertAdjacentHTML("beforeend", `<datalist id="dl-places">${D.places.map(x => `<option value="${esc(x)}">`).join("")}</datalist>` +
+document.body.insertAdjacentHTML("beforeend", `<div id="meas" aria-hidden="true"></div><datalist id="dl-places">${D.places.map(x => `<option value="${esc(x)}">`).join("")}</datalist>` +
   `<datalist id="dl-people">${D.people.map(x => `<option value="${esc(x.n)}" label="${esc(x.t)}">`).join("")}</datalist>`);
 $("#hint").textContent = "Drag plans in from the tray · drag a card's + to link · double-click to add a card";
-recut();
 load().then(() => {
   const want = decodeURIComponent(location.hash.slice(1)) || store.get("osse-paths-lane");
   pick(want === RUN || D.lanes.some(l => l.key === want) ? want : D.lanes[0].key);
