@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
-"""Build a DM page for every vault note, plus an index, into this repo's vault/ folder.
-  python3 tools/osse/pages.py          rebuild every page (build.py also does this after each real build)
-Each page is generated from the note and the vault graph: no text is written by hand or by Claude.
-vault/ is a DM screen. It holds game secrets, prep and plans, so link it only from the hub's game master section.
-Only files whose content changed are rewritten, so a build leaves a small diff."""
+"""Build the Ossë vault's web pages from the vault and its graph. No text is written by hand or by Claude.
+  python3 tools/osse/pages.py          rebuild everything (build.py also does this after each real build)
+
+vault/   the DM screen: a page for every note, with secrets, prep, plans and DM notes. Link it only from the
+         hub's game master section.
+codex/   the players' screen: only what has come out in play. A note is in it once it has reached the table
+         (first_seen, or revealed for a secret). On each page only lines stamped with a played session survive;
+         untagged lines are prep by the vault's rules, so they are left out, as are DM callouts, prep links,
+         link notes, summaries, roles and plans. A line that links an unrevealed secret or a plan is dropped.
+Both index pages have a Rules tab that searches the System Reference Document live through Open5e (rules.js).
+vault/status.json tells the hub where the campaign stands. Only files whose content changed are rewritten."""
 import html, json, os, re, sys, unicodedata
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(os.path.dirname(HERE))
 OUT = os.path.join(REPO, "vault")
+OUT_PLAYER = os.path.join(REPO, "codex")
 VAULT = os.environ.get("OSSE_VAULT") or os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Ossë")
 SITE = "https://osse.thomashuet.ca/vault/"
 sys.path.insert(0, HERE)
@@ -22,11 +29,14 @@ SINGULAR = {"session": "Session", "pc": "Player character", "party": "Party", "n
             "place": "Place", "item": "Thing", "lore": "Lore", "secret": "Secret", "thread": "Thread", "plan": "Plan"}
 FAMILIES = ["kin", "social", "role", "place", "thing", "deed", "knowledge", "faith", "lore", "story", "related"]
 SKIP_SECTIONS = {"Connections", "Past"}          # shown from the graph instead
+PLAYER_SKIP = SKIP_SECTIONS | {"Idea", "Requires", "Links", "Log", "Plans", "Who knows"}
 PROPS = [("player", "Player"), ("class", "Class"), ("race", "Race"), ("pronouns", "Pronouns"), ("voice", "Voice"),
          ("wants", "Wants"), ("fear", "Fear"), ("leader", "Leader"), ("known_by", "Known by"), ("opened", "Opened"),
          ("closed", "Closed"), ("played_on", "Played on"), ("in_world", "In the world"), ("thread", "Thread"),
          ("played", "Played"), ("pruned", "Pruned"), ("pruned_by", "Pruned because"), ("map", "Map")]
+PLAYER_PROPS = [("player", "Player"), ("class", "Class"), ("pronouns", "Pronouns")]
 LINK = re.compile(r"!?\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]+))?\]\]")
+TAG = re.compile(r"\*\(((?:S\d+|prep)[^)]*)\)\*")
 
 
 def slug(name):
@@ -34,30 +44,127 @@ def slug(name):
     return re.sub(r"[^a-z0-9]+", "-", s).strip("-") or "note"
 
 
+def snum(v):
+    m = re.match(r"\s*S(\d+)\b", str(v or ""))
+    return int(m.group(1)) if m else None
+
+
+def player_set(g):
+    cur = g.get("current_session", 0)
+    keep = set()
+    for n in g["nodes"]:
+        t = n["type"]
+        if t in ("plan", "session"):
+            continue
+        if t == "secret":
+            r = snum(n.get("revealed"))
+            if r is not None and r <= cur:
+                keep.add(n["id"])
+        elif t == "party" or (n.get("stage") == "canon" and (snum(n.get("first_seen")) or 99999) <= cur):
+            keep.add(n["id"])
+    return keep
+
+
 class Site:
-    def __init__(self, g):
-        self.g = g
+    def __init__(self, g, player=False):
+        self.g, self.player = g, player
         self.nodes = {n["id"]: n for n in g["nodes"]}
         self.cur = g.get("current_session", 0)
+        self.keep = player_set(g) if player else set(self.nodes)
+        self.alias_all = {}
+        for n in g["nodes"]:
+            for a in [n["id"]] + [str(x) for x in n.get("aliases", [])]:
+                self.alias_all.setdefault(a.lower(), n["id"])
         self.slugs, used = {}, set()
         for n in sorted(g["nodes"], key=lambda n: n["id"]):
+            if n["id"] not in self.keep:
+                continue
             s = slug(n["id"])
             if s in used:
                 s = f"{s}-{n['type']}"
             used.add(s); self.slugs[n["id"]] = s
-        self.alias = {}
-        for n in g["nodes"]:
-            for a in [n["id"]] + [str(x) for x in n.get("aliases", [])]:
-                self.alias.setdefault(a.lower(), n["id"])
+        self.texts = {}
+        self.aliases = {nid: [str(a) for a in self.nodes[nid].get("aliases", []) if str(a) != nid] for nid in self.keep}
+        if player:
+            corpus = " ".join(" ".join(self.filter_lines(ls)) for nid in self.keep for _, ls in sections(self.text(nid))).lower()
+            try:
+                corpus += json.dumps(json.load(open(os.path.join(REPO, "chronicle", "chronicle.json"), encoding="utf-8")), ensure_ascii=False).lower()
+            except OSError:
+                pass
+            self.aliases = {nid: [a for a in al if a.lower() in corpus] for nid, al in self.aliases.items()}
+
+    def text(self, nid):
+        if nid not in self.texts:
+            self.texts[nid] = open(os.path.join(VAULT, self.nodes[nid]["path"]), encoding="utf-8").read()
+        return self.texts[nid]
 
     def href(self, name):
-        nid = self.alias.get(name.strip().lower())
-        return (self.slugs[nid] + ".html", nid) if nid else (None, None)
+        nid = self.alias_all.get(name.strip().lower())
+        return (self.slugs[nid] + ".html", nid) if nid in self.slugs else (None, nid)
 
     def a(self, name, text=None):
         h, nid = self.href(name)
         t = html.escape(text or name)
         return f'<a href="{h}">{t}</a>' if h else f'<span class="nolink">{t}</span>'
+
+    # ---------- what players may see ----------
+    def canon_ok(self, line):
+        tags = TAG.findall(line)
+        if not tags:
+            return False
+        for t in tags:
+            n = snum(t)
+            if n is None or n > self.cur:
+                return False
+        for m in LINK.finditer(line):
+            nid = self.alias_all.get(m.group(1).strip().lower())
+            if nid and nid not in self.keep and self.nodes[nid]["type"] in ("secret", "plan"):
+                return False
+        return True
+
+    def filter_lines(self, lines):
+        out, i, skip = [], 0, None
+        while i < len(lines):
+            ln = lines[i]
+            if ln.startswith(">") or ln.startswith("#"):
+                i += 1; continue
+            if ln.startswith("```"):
+                i += 1
+                while i < len(lines) and not lines[i].startswith("```"):
+                    i += 1
+                i += 1; continue
+            if ln.startswith("|"):
+                rows = []
+                while i < len(lines) and lines[i].startswith("|"):
+                    rows.append(lines[i]); i += 1
+                keep = [r for r in rows[2:] if (lambda c: snum(c) is not None and snum(c) <= self.cur and re.fullmatch(r"S\d+", c))(r.strip().strip("|").split("|")[0].strip())]
+                if keep and len(rows) >= 2:
+                    out += rows[:2] + keep
+                continue
+            m = re.match(r"(\s*)[-*] ", ln)
+            if m:
+                depth = len(m.group(1)) // 2
+                if skip is not None and depth > skip:
+                    i += 1; continue
+                skip = None
+                if self.canon_ok(ln):
+                    out.append(ln)
+                else:
+                    skip = depth
+                i += 1; continue
+            if ln.strip() and self.canon_ok(ln):
+                out.append(ln)
+            i += 1
+        return out
+
+    def first_canon(self, nid):
+        sec = dict(sections(self.text(nid)))
+        for h in ("Now", "What the party knows", "The question", "The truth", "Who they are", "What it is"):
+            for ln in self.filter_lines(sec.get(h, [])):
+                if ln.lstrip().startswith("- "):
+                    s = LINK.sub(lambda m: m.group(2) or m.group(1), ln.strip()[2:])
+                    return TAG.sub("", s).replace("**", "").strip()
+        return ""
 
     # ---------- inline markdown ----------
     def inline(self, s):
@@ -69,7 +176,7 @@ class Site:
 
     def _fmt(self, s):
         s = html.escape(s)
-        s = re.sub(r"\*\((S\d+(?:\s*→\s*S?\d*)?|prep)\)\*", lambda m: tag(m.group(1)), s)
+        s = TAG.sub(lambda m: tag(m.group(1)), s)
         s = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r'<a href="\2" rel="noopener">\1</a>', s)
         s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
         s = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", s)
@@ -129,7 +236,9 @@ class Site:
 
     def ul(self, items):
         out, depth = ["<ul>"], 0
+        base = min(d for d, _ in items)
         for d, text in items:
+            d -= base
             while d > depth: out.append("<ul>"); depth += 1
             while d < depth: out.append("</ul>"); depth -= 1
             box = re.match(r"\[( |x)\]\s*(.*)", text)
@@ -141,7 +250,7 @@ class Site:
 
 def tag(when):
     w = str(when).strip()
-    cls = "prep" if w == "prep" else "draft" if w == "draft" else "canon"
+    cls = "prep" if w.startswith("prep") else "draft" if w == "draft" else "canon"
     return f'<span class="tag {cls}">{html.escape(w)}</span>'
 
 
@@ -161,7 +270,7 @@ def when(e):
 
 def sections(text):
     body = text.split("\n---", 1)[1].split("\n", 1)[1] if text.startswith("---") and "\n---" in text[3:] else text
-    out, cur = [("", [])], None
+    out = [("", [])]
     for ln in body.splitlines():
         if ln.startswith("## "):
             out.append((ln[3:].strip(), []))
@@ -184,8 +293,14 @@ def links_for(site, nid):
         if o == "log":
             if site.nodes.get(other, {}).get("type") == "session": sessions.add(other)
             continue
+        if site.player:
+            if o != "written" or e.get("layer") != "canon" or other not in site.keep:
+                continue
+            if e.get("start") is None and e.get("date") is None:
+                continue
+            e = dict(e, note="")
         if o == "plain":
-            if not fwd and site.nodes.get(other, {}).get("type") not in (None,):
+            if not fwd:
                 mentions.add(other)
             continue
         if e.get("layer") == "draft":
@@ -228,74 +343,74 @@ def chips(site, n, fm):
     t = n["type"]; c = []
     kind = fm.get("kind") if isinstance(fm.get("kind"), str) else ""
     c.append(f'<span class="chip type">{html.escape(SINGULAR.get(t, t))}{" · " + html.escape(kind) if kind else ""}</span>')
-    if n.get("state"):
-        since = n.get("state_since")
+    since = n.get("state_since")
+    if n.get("state") and (not site.player or (snum(since) or 99999) <= site.cur):
         c.append(f'<span class="chip state s-{slug(n["state"])}">{html.escape(n["state"])}{(" " + tag(since)) if since else ""}</span>')
-    for key, lab in (("location", "at"), ("in", "in"), ("holder", "held by")):
-        v = fm.get(key)
-        if isinstance(v, str) and v.strip():
-            m = LINK.search(v)
-            c.append(f'<span class="chip">{lab} {site.a(m.group(1)) if m else html.escape(v)}</span>')
+    if not site.player:
+        for key, lab in (("location", "at"), ("in", "in"), ("holder", "held by")):
+            v = fm.get(key)
+            if isinstance(v, str) and v.strip():
+                m = LINK.search(v)
+                c.append(f'<span class="chip">{lab} {site.a(m.group(1)) if m else html.escape(v)}</span>')
     if t == "secret":
         r = n.get("revealed")
         c.append(f'<span class="chip state {"s-revealed" if r else "s-hidden"}">{"revealed " + tag(r) if r else "hidden from the party"}</span>')
     if t in ("plan", "thread") and n.get("status"):
         c.append(f'<span class="chip state s-{slug(n["status"])}">{html.escape(n["status"])}'
-                 + (f' · target {html.escape(str(n["target"]))}' if n.get("target") else "") + "</span>")
-    if n.get("stage") and n["stage"] != "canon":
+                 + (f' · target {html.escape(str(n["target"]))}' if n.get("target") and not site.player else "") + "</span>")
+    if n.get("stage") and n["stage"] != "canon" and not site.player:
         c.append(f'<span class="chip">{tag(n["stage"])}</span>')
     if n.get("first_seen"):
         c.append(f'<span class="chip">first seen {tag(n["first_seen"])}</span>')
-    if fm.get("story_role"):
-        c.append(f'<span class="chip">{html.escape(str(fm["story_role"]))}</span>')
-    if n.get("importance"):
-        c.append(f'<span class="chip" title="importance">{dots(n["importance"])}</span>')
+    if not site.player:
+        if fm.get("story_role"):
+            c.append(f'<span class="chip">{html.escape(str(fm["story_role"]))}</span>')
+        if n.get("importance"):
+            c.append(f'<span class="chip" title="importance">{dots(n["importance"])}</span>')
     return "".join(c)
 
 
-def head(title, depth=""):
+def head(title, player):
     return (f'<!doctype html><html lang="en-CA"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
-            f'<meta name="robots" content="noindex"><title>{html.escape(title)} · Ossë vault</title>'
+            f'<meta name="robots" content="noindex"><title>{html.escape(title)} · {"The Codex" if player else "Ossë vault"}</title>'
             '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">'
-            f'<link rel="stylesheet" href="{depth}vault.css"></head><body><div class="wrap">')
+            '<link rel="stylesheet" href="pages.css"></head><body><div class="wrap">')
 
 
 def topbar(site, crumb=""):
-    return (f'<header><div><div class="eyebrow">Ossë vault · DM screen · after S{site.cur}</div>'
+    who = "The Codex · what the party knows" if site.player else "Ossë vault · DM screen"
+    return (f'<header><div><div class="eyebrow">{who} · after S{site.cur}</div>'
             f'<nav class="crumbs"><a href="index.html">All entries</a>{(" / " + crumb) if crumb else ""}</nav></div>'
             f'<a class="home" href="../">Hub</a></header>')
 
 
 def page(site, n):
-    nid, t = n["id"], n["type"]
-    text = open(os.path.join(VAULT, n["path"]), encoding="utf-8").read()
+    nid, t, P = n["id"], n["type"], site.player
+    text = site.text(nid)
     fm = build.frontmatter(text)
     rows, past, plans, mentions, sessions = links_for(site, nid)
-    title = nid
-    out = [head(title), topbar(site, f'<a href="index.html#{t}">{html.escape(LABEL.get(t, t))}</a>'), '<main class="sheet">']
-    out.append(f'<h1>{html.escape(title)}</h1>')
-    al = [str(a) for a in n.get("aliases", []) if str(a) != nid]
+    out = [head(nid, P), topbar(site, f'<a href="index.html#{t}">{html.escape(LABEL.get(t, t))}</a>'), '<main class="sheet">']
+    out.append(f'<h1>{html.escape(nid)}</h1>')
+    al = site.aliases.get(nid, [])
     if al:
         out.append(f'<div class="aka">also {html.escape(", ".join(al))}</div>')
     out.append(f'<div class="chips">{chips(site, n, fm)}</div>')
-    if n.get("summary"):
+    if n.get("summary") and not P:
         out.append(f'<p class="summary">{site.inline(str(n["summary"]))}</p>')
-    props = []
-    if fm.get("role"):
-        props.append(("Role", fm["role"]))
-    for k, lab in PROPS:
+    props = [] if P or not fm.get("role") else [("Role", fm["role"])]
+    for k, lab in (PLAYER_PROPS if P else PROPS):
         v = fm.get(k)
-        if v not in (None, "", []):
+        if v not in (None, "", []) and (not P or k != "class" or t == "pc"):
             props.append((lab, ", ".join(map(str, v)) if isinstance(v, list) else str(v)))
     if props:
         out.append('<dl class="props">' + "".join(f"<dt>{html.escape(l)}</dt><dd>{site.inline(v)}</dd>" for l, v in props) + "</dl>")
     logs = []
     for h, ls in sections(text):
-        if h in SKIP_SECTIONS:
+        if h in (PLAYER_SKIP if P else SKIP_SECTIONS) or (P and h.startswith("Open going into")):
             continue
-        body = site.blocks(ls)
+        body = site.blocks(site.filter_lines(ls) if P else ls)
         if not body:
             continue
         if h in ("Session Log", "Log"):
@@ -305,7 +420,7 @@ def page(site, n):
         out.append(f'<section><h2>Links now <span>{len(rows)}, strongest first</span></h2>{link_rows(site, rows)}</section>')
     if past:
         out.append(f'<section><h2>Ended links</h2>{link_rows(site, past)}</section>')
-    if plans:
+    if plans and not P:
         li = []
         for p, es in sorted(plans.items()):
             pn = site.nodes.get(p, {})
@@ -314,32 +429,48 @@ def page(site, n):
                       f'{" · " + html.escape(str(pn["target"])) if pn.get("target") else ""}</span><br><small>{bits}</small></li>')
         out.append(f'<section><h2>In live plans</h2><ul class="plain">{"".join(li)}</ul></section>')
     out += logs
-    ment = sorted(m for m in mentions if site.nodes.get(m, {}).get("type") != "session")
-    if sessions or ment:
+    ss = sorted((s for s in sessions if (snum("S" + str(site.nodes[s].get("number"))) or 0) <= site.cur),
+                key=lambda s: int(site.nodes[s].get("number") or 0))
+    ment = [] if P else sorted(m for m in mentions if site.nodes.get(m, {}).get("type") != "session")
+    if ss or ment:
         out.append('<section class="also"><h2>Also see</h2>')
-        if sessions:
-            ss = sorted(sessions, key=lambda s: int(site.nodes[s].get("number") or 0))
-            out.append('<p><b>Sessions:</b> ' + ", ".join(site.a(s, "S" + str(site.nodes[s].get("number"))) for s in ss) + "</p>")
+        if ss:
+            if P:
+                out.append('<p><b>In the chronicle:</b> ' + ", ".join(
+                    f'<a href="../chronicle/#s{site.nodes[s]["number"]}">S{site.nodes[s]["number"]}</a>' for s in ss) + "</p>")
+            else:
+                out.append('<p><b>Sessions:</b> ' + ", ".join(site.a(s, "S" + str(site.nodes[s].get("number"))) for s in ss) + "</p>")
         if ment:
             out.append('<p><b>Mentioned in:</b> ' + ", ".join(site.a(m) for m in ment) + "</p>")
         out.append("</section>")
-    foot = [f'From <code>{html.escape(n["path"])}</code> in the Ossë vault']
-    if n.get("term"):
-        foot.append(f'<code>{html.escape(n["term"])}</code>')
-    if fm.get("notion"):
-        foot.append(f'<a href="{html.escape(str(fm["notion"]))}" rel="noopener">old Notion page</a>')
+    if P:
+        foot = [f"What the party has learned in play, up to S{site.cur}."]
+    else:
+        foot = [f'From <code>{html.escape(n["path"])}</code> in the Ossë vault']
+        if n.get("term"):
+            foot.append(f'<code>{html.escape(n["term"])}</code>')
+        if fm.get("notion"):
+            foot.append(f'<a href="{html.escape(str(fm["notion"]))}" rel="noopener">old Notion page</a>')
     out.append(f'<footer>{" · ".join(foot)}</footer></main></div></body></html>')
     return "".join(out)
 
 
 def index(site):
+    P = site.player
     groups = {}
     for n in site.g["nodes"]:
-        groups.setdefault(n["type"], []).append(n)
-    out = [head("All entries"), topbar(site), '<main class="sheet index">', "<h1>The Ossë vault</h1>",
-           f'<p class="summary">Every note in the vault as a DM page, after S{site.cur}. Game secrets, prep and plans are here: '
-           'this is a DM screen, never one for players.</p>',
+        if n["id"] in site.keep:
+            groups.setdefault(n["type"], []).append(n)
+    title = "The Codex" if P else "The Ossë vault"
+    lede = (f"Everyone and everything the party has met, as far as play has shown, up to S{site.cur}. "
+            'Session recaps are in the <a href="../chronicle/">chronicle</a>.' if P else
+            f"Every note in the vault as a DM page, after S{site.cur}. Game secrets, prep and plans are here: "
+            "this is a DM screen, never one for players.")
+    out = [head(title, P), topbar(site), '<main class="sheet index">', f"<h1>{title}</h1>", f'<p class="summary">{lede}</p>',
+           '<div class="tabs" role="tablist"><button role="tab" data-tab="world" aria-selected="true">In the world</button>'
+           '<button role="tab" data-tab="rules" aria-selected="false">Rules and items</button></div>',
            '<input id="q" type="search" placeholder="Find a name, alias or summary" autocomplete="off">',
+           '<div id="world">',
            '<nav class="jump">' + " ".join(f'<a href="#{t}">{html.escape(l)} <small>{len(groups.get(t, []))}</small></a>'
                                           for t, l in ORDER if groups.get(t)) + "</nav>"]
     for t, l in ORDER:
@@ -350,20 +481,135 @@ def index(site):
             key = lambda n: (n.get("status") not in ("ready", "draft"), n.get("status") != "ready", str(n.get("target") or "S999"), n["id"])
         out.append(f'<section id="{t}"><h2>{html.escape(l)} <span>{len(ns)}</span></h2><ul class="entries">')
         for n in sorted(ns, key=key):
-            state = n.get("state") or n.get("status") or ("revealed" if n.get("revealed") else "hidden" if t == "secret" else "")
-            hay = " ".join([n["id"]] + [str(a) for a in n.get("aliases", [])] + [str(n.get("summary", ""))]).lower()
+            if P:
+                desc = site.first_canon(n["id"])
+                state = n.get("state") if (snum(n.get("state_since")) or 99999) <= site.cur else ""
+                if t == "thread": state = n.get("status", "")
+            else:
+                desc = str(n.get("summary", ""))
+                state = n.get("state") or n.get("status") or ("revealed" if n.get("revealed") else "hidden" if t == "secret" else "")
+            hay = " ".join([n["id"]] + site.aliases.get(n["id"], []) + [desc]).lower()
             out.append(f'<li data-k="{html.escape(hay)}"><a href="{site.slugs[n["id"]]}.html">{html.escape(n["id"])}</a>'
                        + (f' <span class="st s-{slug(state)}">{html.escape(state)}</span>' if state else "")
-                       + (f'<small>{site.inline(str(n.get("summary", "")))}</small>' if n.get("summary") else "") + "</li>")
+                       + (f'<small>{site.inline(desc)}</small>' if desc else "") + "</li>")
         out.append("</ul></section>")
-    out.append("""<script>
-const q=document.getElementById('q');q.addEventListener('input',()=>{const v=q.value.trim().toLowerCase();
-document.querySelectorAll('.entries li').forEach(li=>{li.hidden=v&&!li.dataset.k.includes(v)});
-document.querySelectorAll('.index section').forEach(s=>{s.hidden=v&&!s.querySelector('li:not([hidden])')})});
-</script>""")
-    out.append("</main></div></body></html>")
+    out.append('<p id="none" class="none" hidden>Nothing in the world by that name. Try <a href="#rules" data-go="rules">Rules and items</a>.</p></div>')
+    out.append('<div id="rules" hidden><div class="ed"><label><input type="radio" name="ed" value="srd-2024" checked> 2024 rules</label>'
+               '<label><input type="radio" name="ed" value="srd-2014"> 2014 rules</label></div>'
+               '<div class="rgrid"><ol id="rlist" class="rlist"></ol><article id="rshow" class="rshow"></article></div>'
+               '<p class="credit">Rules, spells, items and creatures from the System Reference Document (5.1 and 5.2, CC BY 4.0 by Wizards of the Coast), '
+               'searched live through <a href="https://open5e.com" rel="noopener">Open5e</a>. Not in the SRD? '
+               '<a id="ddb" href="https://www.dndbeyond.com/search" rel="noopener">Search D&amp;D Beyond</a> or <a href="https://5e.tools/" rel="noopener">open 5e.tools</a>.</p></div>')
+    out.append('<script src="rules.js"></script></main></div></body></html>')
     return "".join(out)
 
+
+RULES_JS = r"""/* Search tabs for the Ossë pages: "In the world" filters this page; "Rules and items" asks Open5e (SRD only). */
+(() => {
+const $ = s => document.querySelector(s), API = "https://api.open5e.com/v2/";
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const q = $("#q"), tabs = document.querySelectorAll("[data-tab]");
+let tab = "world", timer = 0, seq = 0, conds = null;
+const store = { get(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e) {} } };
+function show(t){
+  tab = t;
+  tabs.forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  $("#world").hidden = t !== "world"; $("#rules").hidden = t !== "rules";
+  q.placeholder = t === "world" ? "Find a name, alias or summary" : "Find a rule, spell, item, creature or condition";
+  if (location.hash !== "#" + t && (t === "rules" || location.hash === "#rules")) history.replaceState(null, "", t === "rules" ? "#rules" : location.pathname);
+  run();
+}
+function world(){
+  const v = q.value.trim().toLowerCase();
+  document.querySelectorAll(".entries li").forEach(li => { li.hidden = v && !li.dataset.k.includes(v); });
+  let any = false;
+  document.querySelectorAll("#world section").forEach(s => { const on = !v || s.querySelector("li:not([hidden])"); s.hidden = !on; any = any || on; });
+  $("#none").hidden = any;
+}
+function md(s){
+  const lines = String(s || "").split("\n"), out = []; let list = null, table = null;
+  const inl = t => esc(t).replace(/\*\*\*(.+?)\*\*\*/g, "<b><i>$1</i></b>").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<i>$2</i>").replace(/_(.+?)_/g, "<i>$1</i>");
+  const flush = () => { if (list) { out.push("<ul>" + list.join("") + "</ul>"); list = null; } if (table) { out.push("<table>" + table.join("") + "</table>"); table = null; } };
+  for (const ln of lines) {
+    const t = ln.trim();
+    if (/^\|/.test(t)) { if (/^\|[\s:|-]+\|$/.test(t)) continue; table = table || []; const c = t.replace(/^\||\|$/g, "").split("|");
+      table.push("<tr>" + c.map(x => (table.length ? "<td>" : "<th>") + inl(x.trim()) + (table.length ? "</td>" : "</th>")).join("") + "</tr>"); continue; }
+    if (/^[-*] /.test(t)) { if (table) flush(); list = list || []; list.push("<li>" + inl(t.slice(2)) + "</li>"); continue; }
+    flush();
+    if (/^#+ /.test(t)) out.push("<h4>" + inl(t.replace(/^#+ /, "")) + "</h4>"); else if (t) out.push("<p>" + inl(t) + "</p>");
+  }
+  flush(); return out.join("");
+}
+const mod = v => (v >= 10 ? "+" : "") + Math.floor((v - 10) / 2);
+function detail(o, model){
+  const h = [`<h3>${esc(o.name)}</h3>`], meta = [], doc = o.document?.display_name || o.document?.name || "";
+  if (model === "Spell") {
+    meta.push(`${o.level ? "Level " + o.level : "Cantrip"} ${esc(o.school?.name || o.school || "")}`.trim());
+    const comp = [o.verbal && "V", o.somatic && "S", o.material && "M" + (o.material_specified ? ` (${o.material_specified})` : "")].filter(Boolean).join(", ");
+    h.push(`<dl class="kv"><dt>Casting time</dt><dd>${esc(o.casting_time)}${o.ritual ? " or ritual" : ""}</dd><dt>Range</dt><dd>${esc(o.range_text || o.range)}</dd>
+      <dt>Components</dt><dd>${esc(comp)}</dd><dt>Duration</dt><dd>${esc(o.duration)}${o.concentration ? ", concentration" : ""}</dd>
+      ${o.classes?.length ? `<dt>Classes</dt><dd>${esc(o.classes.map(c => c.name || c).join(", "))}</dd>` : ""}</dl>`);
+    h.push(md(o.desc)); if (o.higher_level) h.push(`<p><b>At higher levels.</b> ${esc(o.higher_level)}</p>`);
+  } else if (model === "Creature") {
+    meta.push(`${esc(o.size?.name || "")} ${esc(o.type?.name || "")}${o.alignment ? ", " + esc(o.alignment) : ""}`);
+    const sp = o.speed_all || o.speed || {}, speed = Object.entries(sp).filter(([k, v]) => v && k !== "unit" && k !== "hover").map(([k, v]) => (k === "walk" ? "" : k + " ") + v + " ft.").join(", ");
+    const ab = o.ability_scores || {}, keys = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
+    h.push(`<dl class="kv"><dt>Armour class</dt><dd>${esc(o.armor_class)}${o.armor_detail ? " (" + esc(o.armor_detail) + ")" : ""}</dd>
+      <dt>Hit points</dt><dd>${esc(o.hit_points)}${o.hit_dice ? " (" + esc(o.hit_dice) + ")" : ""}</dd><dt>Speed</dt><dd>${esc(speed)}</dd>
+      <dt>Challenge</dt><dd>${esc(o.challenge_rating_text || o.challenge_rating)}${o.proficiency_bonus ? " · PB +" + o.proficiency_bonus : ""}</dd>
+      ${o.passive_perception ? `<dt>Passive Perception</dt><dd>${o.passive_perception}</dd>` : ""}${o.languages?.as_string ? `<dt>Languages</dt><dd>${esc(o.languages.as_string)}</dd>` : ""}</dl>
+      <table class="abil"><tr>${keys.map(k => `<th>${k.slice(0,3).toUpperCase()}</th>`).join("")}</tr><tr>${keys.map(k => `<td>${ab[k] ?? ""} (${ab[k] != null ? mod(ab[k]) : ""})</td>`).join("")}</tr></table>`);
+    const part = (title, xs) => xs?.length ? `<h4>${title}</h4>` + xs.map(x => `<p><b>${esc(x.name)}.</b> ${md(x.desc).replace(/^<p>|<\/p>$/g, "")}</p>`).join("") : "";
+    const acts = o.actions || [], by = t => acts.filter(a => (a.action_type || "ACTION") === t);
+    h.push(part("Traits", o.traits) + part("Actions", by("ACTION")) + part("Bonus actions", by("BONUS_ACTION")) + part("Reactions", by("REACTION")) + part("Legendary actions", by("LEGENDARY_ACTION")));
+  } else if (model === "MagicItem" || model === "Item") {
+    meta.push([o.category?.name, o.rarity?.name, o.requires_attunement ? "requires attunement" + (o.attunement_detail ? " " + o.attunement_detail : "") : ""].filter(Boolean).map(esc).join(", "));
+    if (model === "Item") h.push(`<dl class="kv">${o.cost ? `<dt>Cost</dt><dd>${esc(o.cost)} gp</dd>` : ""}${o.weight ? `<dt>Weight</dt><dd>${esc(o.weight)} ${esc(o.weight_unit || "lb")}</dd>` : ""}
+      ${o.weapon ? `<dt>Damage</dt><dd>${esc(o.weapon.damage_dice || "")} ${esc(o.weapon.damage_type?.name || "")}</dd>${o.weapon.properties?.length ? `<dt>Properties</dt><dd>${esc(o.weapon.properties.map(p => p.property?.name || p.name || p).join(", "))}</dd>` : ""}` : ""}
+      ${o.armor ? `<dt>Armour class</dt><dd>${esc(o.armor.ac_display || o.armor.ac_base)}</dd>` : ""}</dl>`);
+    h.push(md(o.desc));
+  } else if (model === "Condition" && o.descriptions?.length) {
+    const ed = document.querySelector("[name=ed]:checked").value, d = o.descriptions.find(x => x.document === ed) || o.descriptions.find(x => x.document?.startsWith("srd")) || o.descriptions[0];
+    h.push(md(d.desc)); o.document = {display_name: d.document === "srd-2024" ? "SRD 5.2 (2024 rules)" : d.document === "srd-2014" ? "SRD 5.1 (2014 rules)" : d.document};
+  } else { h.push(md(o.desc)); }
+  if (meta.filter(Boolean).length) h.splice(1, 0, `<p class="meta">${meta.join(" · ")}</p>`);
+  h.push(`<p class="src">${esc(doc)}</p>`);
+  return h.join("");
+}
+async function open(route, key, model){
+  const box = $("#rshow"); box.innerHTML = "<p class='muted'>Opening</p>";
+  try { const r = await fetch(API + route.replace(/^v2\//, "") + encodeURIComponent(key) + "/"); box.innerHTML = r.ok ? detail(await r.json(), model) : "<p>Could not open that entry.</p>"; }
+  catch(e) { box.innerHTML = "<p>Open5e can't be reached. Check the connection.</p>"; }
+}
+async function rules(){
+  const v = q.value.trim(), ed = document.querySelector("[name=ed]:checked").value, me = ++seq, list = $("#rlist");
+  $("#ddb").href = "https://www.dndbeyond.com/search?q=" + encodeURIComponent(v);
+  if (v.length < 2) { list.innerHTML = "<li class='muted'>Type at least two letters.</li>"; return; }
+  list.innerHTML = "<li class='muted'>Searching</li>";
+  try {
+    if (!conds) { conds = []; try { const c = await (await fetch(API + "conditions/?limit=60&fields=key,name")).json(); conds = c.results.filter(x => !x.key.includes("_")).map(x => ({route: "v2/conditions/", object_pk: x.key, object_name: x.name, object_model: "Condition"})); } catch(e) {} }
+    const j = await (await fetch(API + "search/?limit=30&document_pk=" + ed + "&query=" + encodeURIComponent(v))).json();
+    if (me !== seq) return;
+    const lv = v.toLowerCase(), rank = r => { const n = r.object_name.toLowerCase(); return n === lv ? 0 : n.startsWith(lv) ? 1 : n.includes(lv) ? 2 : 3; };
+    const hits = conds.filter(c => c.object_name.toLowerCase().includes(lv)).concat(j.results || []).sort((a, b) => rank(a) - rank(b));
+    list.innerHTML = hits.length ? hits.map((r, i) => `<li><button data-r="${esc(r.route)}" data-k="${esc(r.object_pk)}" data-m="${esc(r.object_model)}"><b>${esc(r.object_name)}</b><span>${esc(r.object_model.replace(/([a-z])([A-Z])/g, "$1 $2"))}</span></button></li>`).join("")
+      : "<li class='muted'>Nothing in the SRD. Try D&amp;D Beyond below.</li>";
+    const first = list.querySelector("button"); if (first && rank(hits[0]) <= 1) first.click(); else if (!first) $("#rshow").innerHTML = "";
+  } catch(e) { if (me === seq) list.innerHTML = "<li class='muted'>Open5e can't be reached. Check the connection.</li>"; }
+}
+function run(){ if (tab === "world") world(); else { clearTimeout(timer); timer = setTimeout(rules, 250); } }
+q.addEventListener("input", run);
+tabs.forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
+document.addEventListener("click", e => {
+  const b = e.target.closest("#rlist button"); if (b) { document.querySelectorAll("#rlist button").forEach(x => x.classList.toggle("on", x === b)); open(b.dataset.r, b.dataset.k, b.dataset.m); }
+  const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); show(g.dataset.go); }
+});
+document.querySelectorAll("[name=ed]").forEach(r => r.addEventListener("change", () => { store.set("osse-rules-ed", r.value); run(); }));
+const ed = store.get("osse-rules-ed"); if (ed) { const r = document.querySelector(`[name=ed][value="${ed}"]`); if (r) r.checked = true; }
+const p = new URLSearchParams(location.search); if (p.get("q")) q.value = p.get("q");
+show(location.hash === "#rules" ? "rules" : "world");
+})();
+"""
 
 CSS = """:root{
   --ink:#0a0d14;--line:rgba(201,170,110,.16);--line-2:rgba(201,170,110,.32);
@@ -382,7 +628,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;pa
 .home:hover{color:var(--gold-hi);border-color:var(--line-2)}
 .sheet{background:linear-gradient(180deg,var(--vellum),var(--vellum-2));color:var(--vink);border-radius:6px;padding:clamp(20px,4vw,40px);box-shadow:0 18px 40px rgba(0,0,0,.45)}
 .sheet a{color:var(--vred);text-decoration-color:var(--vrule);text-underline-offset:2px}
-.nolink{font-weight:600}
+.nolink{font-weight:600}.muted{color:var(--vmuted)}
 h1{margin:0;font:600 clamp(26px,5vw,36px)/1.15 var(--f-display);letter-spacing:.03em;color:var(--vink)}
 .aka{color:var(--vmuted);font-style:italic;margin-top:2px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
@@ -397,7 +643,7 @@ h1{margin:0;font:600 clamp(26px,5vw,36px)/1.15 var(--f-display);letter-spacing:.
 section{margin-top:22px}
 h2{font:600 15px/1.3 var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--vred);margin:0 0 8px;padding-bottom:5px;border-bottom:1px solid var(--vrule)}
 h2 span{font:400 12px var(--f-mono);letter-spacing:.04em;text-transform:none;color:var(--vmuted);margin-left:6px}
-h4{font:600 14px var(--f-display);letter-spacing:.08em;margin:14px 0 4px}
+h3{font:600 22px/1.2 var(--f-display);margin:0 0 4px}h4{font:600 14px var(--f-display);letter-spacing:.08em;margin:14px 0 4px;color:var(--vred)}
 ul{margin:6px 0;padding-left:22px}li{margin:3px 0}ul.plain{list-style:none;padding:0}ul.plain li{margin:8px 0}
 li.task{list-style:"☐  "}li.task.done{list-style:"☑  ";color:var(--vmuted)}
 p{margin:6px 0}small{color:var(--vmuted)}
@@ -417,12 +663,26 @@ td{padding:6px 8px;border-bottom:1px solid var(--vline);vertical-align:top}.log 
 .lk .ty{color:var(--vmuted);font-style:italic}.lk .to small{margin-left:6px;font:11px var(--f-mono)}.lk .nt{grid-column:2/5;font-size:14px;color:var(--vmuted)}
 .also p{font-size:15.5px}
 footer{margin-top:28px;padding-top:10px;border-top:1px solid var(--vline);font-size:13px;color:var(--vmuted)}
-#q{width:100%;font:16px var(--f-body);padding:10px 12px;margin:14px 0 6px;border:1px solid var(--vline);border-radius:4px;background:rgba(255,255,255,.5);color:var(--vink)}
+.tabs{display:flex;gap:4px;margin:18px 0 0;border-bottom:1px solid var(--vrule)}
+.tabs button{font:600 13px/1 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--vmuted);background:none;border:1px solid transparent;border-bottom:0;border-radius:4px 4px 0 0;padding:11px 14px;cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected=true]{color:var(--vred);border-color:var(--vrule);background:rgba(255,255,255,.35)}
+#q{width:100%;font:16px var(--f-body);padding:10px 12px;margin:12px 0 6px;border:1px solid var(--vline);border-radius:4px;background:rgba(255,255,255,.55);color:var(--vink)}
 .jump{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px;margin:6px 0 10px}.jump a{text-decoration:none}.jump small{font:11px var(--f-mono)}
 .entries{list-style:none;padding:0;columns:2 320px;column-gap:28px}
 .entries li{break-inside:avoid;margin:0 0 10px}.entries li>a{font-weight:600}.entries small{display:block;font-size:14px;line-height:1.35}
 .st{font:500 11px var(--f-mono);padding:0 5px;border:1px solid var(--vline);border-radius:3px;margin-left:4px}
-@media (max-width:640px){.lk{grid-template-columns:52px 1fr auto}.lk .ty{grid-column:2/4}.lk .to{grid-column:1/3}.lk .wn{grid-row:2;grid-column:3}.lk .nt{grid-column:1/4}.props{grid-template-columns:1fr}.props dt{line-height:1.2;margin-top:6px}}
+.none{margin:16px 0}
+.ed{display:flex;gap:18px;font-size:15px;margin:2px 0 10px}.ed input{accent-color:var(--vred)}
+.rgrid{display:grid;grid-template-columns:minmax(200px,280px) 1fr;gap:18px;align-items:start}
+.rlist{list-style:none;padding:0;margin:0;max-height:70vh;overflow:auto;border-right:1px solid var(--vline);padding-right:8px}
+.rlist li{margin:0}.rlist button{width:100%;display:flex;justify-content:space-between;gap:8px;align-items:baseline;text-align:left;font:15px/1.3 var(--f-body);color:var(--vink);background:none;border:0;border-radius:4px;padding:8px;cursor:pointer}
+.rlist button span{font:11px var(--f-mono);color:var(--vmuted);white-space:nowrap}.rlist button:hover,.rlist button.on{background:rgba(124,22,34,.08)}
+.rshow .meta{font-style:italic;color:var(--vmuted);margin:0 0 8px}.rshow .src{font:11px var(--f-mono);color:var(--vmuted);margin-top:14px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:2px 14px;font-size:15.5px;margin:8px 0}.kv dt{font-weight:600}.kv dd{margin:0}
+.abil td,.abil th{text-align:center}
+.credit{font-size:13px;color:var(--vmuted);margin-top:18px;border-top:1px solid var(--vline);padding-top:8px}
+@media (max-width:640px){.lk{grid-template-columns:52px 1fr auto}.lk .ty{grid-column:2/4}.lk .to{grid-column:1/3}.lk .wn{grid-row:2;grid-column:3}.lk .nt{grid-column:1/4}
+  .props{grid-template-columns:1fr}.props dt{line-height:1.2;margin-top:6px}.rgrid{grid-template-columns:1fr}.rlist{max-height:40vh;border-right:0;border-bottom:1px solid var(--vline)}}
 @media print{body{background:#fff;padding:0}header{display:none}.sheet{box-shadow:none;background:#fff}}
 """
 
@@ -435,22 +695,42 @@ def write(path, text):
     return 1
 
 
+def status(g):
+    cur = g.get("current_session", 0); nxt = cur + 1
+    plans = [n for n in g["nodes"] if n["type"] == "plan" and n.get("status") in ("draft", "ready")]
+    aimed = [n for n in plans if str(n.get("target", "")).upper() == f"S{nxt}"]
+    screens = sorted(int(m.group(1)) for f in os.listdir(os.path.join(REPO, "screen")) for m in [re.fullmatch(r"s(\d+)\.html", f)] if m)
+    titles = {str(n.get("number")): re.sub(r"^S\d+\s*-\s*", "", n["id"]) for n in g["nodes"] if n["type"] == "session" and n.get("number")}
+    return {"current": cur, "next": nxt, "screens": screens, "titles": titles,
+            "ready": sorted(n["id"] for n in aimed if n.get("status") == "ready"), "aimed": len(aimed), "live_plans": len(plans),
+            "open_threads": sum(1 for n in g["nodes"] if n["type"] == "thread" and n.get("status", "open") == "open"),
+            "problems": len(g.get("problems", []))}
+
+
+def build_set(g, out_dir, player):
+    site = Site(g, player)
+    os.makedirs(out_dir, exist_ok=True)
+    keep, changed = {"index.html", "pages.css", "rules.js"}, 0
+    changed += write(os.path.join(out_dir, "pages.css"), CSS)
+    changed += write(os.path.join(out_dir, "rules.js"), RULES_JS)
+    changed += write(os.path.join(out_dir, "index.html"), index(site))
+    for nid in site.slugs:
+        f = site.slugs[nid] + ".html"; keep.add(f)
+        changed += write(os.path.join(out_dir, f), page(site, site.nodes[nid]))
+    for f in os.listdir(out_dir):
+        if (f.endswith(".html") or f.endswith(".css")) and f not in keep:
+            os.remove(os.path.join(out_dir, f)); changed += 1
+    return len(site.slugs), changed, site
+
+
 def build_pages(g=None):
     g = g or json.load(open(os.path.join(VAULT, ".osse", "graph.json"), encoding="utf-8"))
-    site = Site(g)
-    os.makedirs(OUT, exist_ok=True)
-    keep, changed = {"index.html", "vault.css"}, 0
-    changed += write(os.path.join(OUT, "vault.css"), CSS)
-    changed += write(os.path.join(OUT, "index.html"), index(site))
-    for n in g["nodes"]:
-        f = site.slugs[n["id"]] + ".html"; keep.add(f)
-        changed += write(os.path.join(OUT, f), page(site, n))
-    for f in os.listdir(OUT):
-        if f.endswith(".html") and f not in keep:
-            os.remove(os.path.join(OUT, f)); changed += 1
-    return len(keep) - 1, changed, site
+    total, changed, site = build_set(g, OUT, False)
+    changed += write(os.path.join(OUT, "status.json"), json.dumps(status(g), ensure_ascii=False, indent=1) + "\n")
+    ptotal, pchanged, _ = build_set(g, OUT_PLAYER, True)
+    return total, changed + pchanged, site, ptotal
 
 
 if __name__ == "__main__":
-    total, changed, _ = build_pages()
-    print(f"DM pages: {total} in vault/, {changed} changed")
+    total, changed, _, ptotal = build_pages()
+    print(f"Pages: {total} DM pages in vault/, {ptotal} player pages in codex/, {changed} files changed")

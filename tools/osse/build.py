@@ -491,7 +491,7 @@ def render_board(notes, plans, status_of, parsed, report, newly, current):
 def render_glossary(notes):
     cats = [("Places", ("place",)), ("People", ("pc", "npc")), ("Factions & peoples", ("faction",)), ("Other", ("item", "lore", "secret", "thread"))]
     out = ["---", "type: glossary", "---", "", "> [!info] Name and spelling glossary",
-           "> Every proper noun in canon and prep, for the Notion session summary instructions. Draft names are left out. Rebuilt by `tools/osse/build.py` in the homebrew repo.", ""]
+           "> Every proper noun in canon and prep, for spelling checks on the session transcript and the transcript bot's word list. Draft names are left out. Rebuilt by `tools/osse/build.py` in the homebrew repo.", ""]
     for label, kinds in cats:
         names = []
         for n in notes.values():
@@ -668,5 +668,5 @@ if __name__ == "__main__":
         print("PROBLEM:", p)
     if not DRY:
         import pages
-        total, changed, _ = pages.build_pages()
-        print(f"DM pages: {total} in vault/ of the homebrew repo, {changed} changed" + ("; commit and push them" if changed else ""))
+        total, changed, _, ptotal = pages.build_pages()
+        print(f"Pages: {total} DM pages in vault/, {ptotal} player pages in codex/, {changed} files changed" + ("; commit and push them" if changed else ""))

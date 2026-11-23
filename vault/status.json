@@ -1,0 +1,29 @@
+{
+ "current": 13,
+ "next": 14,
+ "screens": [
+  13
+ ],
+ "titles": {
+  "1": "Strangers in Ossë",
+  "10": "The Aerrowyn Gala",
+  "11": "To the Champions of Varenthal",
+  "12": "The Night the Bells Tolled",
+  "13": "A Crown of Knives",
+  "2": "Mission Under Fire",
+  "3": "The Glowing Goat",
+  "4": "Interrogations and Conspiracies",
+  "5": "Unholy Alliances",
+  "6": "The Vantry Investigation",
+  "7": "Forged in Fire",
+  "8": "A Royal Response",
+  "9": "Sermons of Fire and Brimstone"
+ },
+ "ready": [
+  "The loyal page"
+ ],
+ "aimed": 10,
+ "live_plans": 34,
+ "open_threads": 11,
+ "problems": 0
+}
