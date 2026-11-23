@@ -75,7 +75,10 @@ Every type, kind, property and link type maps to a standard term in `tools/osse/
 - In-world dates are optional: a session's `in_world` property or a note line, never in place of a stamp.
 
 ## Before a session
-Mark the plans Tom will use as `ready` and give them `target`. The build lists them on the board and on `Home.md`. The game master screen pages in `screen/` are built from the session plan (see the `session-screen` skill); the vault is where to look up who and what is involved.
+1. Mark the plans Tom will use as `ready` and give them `target`. The build lists them on the board and on `Home.md`.
+2. Run `python3 tools/osse/build.py`, then refresh the Notion spelling glossary from the vault's `Glossary.md` exactly as in step 8 of the `post-session` skill (additions only). This catches names added during prep, so the session's AI summary spells them right.
+
+The game master screen pages in `screen/` are built from the session plan (see the `session-screen` skill); the vault is where to look up who and what is involved.
 
 ## After a session
 Follow the `post-session` skill in `.claude/skills/`.

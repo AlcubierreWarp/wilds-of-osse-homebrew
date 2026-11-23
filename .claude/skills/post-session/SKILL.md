@@ -55,6 +55,7 @@ On approval, write every change with a short script (never re-type a note). Run 
 Follow the `chronicle` skill: write `Chronicle/S<n> - <title>.md` with `tools/chronicle.py note`, export, check, commit and push. Only what the table saw; no secrets, plans or prep. Add any new quest line to `Chronicle/Quest lines.md`.
 
 ## Step 8: Glossary
+Run this again before each session, after prep (see `docs/osse/README.md`, Before a session).
 Read the vault's `Glossary.md` and compare it with the `## 🔤 Name & Spelling Glossary` section of the Notion glossary page. Add only (never remove or respell), per category line. Write with `notion-update-page` (`update_content`, exact `old_str` from a fresh fetch), then re-fetch to confirm.
 
 ## Output style
