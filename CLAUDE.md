@@ -35,6 +35,7 @@ The campaign's truth lives in the Ossë Obsidian vault in iCloud, outside this r
 - After any vault change, `python3 tools/osse/build.py` and fix every problem it prints.
 - `vault/` holds a DM page for every vault note, rebuilt by `build.py`. It is a DM screen: link it only from the hub's game master section.
 - `codex/` is the players' version: only notes the table has met, only lines stamped with a played session. It is a player screen; it never links to `vault/`.
+- `vault/paths.html` (Paths ahead, also rebuilt by `build.py` from `tools/osse/paths.py`) draws every live plan as a branching tree under the player character it concerns, with what-ifs. DM screen only.
 - `vault/status.json` (also rebuilt by `build.py`) drives the hub's launchboard: the next session, its screen, and the checklist's automatic ticks.
 - The two boundaries (player screens vs DM screens, real-world secrets vs game secrets) are in `docs/osse/README.md`.
 

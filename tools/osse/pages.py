@@ -9,6 +9,7 @@ codex/   the players' screen: only what has come out in play. A note is in it on
          untagged lines are prep by the vault's rules, so they are left out, as are DM callouts, prep links,
          link notes, summaries, roles and plans. A line that links an unrevealed secret or a plan is dropped.
 Both index pages have a Rules tab that searches the System Reference Document live through Open5e (rules.js).
+vault/paths.html (Paths ahead, from paths.py) draws the live plans as branching trees per player character.
 vault/status.json tells the hub where the campaign stands. Only files whose content changed are rewritten."""
 import html, json, os, re, sys, unicodedata
 
@@ -465,7 +466,8 @@ def index(site):
     lede = (f"Everyone and everything the party has met, as far as play has shown, up to S{site.cur}. "
             'Session recaps are in the <a href="../chronicle/">chronicle</a>.' if P else
             f"Every note in the vault as a DM page, after S{site.cur}. Game secrets, prep and plans are here: "
-            "this is a DM screen, never one for players.")
+            "this is a DM screen, never one for players. "
+            '<a href="paths.html">Paths ahead</a> draws the live plans as branches under each player character.')
     out = [head(title, P), topbar(site), '<main class="sheet index">', f"<h1>{title}</h1>", f'<p class="summary">{lede}</p>',
            '<div class="tabs" role="tablist"><button role="tab" data-tab="world" aria-selected="true">In the world</button>'
            '<button role="tab" data-tab="rules" aria-selected="false">Rules and items</button></div>',
@@ -714,6 +716,10 @@ def build_set(g, out_dir, player):
     changed += write(os.path.join(out_dir, "pages.css"), CSS)
     changed += write(os.path.join(out_dir, "rules.js"), RULES_JS)
     changed += write(os.path.join(out_dir, "index.html"), index(site))
+    if not player:   # Paths ahead: live plans as branching trees, one lane per player character (tools/osse/paths.py)
+        import paths
+        keep.add("paths.html")
+        changed += write(os.path.join(out_dir, "paths.html"), paths.page(site))
     for nid in site.slugs:
         f = site.slugs[nid] + ".html"; keep.add(f)
         changed += write(os.path.join(out_dir, f), page(site, site.nodes[nid]))
