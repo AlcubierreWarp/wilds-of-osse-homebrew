@@ -276,7 +276,7 @@ CSS = r"""
 .ch.ready{background:var(--vink);color:var(--vellum);border-color:var(--vink)}.ch.sec{border:1px dashed var(--vred);color:var(--vred);cursor:pointer}
 .ch.sec.out{background:var(--vred);color:var(--vellum);border-style:solid}.ch.move{background:#b8860b;color:#fff;border-color:#b8860b}.ch.ck{border-color:#b8860b;color:#7a5a08}
 .ch.ed{border:1px dashed var(--vred);color:var(--vred)}
-.bn .opts{margin:2px 0 0;padding:0;list-style:none;font-size:13px}.bn .opts li{margin:2px 0}.bn .opts li::before{content:"◇ ";color:var(--vred)}
+.bn .opts{margin:2px 0 0;padding:0;list-style:none;font-size:13px}.bn .opts li{margin:2px 0}.bn .opts li::before{content:"◇ ";color:var(--vred)}.opts .to{color:var(--vmuted)}.opts .off{opacity:.6}
 .bn .why{display:none;font:500 11px/1.3 var(--f-mono);color:var(--vred)}
 .bn.cut{opacity:.45}.bn.cut .t{text-decoration:line-through}.bn.cut .why{display:block}
 .bn .xx{position:absolute;right:-10px;top:-10px;width:22px;height:22px;border-radius:50%;border:1px solid var(--vrule);background:#fbf5e6;color:var(--vred);font:600 14px/18px var(--f-mono);padding:0;cursor:pointer;display:none;z-index:3}
@@ -343,7 +343,7 @@ CSS = r"""
 .req li{display:flex;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px dashed var(--vline);font-size:15px}
 .req .ok{font:600 12px var(--f-mono);width:14px;flex:none}.req .ok.y{color:#2f6b3a}.req .ok.n{color:var(--vred)}.req .ok.m{color:#b8860b}
 .req .kk{font:500 11px var(--f-mono);color:var(--vmuted);flex:none;min-width:54px}.req small{display:block}
-.req button{margin-left:auto;flex:none}
+.req button{margin-left:auto;flex:none}.optl li{flex-wrap:wrap}.optl li>span:nth-child(2){flex:1;min-width:60%}.ob{display:flex;gap:4px;flex-wrap:wrap;width:100%;justify-content:flex-end}.ob button{margin-left:0}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .acts a,.acts button{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--vink);border-radius:4px;padding:9px 11px;color:var(--vink);background:none;cursor:pointer;text-decoration:none}
 .acts .del{border-color:var(--vred);color:var(--vred)}
@@ -368,7 +368,9 @@ CSS = r"""
 .rc .rw{font-size:13px;color:var(--vmuted);margin-top:1px}
 .pcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
 .pcx{font:700 10.5px/1.55 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:0 7px;border-radius:4px;border:2px solid var(--c);color:#1b1410;background:color-mix(in srgb,var(--c) 18%,#fbf5e6);white-space:nowrap}
-.pcx.in{background:var(--c)}button.pcx{cursor:pointer}button.pcx:hover{outline:2px solid var(--vink);outline-offset:1px}
+.pcx.in{background:var(--c)}.pcx.off{border-style:dashed;background:none;opacity:.85}.pcx.plus{--c:#9a8c74;border-style:dashed;background:none;color:var(--vmuted)}.pcx.plus.on{border-style:solid;background:var(--vink);color:var(--vellum)}.pcs .none{font-size:13px;font-style:italic;color:var(--vmuted)}
+.addsc{display:block;width:100%;max-width:760px;margin:4px 0 0;padding:12px;border:1.5px dashed #7f977b;border-radius:6px;background:none;color:#3f5a3c;font:600 13px var(--f-display);letter-spacing:.06em;cursor:pointer}.addsc:hover{background:#e7efe3}
+.ot{padding:3px 6px;font-size:13.5px;color:var(--vmuted)}.ot .el{color:var(--vred)}.ot .el::after{content:" →"}.ot small{font-size:12px}button.pcx{cursor:pointer}button.pcx:hover{outline:2px solid var(--vink);outline-offset:1px}
 .ch.who.pc{border:2px solid var(--c);background:color-mix(in srgb,var(--c) 30%,#fbf5e6);color:#1b1410}
 .rc .rx{font:600 11px var(--f-mono);letter-spacing:.06em;border:1px solid var(--vline);background:rgba(255,255,255,.5);color:var(--vink);border-radius:4px;padding:6px 8px;cursor:pointer;white-space:nowrap}
 .rc .rx[aria-expanded=true]{background:var(--vink);color:var(--vellum)}
@@ -422,7 +424,7 @@ const PLANKINDS = ["scene", "beat", "decision", "clock", "pressure", "bottleneck
 const KDESC = {scene: "Where, and who is there: it sets the stage. A box on the board; the cards inside it happen during the scene.",
   beat: "One key moment in a scene or encounter: a situation to put in front of them, not a script.",
   clock: "Time pressure: something happens when its segments fill. Tap the clock on the card to fill a segment.",
-  decision: "A choice the character faces. Each option leads to its own card; label each link with the choice.",
+  decision: "A choice the character faces. Each link out of it is one option: label the link with the choice. Two choices can lead to the same card, with a link for each.",
   pressure: "What the world does if no one acts: a portent that fires when they stall.",
   bottleneck: "A beat most paths reach, where branches meet again.",
   note: "A loose idea. Claude turns it into a plan when you ask."};
@@ -559,7 +561,8 @@ function extras(o) {   // what a scene or clock adds to its card
 /* ---------- session plan: every scene of a session, in running order ---------- */
 const RUN = "@session", PCS = D.lanes.filter(l => l.kind === "pc");
 let runMode = false, runTab = null;
-const opened = new Set();
+const opened = new Set(), HOMELESS = (D.lanes.find(l => l.kind === "party") || D.lanes[0]).key;   // where a scene with no players waits
+let casting = null;
 const lc = x => String(x || "").trim().toLowerCase();
 function pcOf(name) {   // a player character's key, "party", or null
   const n = lc(name);
@@ -578,9 +581,12 @@ const scenesIn = t => {
 const looseIn = t => Object.keys(doc.items).filter(i => live(i) && !isScene(i) && !sceneOf(i) && sessOf(i) === t);
 function runOrder() { const o = {}; runSessions().forEach(t => { const s = scenesIn(t); if (s.length) o[t] = s; }); return o; }
 function pills(id) {   // the boards a scene is on: filled, listed as present; outlined, on their board only
-  const ks = lanesOf(id), cast = castLanes(id);
-  return D.lanes.filter(l => ks.includes(l.key)).map(l => `<button class="pcx${cast.includes(l.key) ? " in" : ""}" style="--c:${esc(l.colour || "#b9ab95")}" data-go="${esc(l.key)}" data-id="${esc(id)}" ` +
-    `title="${esc(cast.includes(l.key) || l.kind !== "pc" ? "" : "Not listed as present. ")}Open this scene on ${esc(boardName(l.key))}">${esc(l.short)}</button>`).join("");
+  const cast = castLanes(id), homes = it(id).homes, ks = lanesOf(id), ed = casting === id;
+  if (ed) return D.lanes.filter(l => l.kind !== "world").map(l => `<button class="pcx${cast.includes(l.key) ? " in" : " off"}" aria-pressed="${cast.includes(l.key)}" style="--c:${esc(l.colour || "#b9ab95")}" data-cast="${esc(l.key)}" data-id="${esc(id)}">${cast.includes(l.key) ? "✓ " : "+ "}${esc(l.kind === "party" ? "Everyone" : l.short)}</button>`).join("") +
+    `<button class="pcx plus on" data-casting="${esc(id)}">Done</button>`;
+  return (homes.length || cast.length ? D.lanes.filter(l => ks.includes(l.key)).map(l => `<button class="pcx${cast.includes(l.key) ? " in" : ""}" style="--c:${esc(l.colour || "#b9ab95")}" data-go="${esc(l.key)}" data-id="${esc(id)}" ` +
+    `title="${esc(cast.includes(l.key) || l.kind !== "pc" ? "" : "Not listed as present. ")}Open this scene on ${esc(boardName(l.key))}">${esc(l.short)}</button>`).join("") : `<span class="none">No players yet</span>`) +
+    `<button class="pcx plus" data-casting="${esc(id)}" title="Add or remove players">+ Players</button>`;
 }
 function treeOf(sid) {   // a scene's cards under the cards that lead to them, by the arrows
   const pos = m => [it(m).ry || 0, it(m).rx || 0];
@@ -589,9 +595,9 @@ function treeOf(sid) {   // a scene's cards under the cards that lead to them, b
   ms.forEach(m => {
     const cands = es.filter(e => e.to === m && inn.has(e.from)), own = cands.filter(e => e.own).reverse();   // Tom's latest arrow wins
     const pick = [...own, ...cands.filter(e => !e.own)].find(e => { for (let x = e.from; x; x = par[x]) if (x === m) return false; return true; });
-    if (pick) { par[m] = pick.from; lab[m] = pick.label === "then" ? "" : pick.label; }
-    else { const top = es.find(e => e.to === m && e.from === sid); if (top) lab[m] = top.label; }
-    also[m] = cands.filter(e => e !== pick).map(e => e.from);
+    if (pick) { par[m] = pick.from; lab[m] = cands.filter(e => e.from === pick.from && e.label && e.label !== "then").map(e => e.label); }
+    else { const top = es.find(e => e.to === m && e.from === sid); if (top && top.label) lab[m] = [top.label]; }
+    also[m] = [...new Set(cands.filter(e => !pick || e.from !== pick.from).map(e => e.from))];
     (kids[par[m] || ""] ||= []).push(m);
   });
   return {ms, par, lab, also, kids, under: m => { const out = [m]; for (let i = 0; i < out.length; i++) out.push(...(kids[out[i]] || [])); return out; }};
@@ -601,9 +607,44 @@ function treeHtml(sid, tr, root) {
   return `<ul class="tree">` + list.map(m => {
     const k = kindOf(m) || "beat", o = objOf(m), [f, n] = parseClock(o.clock);
     return `<li><div class="tr${m.startsWith("p:") && cut[m.slice(2)] ? " cut" : ""}" data-card="${esc(m)}"><span class="rg" title="Drag to move it">⠿</span><span class="mk k-${esc(k)}">${esc(KINDS[k] || "Beat")}</span>` +
-      `<span class="tt">${tr.lab[m] ? `<i class="el">${esc(tr.lab[m])}</i> ` : ""}${esc(titleOf(m))}</span>${k === "clock" ? `<span class="rng">${ring(f, n, 18)}</span>` : ""}` +
-      (tr.also[m].length ? `<small>also after ${esc(tr.also[m].map(titleOf).join(", "))}</small>` : "") + `</div>${treeHtml(sid, tr, m)}</li>`;
+      `<span class="tt">${tr.lab[m] && tr.lab[m].length ? `<i class="el">${tr.lab[m].map(esc).join(" <b>or</b> ")}</i> ` : tr.par[m] && kindOf(tr.par[m]) === "decision" ? `<i class="el none">choice not named</i> ` : ""}${esc(titleOf(m))}</span>${k === "clock" ? `<span class="rng">${ring(f, n, 18)}</span>` : ""}` +
+      (tr.also[m].length ? `<small>also after ${esc(tr.also[m].map(titleOf).join(", "))}</small>` : "") + `</div>${treeHtml(sid, tr, m)}${k === "decision" ? elsewhere(m, tr) : ""}</li>`;
   }).join("") + `</ul>`;
+}
+function elsewhere(m, tr) {   // a decision's options that lead out of this scene, or to a card shown under another
+  const os = optionsOf(m).filter(o => tr.par[o.to] !== m);
+  const at = o => o.off ? "not placed" : tr.ms.includes(o.to) ? "below" : sceneOf(o.to) ? `in “${titleOf(sceneOf(o.to))}”${sessOf(o.to) !== sessOf(m) ? ", " + sessOf(o.to) : ""}` : isScene(o.to) ? `a scene${sessOf(o.to) !== sessOf(m) ? " in " + sessOf(o.to) : ""}` : `not in a scene${sessOf(o.to) !== sessOf(m) ? ", " + sessOf(o.to) : ""}`;
+  return os.length ? `<ul class="tree outs">${os.map(o => `<li><div class="ot">↗ ${o.label ? `<i class="el">${esc(o.label)}</i> ` : ""}${esc(titleOf(o.to))} <small>${esc(at(o))}</small></div></li>`).join("")}</ul>` : "";
+}
+function togglePlayer(id, k) {   // in or out of a scene; "The Party" stands for everyone
+  const o = it(id), list = [...(objOf(id).present || [])], everyone = list.some(n => pcOf(n) === "party"), lead = list.some(n => pcOf(n) === k);
+  let next;
+  if (k === "The Party") next = everyone ? list.filter(n => pcOf(n) !== "party") : ["The Party", ...list.filter(n => !pcOf(n))];
+  else if (lead) next = list.filter(n => pcOf(n) !== k);
+  else if (everyone) next = [...PCS.map(p => p.key).filter(x => x !== k), ...list.filter(n => !pcOf(n))];
+  else next = [...list, k];
+  const before = lanesOf(id);
+  setPresent(id, next);
+  const cast = castLanes(id);
+  if ((k === "The Party" && everyone) || (k !== "The Party" && (lead || everyone))) o.homes = o.homes.filter(h => h !== k);   // out of the scene: off that board too
+  if (!o.homes.length && !cast.length) o.born = HOMELESS;
+  const now = lanesOf(id); before.forEach(b => { if (!now.includes(b) && o.at) delete o.at[b]; });
+  changed(); drawRun(); if (shown === id) open(id, mode);
+}
+function newScene() {   // a scene for this session, on no board until it has players
+  const cid = Math.random().toString(36).slice(2, 10), id = "c:" + cid;
+  doc.cards[cid] = {kind: "scene", title: "", text: "", where: "", present: []};
+  doc.items[id] = {s: runTab, homes: [], born: HOMELESS, at: {}, w: SCW, h: SCH};
+  doc.order[runTab] = [...scenesIn(runTab).filter(x => x !== id), id];
+  opened.add(id); casting = id; changed(); drawRun();
+  const el = $$("#run .rc").find(x => x.dataset.uid === id); if (el) el.scrollIntoView({block: "nearest"});
+  openHere(id);
+}
+function newInScene(sid) {   // a card of Tom's, at the end of a scene
+  const cid = Math.random().toString(36).slice(2, 10), id = "c:" + cid, ks = lanesOf(sid);
+  doc.cards[cid] = {kind: "beat", title: "", text: ""};
+  doc.items[id] = {s: sessOf(sid), homes: [ks[0]], born: ks[0], at: {}};
+  dropInto(id, {sid}, [id]); openHere(id);
 }
 function runCard(id, i) {
   const o = objOf(id), mine = id.startsWith("c:"), op = opened.has(id), tr = treeOf(id), others = (o.present || []).filter(n => !pcOf(n)), text = (mine ? o.text : o.summary) || "";
@@ -615,7 +656,7 @@ function runCard(id, i) {
     `<div class="pcs">${pills(id)}</div></div>` +
     `<button class="rx" aria-expanded="${op}" title="Show or hide what happens in this scene">${op ? "▾" : "▸"} ${tr.ms.length}</button>` +
     `<div class="rm"${op ? "" : " hidden"}>${text ? `<p>${esc(text)}</p>` : ""}` + (treeHtml(id, tr, "") || `<p class="muted">Nothing in this scene yet. Drag a card here.</p>`) +
-    `<div class="acts"><button data-edit="${esc(id)}">Edit scene</button></div></div></div>`;
+    `<div class="acts"><button data-edit="${esc(id)}">Edit scene</button><button data-addto="${esc(id)}">+ Card</button></div></div></div>`;
 }
 let runQ = "", runTray = false;
 function drawRun() {
@@ -625,12 +666,17 @@ function drawRun() {
   $$("#rsess [data-rtab]").forEach(b => b.onclick = () => { runTab = b.dataset.rtab; closeDrawer(); drawRun(); $("#run").scrollTop = 0; });
   $("#run").innerHTML = `<div class="runh"><span><b>Running order · ${esc(t)}</b> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"}</span>` +
     (scenes.length ? `<button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button>` : "") + `</div>` +
-    (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add one on a character's board (+ Scene), or drag a scene in from the plans on the right.</p>`);
+    (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add the scenes first and fit beats and decisions into them, or drag cards in later.</p>`) +
+    `<button class="addsc" data-newscene>+ Add a scene to ${esc(t)}</button>`;
   $("#run").scrollTop = top;
   drawLoose(t);
   $$("#run [data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); goto(b.dataset.go, t, b.dataset.id); });
   $$("#run [data-edit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openHere(b.dataset.edit); });
   $$("#run .rx").forEach(b => b.onclick = ev => { ev.stopPropagation(); toggleRun(b.closest(".rc").dataset.uid); });
+  $$("#run [data-casting]").forEach(b => b.onclick = ev => { ev.stopPropagation(); casting = casting === b.dataset.casting ? null : b.dataset.casting; drawRun(); });
+  $$("#run [data-cast]").forEach(b => b.onclick = ev => { ev.stopPropagation(); togglePlayer(b.dataset.id, b.dataset.cast); });
+  $$("#run [data-addto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); newInScene(b.dataset.addto); });
+  $("#run [data-newscene]").onclick = newScene;
   const ax = $("#run [data-allx]"); if (ax) ax.onclick = () => { scenes.forEach(x => all ? opened.delete(x) : opened.add(x)); drawRun(); };
   $$("#run .rc").forEach(el => runDrag(el, t));
   $$("#run .tr").forEach(el => cardDrag(el, el.dataset.card));
@@ -732,7 +778,11 @@ function cardDrag(el, id) {   // a card: into a scene, under or beside another c
       else if (spot.scene) {
         putPlan(id, runTab); const ord = scenesIn(runTab).filter(x => x !== id), i = spot.before ? ord.indexOf(spot.before) : -1;
         ord.splice(i < 0 ? ord.length : i, 0, id); doc.order[runTab] = ord; changed(); drawRun();
-      } else dropInto(id, spot, mine);
+      } else {
+        dropInto(id, spot, mine);
+        const e = spot.parent && kindOf(spot.parent) === "decision" && doc.edges.find(x => x.from === spot.parent && x.to === id && !x.label);
+        if (e) edgeEditor(e.id);   // a new option: ask for the choice
+      }
     });
   });
 }
@@ -751,8 +801,8 @@ function dropInto(id, spot, block) {   // put a card (and what follows it) into 
   if (whole && from !== sid) { const e = genEdges().filter(x => x.to === id && members.has(x.from)).pop(); if (e) spot.parent = e.from; }
   else doc.edges = doc.edges.filter(e => e.to !== id || e.from === spot.parent || !(e.from === oldPar || (!spot.parent && (members.has(e.from) || (old && old.ms.includes(e.from))))));
   if (spot.parent) {
-    const i = doc.edges.findIndex(e => e.from === spot.parent && e.to === id);
-    if (i >= 0) doc.edges.push(doc.edges.splice(i, 1)[0]);   // the latest arrow is the one the list follows
+    const mine = e => e.from === spot.parent && e.to === id;
+    if (doc.edges.some(mine)) doc.edges = [...doc.edges.filter(e => !mine(e)), ...doc.edges.filter(mine)];   // the latest arrow is the one the list follows
     else addEdge(spot.parent, id);
   }
   /* place */
@@ -843,7 +893,7 @@ function planCard(id) {
   const checks = p.req.filter(r => r.k === "check").length;
   return `<div class="k"><span>${esc(KINDS[p.kind] || "Beat")}</span><span>${p.edited ? "edited · not in vault" : esc(p.status)}</span></div><div class="t">${esc(p.id)}</div>` +
     extras(p) + `<div class="s">${esc(p.summary)}</div>` +
-    (p.kind === "decision" ? (p.options.length ? `<ul class="opts">${p.options.map(o => `<li>${esc(o.label || o.to)}</li>`).join("")}</ul>` : `<div class="s"><i>Options not written yet.</i></div>`) : "") +
+    (p.kind === "decision" ? optsHtml("p:" + p.id) : "") +
     `<div class="chips">${p.status === "ready" ? '<span class="ch ready">ready</span>' : ""}${mv ? `<span class="ch move">${esc(mv)}</span>` : ""}` +
     secReq(p).map(r => `<span class="ch sec ${isOut(r.a) ? "out" : ""}" data-sec="${esc(r.a)}" data-need="${r.k}" title="Tap: what if this comes out?">${isOut(r.a) ? "out" : "secret"}: ${esc(r.a)}</span>`).join("") +
     (checks ? `<span class="ch ck">${checks} check${checks > 1 ? "s" : ""}</span>` : "") +
@@ -895,7 +945,7 @@ function cardHtml(id) {
   if (mine) {
     const c = doc.cards[id.slice(2)];
     inner = `<div class="k"><span>${esc(KINDS[c.kind] || "Note")}</span><span>yours · not in vault</span></div><div class="t">${esc(c.title || "Untitled")}</div>` + extras(c) +
-      (c.text ? `<div class="s">${esc(c.text.length > 220 ? c.text.slice(0, 220) + "…" : c.text)}</div>` : "");
+      (c.text ? `<div class="s">${esc(c.text.length > 220 ? c.text.slice(0, 220) + "…" : c.text)}</div>` : "") + (c.kind === "decision" ? optsHtml(id) : "");
     cls = `mine k-${c.kind}`;
   } else {
     const pid = id.slice(2), p = view_of(pid);
@@ -983,24 +1033,36 @@ function genEdges() {   // every link between placed items: the vault's, then To
     p.req.forEach(r => { if ((r.k === "plan" || r.k === "played") && live("p:" + r.a)) out.push({from: "p:" + r.a, to: id, label: "then"}); });
     if (p.kind === "decision") p.options.forEach(o => { if (live("p:" + o.to)) out.push({from: id, to: "p:" + o.to, label: o.label, opt: 1}); });
   }
-  const best = new Map();   // a decision's option line beats the bare "needs" between the same two
-  out.forEach(e => { const k = e.from + ">" + e.to; if (!best.has(k) || e.opt) best.set(k, e); });
-  return [...best.values()].concat(doc.edges.filter(e => !best.has(e.from + ">" + e.to)).map(e => ({...e, own: 1})));
+  const pair = e => e.from + ">" + e.to, same = (a, b) => lc(a.label) === lc(b.label);
+  const opts = out.filter(e => e.opt), needs = out.filter(e => !e.opt), choosing = e => kindOf(e.from) === "decision";
+  const own = doc.edges.filter(e => live(e.to) && (choosing(e) ? !opts.some(o => pair(o) === pair(e) && same(o, e)) : !out.some(o => pair(o) === pair(e)))).map(e => ({...e, own: 1}));
+  /* from a decision, each link is an option, so the bare "needs" between two cards goes when an option joins them */
+  return [...opts, ...needs.filter(e => !opts.some(o => pair(o) === pair(e)) && !(choosing(e) && own.some(o => pair(o) === pair(e)))), ...own];
 }
-function curve(a, b, inside) {
+function optionsOf(id) {   // a decision's options: one for each link out of it, then any the vault lists whose plan is not on the boards
+  const on = live(id) ? genEdges().filter(e => e.from === id && live(e.to)).map(e => ({to: e.to, label: e.label === "then" ? "" : e.label, own: e.own, id: e.id})) : [];
+  const off = id.startsWith("p:") && P[id.slice(2)] ? P[id.slice(2)].options.filter(o => !live(id) || !live("p:" + o.to)).map(o => ({to: "p:" + o.to, label: o.label, off: 1})) : [];
+  return on.concat(off);
+}
+const optsHtml = id => { const os = optionsOf(id);
+  return os.length ? `<ul class="opts">${os.map(o => `<li${o.off ? ' class="off"' : ""}>${o.label ? esc(o.label) : "<i>choice not named</i>"} <span class="to">→ ${esc(titleOf(o.to))}${o.off ? " (not placed)" : ""}</span></li>`).join("")}</ul>`
+    : `<div class="s"><i>No options yet: link this card to what each choice leads to.</i></div>`; };
+function curve(a, b, inside, off = 0) {   // off: how far to fan out, when several links join the same two cards
   if (inside) {   // a scene to a card inside it: down from the header
     const x1 = a.x + 20, y1 = a.y + a.hh, x2 = b.x, y2 = b.y + Math.min(b.h / 2, 56);
     return {d: `M${x1},${y1} C${x1},${y2} ${x1},${y2} ${x2},${y2}`, mx: (x1 + x2) / 2, my: y2 - 12};
   }
   const x1 = a.x + a.w, y1 = a.y + Math.min(a.h / 2, 56), x2 = b.x, y2 = b.y + Math.min(b.h / 2, 56);
   const dx = x2 < x1 + 20 ? 90 : Math.max(50, (x2 - x1) / 2);
-  return {d: `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`, mx: (x1 + x2) / 2, my: (y1 + y2) / 2};
+  return {d: `M${x1},${y1} C${x1 + dx},${y1 + off} ${x2 - dx},${y2 + off} ${x2},${y2}`, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 + off * .75};
 }
 function wires(temp) {
   const tab = T(), ti = doc.sessions.indexOf(tab), order = x => doc.sessions.indexOf(x), here = id => live(id) && lanesOf(id).includes(lane);
   let svg = '<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="rgba(124,22,34,.75)"/></marker></defs>', labels = "";
-  const carried = new Set();
-  genEdges().forEach(e => {
+  const carried = new Set(), es = genEdges(), count = {}, seen = {};
+  es.forEach(e => { const k = e.from + ">" + e.to; count[k] = (count[k] || 0) + 1; });
+  es.forEach(e => {
+    const key = e.from + ">" + e.to, nth = seen[key] = (seen[key] ?? -1) + 1;
     if (e.from.startsWith("start")) { if (e.lane && e.lane !== lane) return; e = {...e, from: "start"}; }
     if (!here(e.to) || (e.from !== "start" && !here(e.from))) return;
     const fs = e.from === "start" ? tab : sessOf(e.from), ts = sessOf(e.to);
@@ -1011,7 +1073,7 @@ function wires(temp) {
       carried.add(e.to); from = "start"; lab = `after ${titleOf(e.from)} (${fs})`; cls = "carry";
     }
     const a = box(from), b = box(e.to); if (!a || !b) return;
-    const c = curve(a, b, a.sc && sceneOf(e.to) === from);
+    const c = curve(a, b, a.sc && sceneOf(e.to) === from, (nth - (count[key] - 1) / 2) * 60);
     svg += `<path class="${cls}" d="${c.d}" marker-end="url(#ar)"/>`;
     if (e.own && from === e.from) svg += `<path class="hit" data-edge="${esc(e.id)}" d="${c.d}"/>`;
     if (lab || e.own) labels += `<div class="wl ${e.own && from === e.from ? "own" : ""}" ${e.own && from === e.from ? `data-edge="${esc(e.id)}"` : ""} style="left:${c.mx}px;top:${c.my}px">${esc(lab || "add a label")}</div>`;
@@ -1172,7 +1234,7 @@ function link(ev, from) {
     const hit = document.elementsFromPoint(e.clientX, e.clientY).map(x => x.closest && x.closest(".bn")).find(Boolean);
     const to = hit && hit.dataset.id;
     if (!to || to === from || to === "start") { wires(); return; }
-    const id = addEdge(from === "start" ? "start:" + T() : from, to); changed(); wires(); edgeEditor(id);
+    const id = addEdge(from === "start" ? "start:" + T() : from, to); changed(); draw(); edgeEditor(id);
   };
   t.addEventListener("pointermove", mv); t.addEventListener("pointerup", up);
 }
@@ -1323,9 +1385,7 @@ function open(id, m) {
       const cl = F[r.a] && F[r.a].clues !== undefined ? `<small>${F[r.a].clues} way${F[r.a].clues === 1 ? "" : "s"} it could come out${F[r.a].clues < 3 ? ": aim for three" : ""}</small>` : "";
       return `<li><span class="ok ${ok[0]}">${ok[1]}</span><span class="kk">${esc(r.imp ? "alive*" : r.k)}</span><span>${nm}${cl}</span>${can ? `<button class="mini" data-i="${i}">${esc(lab)}</button>` : ""}</li>`;
     }).join("");
-    const opts = p.kind !== "decision" ? "" : `<h4>Options</h4>` + (p.options.length ? `<ul class="req">${p.options.map((o, i) =>
-      `<li><span class="kk">choice</span><span>${esc(o.label || "")} → <b>${esc(o.to)}</b></span><button class="mini" data-pick="${i}">what if they choose this?</button></li>`).join("")}</ul>`
-      : `<p class="muted" style="font-size:15px">None written yet. Add a card for each choice and link this decision to each one, with the choice as the label.</p>`);
+    const opts = p.kind === "decision" ? optsPanel(id) : "";
     const ideaHtml = p.edited && (L().edits[pid] || {}).idea !== undefined ? `<p>${esc(p.ideaText).replace(/\n/g, "<br>")}</p>` : p.idea;
     const [cf, cn] = parseClock(p.clock);
     body = `<p>${esc(p.summary)}</p>${cut[pid] ? `<p style="color:var(--vred);font-weight:600">Closed by the what-ifs: ${esc(cut[pid])}</p>` : ""}` +
@@ -1367,12 +1427,25 @@ function open(id, m) {
     return;
   }
   d.querySelectorAll("[data-i]").forEach(b => b.onclick = () => flip(p.req[+b.dataset.i]));
-  d.querySelectorAll("[data-pick]").forEach(b => b.onclick = () => {
-    const keep = p.options[+b.dataset.pick].to; p.options.forEach(o => { if (o.to !== keep) ov.drop[o.to] = true; }); delete ov.drop[keep]; refresh(); });
+  optsBind(d, id);
   const back = d.querySelector("[data-back]"); if (back) back.onclick = () => unplace(pid);
   const pl = d.querySelector("[data-place]"); if (pl) pl.onclick = () => { place(pid, T()); open(id); };
   d.querySelector("[data-dropplan]").onclick = () => { if (confirm(`Drop “${pid}”? It leaves this board and the tray. Claude marks it dropped in the vault when you bring the board in; until then you can undo it from the tray.`)) dropPlan(pid); };
   d.querySelector("[data-drop]").onclick = () => { if (ov.drop[pid]) delete ov.drop[pid]; else ov.drop[pid] = true; refresh(); };
+}
+function optsPanel(id) {   // a decision's options in its panel: one line per link
+  const os = optionsOf(id), plans = new Set(os.map(o => o.to).filter(x => x.startsWith("p:")));
+  return `<h4>Options</h4>` + (os.length ? `<ul class="req optl">${os.map((o, i) => `<li><span class="kk">option</span><span>${o.label ? esc(o.label) : "<i>choice not named</i>"} → <b>${esc(titleOf(o.to))}</b>${o.off ? " (not placed)" : ""}</span>` +
+    `<span class="ob">${o.own ? `<button class="mini" data-eo="${esc(o.id)}">edit</button>` : ""}${o.off ? "" : `<button class="mini" data-oo="${i}" title="Another choice that leads to the same card">+ same outcome</button>`}` +
+    `${[...plans].some(x => x !== o.to) ? `<button class="mini" data-pick="${i}">what if this?</button>` : ""}</span></li>`).join("")}</ul>`
+    : `<p class="muted" style="font-size:15px">Each link out of this card is an option. Drag from its + to the card a choice leads to (or, in the Session plan, drop that card on this one), and label the link with the choice.</p>`);
+}
+function optsBind(d, id) {
+  const os = optionsOf(id);
+  d.querySelectorAll("[data-eo]").forEach(b => b.onclick = () => edgeEditor(b.dataset.eo));
+  d.querySelectorAll("[data-oo]").forEach(b => b.onclick = () => { const e = addEdge(id, os[+b.dataset.oo].to); changed(); draw(); edgeEditor(e); });
+  d.querySelectorAll("[data-pick]").forEach(b => b.onclick = () => {
+    const keep = os[+b.dataset.pick].to; os.forEach(o => { if (o.to !== keep && o.to.startsWith("p:")) ov.drop[o.to.slice(2)] = true; }); delete ov.drop[keep.slice(2)]; refresh(); });
 }
 function toScene(id) {   // after its kind changes: a scene needs a box and sits in no other; anything else holds no cards
   const o = it(id); if (!o) return;
@@ -1388,13 +1461,16 @@ function cardEditor(id) {
     (c.kind === "scene" ? sceneFields(c.where, "ce") : "") + (c.kind === "clock" ? clockFields(c.clock, "ce") : "") +
     `<label for="ce-x">${c.kind === "scene" ? "The situation: what is going on when it opens" : c.kind === "clock" ? "What happens when it fills" : "What happens, or the choice"}</label><textarea id="ce-x" placeholder="A sentence or two: who, what, and why it matters.">${esc(c.text)}</textarea>` +
     (c.kind === "scene" ? sceneView(c, "c:" + id).replace(/<h4>Scene<\/h4><dl[\s\S]*?<\/dl>/, "") : inSceneLine("c:" + id)) +
+    (c.kind === "decision" ? optsPanel("c:" + id) : "") +
     sessPick(sessOf("c:" + id), "ce-sess") +
     `<p class="muted" style="font-size:14px">Link it with the + on its right edge, and label each link. When the board is ready, ask Claude to bring it into the vault.</p>` +
     `<div class="acts"><button data-done>Done</button><button class="del" data-del>Delete card</button></div>`);
   const t = d.querySelector("#ce-t"), x = d.querySelector("#ce-x"), k = d.querySelector("#ce-k");
   const w = d.querySelector("#ce-w");
   const sync = () => { c.title = t.value.trim(); c.text = x.value.trim(); c.kind = k.value; if (w) c.where = w.value.trim(); d.querySelector("#ce-kd").textContent = KDESC[c.kind]; changed(); };
-  t.oninput = sync; x.oninput = sync;
+  t.oninput = sync; x.oninput = sync; t.onchange = () => { sync(); draw(); };
+  t.onkeydown = ev => { if (ev.key === "Enter") { sync(); closeDrawer(); draw(); } };
+  optsBind(d, "c:" + id);
   k.onchange = () => { sync(); toScene("c:" + id); changed(); draw(); open("c:" + id); };
   if (w) { w.oninput = sync; w.onchange = () => { sync(); draw(); }; }
   if (d.querySelector(".whobox")) { const pk = whoPicker(d, [...(c.present || [])], () => { c.present = pk.get(); changed(); draw(); if (runMode) return; const on = d.querySelector(".inscene"); if (on && c.kind === "scene") on.textContent = `On ${names(lanesOf("c:" + id))}. One copy: a change on one board is a change on all of them.`; }); }
@@ -1405,16 +1481,19 @@ function cardEditor(id) {
   if (!c.title) setTimeout(() => t.focus(), 50);
 }
 function edgeEditor(eid) {
-  const e = L().edges.find(x => x.id === eid); if (!e) return;
-  const d = frame(`<div class="ey">Your link · not in the vault yet</div><h3>${esc(e.from.startsWith("start") ? "Start of " + T() : titleOf(e.from))} → ${esc(titleOf(e.to))}</h3>` +
-    `<label for="ee-l">Label</label><input type="text" id="ee-l" value="${esc(e.label)}" placeholder="the choice, or “then”, or “if they stall”">` +
-    `<p class="muted" style="font-size:14px">From a decision, write the choice that leads here. Between beats, “then” means the second needs the first.</p>` +
-    `<div class="acts"><button data-done>Done</button><button class="del" data-del>Delete link</button></div>`);
-  const i = d.querySelector("#ee-l");
+  const e = doc.edges.find(x => x.id === eid); if (!e) return;
+  shown = null;
+  const dec = kindOf(e.from) === "decision";
+  const d = frame(`<div class="ey">${dec ? "An option of this decision" : "Your link"} · not in the vault yet</div><h3>${esc(e.from.startsWith("start") ? "Start of " + T() : titleOf(e.from))} → ${esc(titleOf(e.to))}</h3>` +
+    `<label for="ee-l">${dec ? "The choice" : "Label"}</label><input type="text" id="ee-l" value="${esc(e.label)}" placeholder="${dec ? "what the character chooses" : "“then”, or “if they stall”"}">` +
+    `<p class="muted" style="font-size:14px">${dec ? "Each link out of a decision is one option. Two choices can lead to the same card: add a link for each." : "Between beats, “then” means the second needs the first."}</p>` +
+    `<div class="acts"><button data-done>Done</button>${dec ? `<button data-again>Another choice leading here</button>` : ""}<button class="del" data-del>Delete link</button></div>`);
+  const i = d.querySelector("#ee-l"), done = () => { closeDrawer(); draw(); };
   i.oninput = () => { e.label = i.value.trim(); changed(); };
-  i.onkeydown = ev => { if (ev.key === "Enter") { closeDrawer(); wires(); } };
-  d.querySelector("[data-done]").onclick = () => { closeDrawer(); wires(); };
-  d.querySelector("[data-del]").onclick = () => { const s = L(); s.edges = s.edges.filter(x => x.id !== eid); changed(); closeDrawer(); wires(); };
+  i.onkeydown = ev => { if (ev.key === "Enter") done(); };
+  d.querySelector("[data-done]").onclick = done;
+  const ag = d.querySelector("[data-again]"); if (ag) ag.onclick = () => { const n = addEdge(e.from, e.to); changed(); draw(); edgeEditor(n); };
+  d.querySelector("[data-del]").onclick = () => { doc.edges = doc.edges.filter(x => x.id !== eid); changed(); done(); };
   setTimeout(() => i.focus(), 50);
 }
 function legend() {
@@ -1545,7 +1624,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 function pick(key) {
   if (lane && !runMode) views[lane + "|" + T()] = {...view};
   runMode = key === RUN;
-  $("#runw").hidden = !runMode; $("#work").hidden = runMode; $$(".tools .mini").forEach(b => { b.hidden = runMode; });
+  $("#runw").hidden = !runMode; $("#work").hidden = runMode; $$('.tools [data-act="card"]').forEach(b => { b.hidden = runMode; });
   store.set("osse-paths-lane", key); history.replaceState(null, "", "#" + encodeURIComponent(key));
   $$("#lanes button").forEach(b => b.setAttribute("aria-selected", b.dataset.lane === key));
   closeDrawer();
@@ -1562,6 +1641,7 @@ $$("[data-act]").forEach(b => b.onclick = ev => {
   ev.stopPropagation();
   const a = b.dataset.act;
   const r = board.getBoundingClientRect();
+  if (a === "scene" && runMode) { newScene(); return; }
   if (a === "card" || a === "scene") { const w = toWorld(r.left + r.width / 2, r.top + r.height / 3), cw = a === "scene" ? SCW : CARDW;
     newCard(Math.max(SX + 344, w.x - cw / 2), w.y, a === "scene" ? "scene" : ""); }   // clear of the start card
   if (a === "zin" || a === "zout") zoomAt(view.k * (a === "zin" ? 1.25 : .8), r.left + r.width / 2, r.top + r.height / 2);

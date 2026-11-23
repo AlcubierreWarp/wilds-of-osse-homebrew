@@ -15,7 +15,7 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | **Character-first prep; flags** | Shea, *Review the Characters*; Burning Wheel Beliefs | Start from each character and what they want, not from the plot. Each board starts from where the character stands at the end of the last session. |
 | **Scenes and beats** | Robert McKee, *Story*; screenwriting practice | A scene is a unit of place, time and people that sets the stage; a beat is one exchange or turn inside it. Ossë marks the stage as `kind: scene` (with `where:` and `present:`) and the moments inside it as beats, decisions, clocks and pressures that name it with `scene:`. |
 | **Progress clocks** | John Harper, *Blades in the Dark* | A clock is a circle cut into segments; fill one when time passes or things go wrong, and something happens when it is full. Ossë marks it `kind: clock` with `clock: filled/segments`. |
-| **Decision points** | Choice-based design generally | A decision is a choice the character faces, with options. Each option leads to its own plan. Ossë marks it `kind: decision` with an `## Options` section. |
+| **Decision points** | Choice-based design generally | A decision is a choice the character faces, with options. Two choices can lead to the same outcome. Ossë marks it `kind: decision` with an `## Options` section. |
 
 ## The board
 
@@ -27,11 +27,12 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | **Tray** | Live plans for this board not placed yet. At first, every plan with no session target | Live plans; placing one sets its `target` when Tom asks Claude to bring the board in |
 | **Cards** | Live plans, by kind (below) | Plan notes |
 | **Links** | Solid: the vault already joins them. Dashed red: Tom's, not in the vault yet | `plan: [[X]]` in the later plan's Requires, or a decision's `## Options` |
+| **Options** | Each link out of a decision is one option, labelled with the choice; the card lists them. Two choices can lead to the same card: draw a link for each (or tap "Another choice leading here" on the first) | One `## Options` line per link |
 | **Secret chips** | A secret a card needs hidden or revealed. Tap to try a what-if | `hidden:` / `revealed:` requirements |
 | **Scenes on the board** | A scene is a box with its details in a header: where, who is present, the situation. Drag it by the header and the cards inside move with it; drag the corner to resize it. Drop a card inside to set it in the scene. Where and who are picked from the vault's places and people, or typed | `where:`, `present:`; `scene:` on the cards inside |
 | **One copy** | Every plan, card, scene and link exists once, however many boards show it: change it on one and it changes on all. Session tabs are shared too. Only a thing's place on each canvas is its own; a card inside a scene keeps the same place in the box everywhere | |
 | **Scenes on several boards** | A scene shows, with its cards, on the board of every player character listed as present (The Party: every character's board and The Party's), and on any board it was put on. The × on it takes it off that board only, and takes that character off who is present | `present:` |
-| **Session plan** | The first button above the boards. Per session, its scenes as small cards in running order: drag one by its ⠿ to move it, or onto another session's tab. Tap it to list its cards as a tree: each sits under the card whose arrow leads to it. Drag a card onto another to make it follow that one, between two to sit beside them, onto a scene to add it there, or back to "Not in a scene". Arrows and places on the canvas follow, and a card with others under it takes them along. Drag in plans not placed yet from the list on the right. Tap a card to open its panel. Name pills use the session screens' colours (filled: listed as present; outlined: on their board only); tap one to open the scene on that board | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
+| **Session plan** | The first button above the boards. Per session, its scenes as small cards in running order: drag one by its ⠿ to move it, or onto another session's tab. + Scene (or Add a scene) starts a new one; + Players on a scene adds or removes players, and the scene appears on or leaves their boards to match; + Card adds a card inside. So a session can be built scenes first. Tap a scene to list its cards as a tree: each sits under the card whose arrow leads to it. Drag a card onto another to make it follow that one (onto a decision, it becomes an option and asks for the choice), between two to sit beside them, onto a scene to add it there, or back to "Not in a scene". Arrows and places on the canvas follow, and a card with others under it takes them along. Drag in plans not placed yet from the list on the right. Tap a card to open its panel. Name pills use the session screens' colours (filled: listed as present; outlined: on their board only); tap one to open the scene on that board | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
 | **Zoom** | + and − at the top right of the canvas, beside Fit and Key; also pinch or Command-scroll | |
 | **Tom's own cards** | New ideas drawn on the board | Become plan notes when Tom asks (the `paths` skill) |
 | **Edits** | Tom changes a plan's kind, summary or idea on the board, or leaves Claude a note. The card says "edited · not in vault" | Written into the plan note when Tom asks; the plan keeps its name |
@@ -45,7 +46,7 @@ Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planni
 | --- | --- | --- | --- |
 | `scene` | The stage: a place, who is there, what is going on. `where:` and `present:` | A box; the cards inside it happen during the scene | `osse:Scene` |
 | `beat` | One key moment in a scene or encounter | A card | `osse:Beat` |
-| `decision` | A choice the character faces; each option is its own plan | A card listing its options | `schema:ChooseAction` |
+| `decision` | A choice the character faces; each link out of it is one option | A card listing its options | `schema:ChooseAction` |
 | `clock` | Time pressure, or something that happens when it fills. `clock: 2/6` | A card with a segmented clock; tap it to fill a segment | `osse:Clock` |
 | `pressure` | What the world does if no one acts | A card | `osse:Pressure` |
 | `bottleneck` | A beat most paths reach, where branches meet | A card with a double edge | `osse:Bottleneck` |
@@ -85,7 +86,7 @@ Corvane asks him to send for Aldous and Sloane.
 - alive: [[Corvane Aerrowyn]]
 ```
 
-Each option is its own plan note. An option plan names the decision under `## Requires` with `plan: [[decision]]` only when it cannot happen without that choice being put to the character. When play makes the choice, the sync marks the chosen plan played and the others `dropped`.
+Each option leads to a plan note; several options may lead to the same one, one line each. An option plan names the decision under `## Requires` with `plan: [[decision]]` only when it cannot happen without that choice being put to the character. When play makes the choice, the sync marks the chosen plan played and the others `dropped`.
 
 ## Which board a plan is on
 1. `for:` names one or more player characters, or The Party.

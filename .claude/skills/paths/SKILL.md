@@ -12,7 +12,7 @@ Tom plans on the Paths ahead page (`vault/paths.html`): one tab per session; he 
 - **set target**: a plan moved to another session tab, or placed from the tray. `Later` means an empty target.
 - **add for**: a plan placed on a board it is not tied to.
 - **left in the tray**: a plan whose vault target Tom did not place. Ask before clearing that target.
-- **NEW CARD**: Tom's card, with its kind, session, text and links; for a scene, where, who is present and the boards it is on; for a clock, its progress; the scene it sits in.
+- **NEW CARD**: Tom's card, with its kind, session, text and links; for a scene, where, who is present and the boards it is on; for a clock, its progress; the scene it sits in. A scene with no players yet is listed under The Party until Tom adds some: leave out `present:` rather than guess.
 - **set scene**: a plan Tom placed inside a scene.
 - **EDITED**: Tom changed a plan's kind, summary or idea, or left a note to Claude.
 - **DROP**: Tom dropped a plan.
@@ -24,7 +24,7 @@ Tom plans on the Paths ahead page (`vault/paths.html`): one tab per session; he 
 - A clock card becomes a `kind: clock` plan with `clock: filled/segments`; its text is what happens when it fills.
 - A NEW CARD becomes a plan note in `Plans/`, written with a short script, following `docs/osse/plans.md`: `stage: draft`, `status: draft`, `kind:` from the card (a `note` card becomes the kind its text describes: usually a beat; ask if unclear), `target:` from its column, `for:` the board's character (not for Around the party; not for a scene whose `present:` already names them), a one-line `summary`, `## Idea` from the card text in Tom's words, tightened.
 - Links into a card or between plans:
-  - from a decision: an `## Options` line in the decision, `- [[Plan]] · label`;
+  - from a decision: each link is one option, so one `## Options` line per link, `- [[Plan]] · label`. Several links to the same plan become several lines to that plan. `show` marks an option with no label "(not named)": ask Tom for the choice;
   - labelled "then" or unlabelled, between scenes: `plan: [[Earlier]]` in the later plan's `## Requires`;
   - from Now: no requirement; it only means "from where they stand".
   - any other label: work out what must be true and write it as a requirement (`hidden:`, `alive:`, `met:`…), or `check:` when no rule can test it.

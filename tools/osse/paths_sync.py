@@ -110,6 +110,8 @@ class Board:
         if not (e["from"].startswith("p:") and e["to"].startswith("p:")):
             return False
         a, b, data = e["from"][2:], e["to"][2:], self.data
+        if a in data and self.obj(e["from"]).get("kind") == "decision":   # each link out of a decision is its own option
+            return any(o["to"] == b and o["label"].strip().lower() == (e.get("label") or "").strip().lower() for o in data[a]["options"])
         if b in data and any(r["k"] in ("plan", "played") and r["a"] == a for r in data[b]["req"]):
             return True
         return a in data and any(o["to"] == b for o in data[a]["options"])
@@ -157,10 +159,11 @@ def show(only=None):
             if sc:
                 lines.append(f"    in the scene {b.label(sc)}")
             for e in b.edges:
+                choice = " option" if not e["from"].startswith("start") and b.obj(e["from"]).get("kind") == "decision" else ""
                 if e["to"] == i:
-                    lines.append(f'    from {b.label(e["from"])}' + (f' · "{e["label"]}"' if e.get("label") else ""))
+                    lines.append(f'    from {b.label(e["from"])}{choice}' + (f' · "{e["label"]}"' if e.get("label") else " · (not named)" if choice else ""))
                 if e["from"] == i:
-                    lines.append(f'    to {b.label(e["to"])}' + (f' · "{e["label"]}"' if e.get("label") else ""))
+                    lines.append(f'   {choice} to {b.label(e["to"])}' + (f' · "{e["label"]}"' if e.get("label") else " · (not named)" if choice else ""))
             say(i, "\n".join(lines))
     for pid, d in data.items():
         ed, i = b.edits.get(pid, {}), "p:" + pid
