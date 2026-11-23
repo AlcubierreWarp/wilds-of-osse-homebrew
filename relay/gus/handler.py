@@ -211,10 +211,11 @@ def handler(event, _context):
         docs[doc_id] = doc
         save(VAULT, vault)
         if doc_id in pub["shelf"]:
-            opened = pub["shelf"][doc_id].get("openedAt")
-            pub["shelf"][doc_id] = public_copy(doc, pub["shelf"][doc_id].get("revealedAt"))
-            if opened:
-                pub["shelf"][doc_id]["openedAt"] = opened
+            prev = pub["shelf"][doc_id]
+            pub["shelf"][doc_id] = public_copy(doc, prev.get("revealedAt"))
+            for keep in ("openedAt", "pushedAt"):
+                if prev.get(keep):
+                    pub["shelf"][doc_id][keep] = prev[keep]
             pub["rev"] += 1
             save(PUBLIC, pub)
         if old and (not doc["asset"] or doc["asset"]["id"] != old.get("id")):
@@ -252,7 +253,10 @@ def handler(event, _context):
         if doc_id not in pub["shelf"]:
             pub["shelf"][doc_id] = public_copy(docs[doc_id], now())
         if op == "push":
+            # A push delivers the file again: it shows as new until Gus opens it, and a pushed protocol lights his Emergency tab.
             pub["signal"] = {"id": doc_id, "at": now()}
+            pub["shelf"][doc_id]["pushedAt"] = pub["signal"]["at"]
+            pub["shelf"][doc_id].pop("openedAt", None)
     else:
         pub["shelf"].pop(doc_id, None)
         if signal.get("id") == doc_id:
