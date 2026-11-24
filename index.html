@@ -72,33 +72,35 @@ h2 small{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:upp
 .dm-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:-4px 0 16px}
 .next{font:500 12px/1.5 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .next b{color:var(--gold-hi);font-weight:500}
-.board{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;align-items:start}
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:10px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px}
 .tile{display:flex;flex-direction:column;gap:6px;padding:14px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
-.tile.wide{grid-column:1/-1}
 .tile h3{margin:0;font:600 16px/1.25 var(--f-display);letter-spacing:.04em;color:var(--text)}
 .tile p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.4;flex:1}
 .tile .row{margin-top:4px}
 .tile .code{margin:4px 0 0;padding:6px 10px}.tile .code b{font-size:16px}
 .warn{color:var(--bad);font-style:italic}
-.check{padding:16px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
-.check h3{margin:0 0 4px;font:600 16px/1.25 var(--f-display);letter-spacing:.04em}
-.check .prog{font:500 11px/1.4 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.past{font-size:13.5px;color:var(--muted)}.past a{color:var(--muted)}.past a:hover{color:var(--gold-hi)}
+.check{margin-top:14px;padding:16px 18px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+.check-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.check h3{margin:0;font:600 18px/1.25 var(--f-display);letter-spacing:.04em}
+.prog{font:500 11px/1.4 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .check ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.check ul ul{margin-left:13px;padding-left:15px;border-left:1px solid var(--line)}
+.check>ul{margin-top:8px}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px 26px;margin-top:10px}
+.phase h4{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 0 4px;padding:6px 4px;border-bottom:1px solid var(--line);
+  font:600 15px/1.25 var(--f-display);letter-spacing:.06em;color:var(--gold)}
+.phase.full h4{color:var(--muted)}
 .check label{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;border-radius:4px;cursor:pointer;font-size:15.5px;line-height:1.35}
 .check label:hover{background:rgba(210,168,81,.06)}
 .check input{appearance:none;flex:none;width:18px;height:18px;margin-top:1px;border:1px solid var(--gold-lo);border-radius:3px;display:grid;place-items:center;background:#0b0908}
 .check input:checked{background:var(--gold);border-color:var(--gold-hi)}
 .check input:checked::after{content:"✓";color:#1c1206;font-size:13px;line-height:1}
-.check li.done span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gold-lo)}
+.check input:indeterminate::after{content:"";width:8px;height:2px;background:var(--gold)}
+.check li.done>label span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--gold-lo)}
 .check small{display:block;font-size:13px;color:var(--muted);text-decoration:none}
 .check .auto{font:500 10px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lo);margin-left:4px}
 .check .foot{display:flex;justify-content:flex-end;margin-top:8px}
-.quiet{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
-.quiet .k{font:500 11px/1.4 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;margin-right:8px}
-.quiet a{color:var(--muted)}.quiet a:hover{color:var(--gold-hi)}
-.quiet button{all:unset;cursor:pointer;color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
-@media (max-width:760px){.board{grid-template-columns:1fr}}
 footer{margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .themes{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
 .themes span{margin-right:4px}
@@ -178,44 +180,62 @@ footer{margin-top:48px;display:flex;flex-direction:column;align-items:center;gap
 
 <script>
 "use strict";
-/* Links live here (PLAYER below; the game master launchboard is TOOLS and CHECKLIST). Addresses are relative, so the page works on GitHub Pages and on a custom domain alike.
+/* Links live here (PLAYER below; the game master section is GM_LINKS and CHECKLIST, and never repeats a player link). Addresses are relative, so the page works on GitHub Pages and on a custom domain alike.
    Codes are not: the player codes come from the Gus relay, so no code sits in this public repository. */
-const RAW = "https://raw.githubusercontent.com/AlcubierreWarp/wilds-of-osse-homebrew/main/wilds-of-osse.json";
 const PLAYER = [
   {title: "D&D Beyond", who: "Everyone",
    text: "Character sheets, spells and the campaign.", href: "https://www.dndbeyond.com/campaigns/7874419", open: "Open D&D Beyond"},
   {title: "Roll20", who: "Everyone",
    text: "The virtual table, maps and tokens.", href: "https://app.roll20.net/campaigns/details/21638976/wilds-of-osse", open: "Open Roll20"},
+  {title: "Discord", who: "Everyone",
+   text: "Voice and chat while we play.", href: "https://discord.com/app", open: "Open Discord"},
   {title: "The Chronicle", who: "Everyone",
    text: "Every session so far: the summary, quest lines, the people you met and the items you found.", href: "chronicle/", open: "Read the chronicle"},
   {title: "The Codex", who: "Everyone",
    text: "Everyone and everything the party has met, as far as play has shown, plus a rules and items lookup.", href: "codex/", open: "Open the codex"},
   {title: "Gus's memory archive", who: "Shane · Gus",
    text: "Gus's documents from Marshal Intelligence. Open it on your own device and enter the code your game master gave you.",
-   href: "screen/gus.html", open: "Open the archive"},
+   href: "screen/gus.html", open: "Open the archive", gm: true},
 ];
-/* Game master launchboard. The session, its screen and the automatic ticks come from vault/status.json (rebuilt by
+/* Game master section. The session, its screen and the automatic ticks come from vault/status.json (rebuilt by
    tools/osse/build.py) and chronicle/chronicle.json, so nothing here changes from one session to the next. */
-const TOOLS = [
-  {title: "Ossë vault", text: "Every person, place, secret and plan, as DM pages.", links: [["Search", "vault/"], ["Rules and items", "vault/#rules"], ["Paths ahead", "vault/paths.html"]]},
-  {title: "Gus's archive", text: "Game master view opens unlocked.", links: [["Open", "screen/gus.html", "gm"]], code: "gus"},
-  {title: "Roll20", text: "Maps, tokens and combat.", links: [["Open", "https://app.roll20.net/campaigns/details/21638976/wilds-of-osse"]]},
-  {title: "Discord", text: "Voice, and the transcript bot.", links: [["Open", "https://discord.com/app"]]},
-  {title: "D&D Beyond", text: "Character sheets and the campaign.", links: [["Open", "https://www.dndbeyond.com/campaigns/7874419"]]},
-  {title: "Player views", text: "What the players can see.", links: [["Codex", "codex/"], ["Chronicle", "chronicle/"]]},
+const GM_LINKS = [
+  {title: "Ossë vault", text: "Every person, place, secret and plan, as DM pages.", href: "vault/", open: "Open the vault"},
+  {title: "Session planner", text: "The boards, and the session's running order.", href: "vault/paths.html", open: "Open the planner"},
 ];
-/* The set-up checklist. auto(s) ticks an item from the status file; the rest are ticked by hand and kept per session. */
+/* The session checklist: loose items, then phases. An item with items of its own is ticked when all of them are, and ticking it
+   ticks them all. auto(s) ticks an item from the status files; the rest are ticked by hand and kept per session on this device. */
 const CHECKLIST = [
-  {id: "synced", label: s => `S${s.current} synced: vault, chronicle and codex`, note: "post-session skill", auto: s => s.chronicle >= s.current},
-  {id: "plans", label: s => `Plans for S${s.next} marked ready`, note: s => s.ready.length ? s.ready.join(", ") : `${s.aimed} aimed at S${s.next}, none ready yet`, auto: s => s.ready.length > 0},
-  {id: "screen", label: s => `S${s.next} screen built`, note: "session-screen skill: iPad and tall", auto: s => s.screens.includes(s.next)},
-  {id: "glossary", label: () => "Names refreshed for the transcript bot", note: "glossary from the vault"},
-  {id: "gus", label: () => "Gus document ready, if any", note: "gus-document skill"},
-  {id: "roll20", label: () => "Roll20 maps, tokens and stat blocks"},
-  {id: "open", label: () => "Screens open: iPad and the tall monitor"},
-  {id: "bot", label: () => "Transcript bot recording in voice"},
+  {id: "synced", label: "Previous session synced", note: s => `S${s.current}: vault, chronicle and codex`, auto: s => !s.error && s.chronicle >= s.current},
 ];
-const RAW_REPO = "https://github.com/AlcubierreWarp/wilds-of-osse-homebrew";
+const PHASES = [
+  {title: "Plan & create", items: [
+    {id: "story", label: "Outline story", note: s => `${s.aimed} plans aimed at S${s.next}, ${s.ready.length} ready`},
+    {id: "npcs", label: "Create NPCs"},
+    {id: "maps", label: "Create maps"},
+    {id: "art", label: "Create illustrations"},
+    {id: "handouts", label: "Draft handouts"},
+    {id: "music", label: "Select music"},
+    {id: "screen-draft", label: "Draft DM screen", auto: s => s.screens.includes(s.next)},
+  ]},
+  {title: "Update systems", items: [
+    {id: "stats", label: "Update stat sheets", note: "if required"},
+    {id: "r20", label: "Update Roll20", items: [
+      {id: "r20-maps", label: "Maps"},
+      {id: "r20-tokens", label: "NPC tokens"},
+    ]},
+    {id: "screen-update", label: "Update DM screen"},
+  ]},
+  {title: "Session setup", items: [
+    {id: "on-roll20", label: "Roll20", note: "Left screen"},
+    {id: "on-discord", label: "Discord", note: "Right screen, bottom", items: [
+      {id: "on-craig", label: "Craig bot"},
+      {id: "on-music", label: "Music bot"},
+    ]},
+    {id: "on-table", label: "Campaign table", note: "Right screen, middle"},
+    {id: "on-claude", label: "Claude", note: "Right screen, top"},
+  ]},
+];
 
 const RELAY = (location.hostname === "localhost" && new URLSearchParams(location.search).get("relay"))
   || "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws";
@@ -231,7 +251,7 @@ let codes = null;
 function playerCards(){
   $("#player-cards").innerHTML = PLAYER.map(c => `<article class="card">
     <span class="who">${esc(c.who)}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
-    <div class="row"><a class="btn" href="${esc(c.href)}">${esc(c.open || "Open")}</a></div>
+    <div class="row"><a class="btn" href="${esc(c.href)}"${c.gm ? ' data-gm="1"' : ""}>${esc(c.open || "Open")}</a></div>
   </article>`).join("");
 }
 
@@ -259,34 +279,41 @@ function dmBody(){
   const n = s.next, built = s.screens.includes(n), mine = ticks(n);
   $("#dm-next").innerHTML = s.error ? "The status file can't be read" : `Next up <b>Session ${n}</b> · after S${s.current}${s.titles[s.current] ? ", " + esc(s.titles[s.current]) : ""} · ${s.open_threads} open threads`;
   const code = codes === null ? "…" : codes.gus || "Not set";
-  const tiles = [`<article class="tile wide"><h3>DM screen · Session ${n}</h3>
-      <p>${built ? "One page, two layouts. Open the iPad layout on the iPad and the tall layout on the vertical monitor."
-                 : `<span class="warn">Not built yet.</span> Build it with the session-screen skill.`}</p>
-      ${built ? `<div class="row"><a class="btn" href="screen/s${n}.html#ipad">iPad</a>
-        <a class="btn" href="screen/s${n}.html#tall">Tall 1080p</a></div>` : ""}</article>`]
-    .concat(TOOLS.map(t => `<article class="tile"><h3>${esc(t.title)}</h3><p>${esc(t.text)}</p>
-      ${t.code ? `<div class="code"><span class="k">Shane's code</span><b>${esc(code)}</b>${codes && codes.gus ? `<button type="button" class="btn ghost small" data-copy="${esc(codes.gus)}">Copy</button>` : ""}</div>` : ""}
-      <div class="row">${t.links.map(([l, h, gm], i) => `<a class="btn${i ? " ghost" : ""} small" href="${esc(h)}"${gm ? ' data-gm="1"' : ""}>${esc(l)}</a>`).join("")}</div></article>`));
-  const items = CHECKLIST.map(c => {
-    const auto = c.auto ? !!c.auto(s) : null, on = auto === true || !!mine[c.id];
-    const note = typeof c.note === "function" ? c.note(s) : c.note;
-    return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-check="${c.id}"${on ? " checked" : ""}${auto === true ? " disabled" : ""}>
-      <span>${esc(c.label(s))}${auto === true ? '<i class="auto">auto</i>' : ""}${note ? `<small>${esc(note)}</small>` : ""}</span></label></li>`;
-  });
-  const done = items.filter(x => x.startsWith('<li class="done"')).length;
   const past = s.screens.filter(x => x !== n).sort((a, b) => b - a);
-  $("#dm-body").innerHTML = `<div class="board"><div class="tiles">${tiles.join("")}</div>
-    <div class="check"><h3>Set up Session ${n}</h3><div class="prog">${done} of ${items.length} done</div><ul>${items.join("")}</ul>
-      <div class="foot"><button type="button" class="btn ghost small" id="check-reset">Clear my ticks</button></div></div></div>
-    <div class="quiet">
-      <div><span class="k">Past screens</span>${past.length ? past.map(x => `<a href="screen/s${x}.html">S${x}${s.titles[x] ? " · " + esc(s.titles[x]) : ""}</a>`).join(" · ") : "none yet"}</div>
-      <div><span class="k">Homebrew</span><a href="${esc(RAW)}">combined file</a> · <button type="button" data-copy="${esc(RAW)}">copy raw link</button> · <a href="${RAW_REPO}">repository</a></div>
-    </div>`;
+  const tile = (title, text, rest) => `<article class="tile"><h3>${esc(title)}</h3><p>${text}</p>${rest}</article>`;
+  const tiles = [
+    tile(`DM screen · S${n}`, built ? "iPad for the table, tall for the vertical monitor." : `<span class="warn">Not built yet.</span>`,
+      (built ? `<div class="row"><a class="btn small" href="screen/s${n}.html#ipad">iPad</a><a class="btn small" href="screen/s${n}.html#tall">Tall</a></div>` : "") +
+      (past.length ? `<div class="past">Past: ${past.map(x => `<a href="screen/s${x}.html"${s.titles[x] ? ` title="${esc(s.titles[x])}"` : ""}>S${x}</a>`).join(" · ")}</div>` : "")),
+    ...GM_LINKS.map(t => tile(t.title, esc(t.text), `<div class="row"><a class="btn small" href="${esc(t.href)}">${esc(t.open)}</a></div>`)),
+    tile("Gus's archive code", "For Shane's device.", `<div class="code"><b>${esc(code)}</b>${codes && codes.gus ? `<button type="button" class="btn ghost small" data-copy="${esc(codes.gus)}">Copy</button>` : ""}</div>`),
+  ];
+  const isOn = c => c.items ? c.items.every(isOn) : !!(c.auto && c.auto(s)) || !!mine[c.id];
+  const some = c => c.items ? c.items.some(some) : isOn(c);
+  const leaves = list => list.flatMap(c => c.items ? leaves(c.items) : [c]);
+  const count = list => { const l = leaves(list); return [l.filter(isOn).length, l.length]; };
+  const item = c => {
+    const on = isOn(c), auto = !!(c.auto && c.auto(s)), note = typeof c.note === "function" ? c.note(s) : c.note;
+    return `<li class="${on ? "done" : ""}"><label><input type="checkbox" data-check="${c.id}"${on ? " checked" : ""}${auto ? " disabled" : ""}${!on && c.items && some(c) ? " data-some" : ""}>
+      <span>${esc(c.label)}${auto ? '<i class="auto">auto</i>' : ""}${note ? `<small>${esc(note)}</small>` : ""}</span></label>${c.items ? `<ul>${c.items.map(item).join("")}</ul>` : ""}</li>`;
+  };
+  const phase = p => { const [d, of] = count(p.items);
+    return `<div class="phase${d === of ? " full" : ""}"><h4>${esc(p.title)}<span class="prog">${d}/${of}</span></h4><ul>${p.items.map(item).join("")}</ul></div>`; };
+  const [done, all] = count([...CHECKLIST, ...PHASES]);
+  const focus = document.activeElement && document.activeElement.dataset.check;
+  $("#dm-body").innerHTML = `<div class="tiles">${tiles.join("")}</div>
+    <div class="check"><div class="check-head"><h3>Session ${n} checklist</h3><span class="prog">${done} of ${all} done</span></div>
+      <ul>${CHECKLIST.map(item).join("")}</ul><div class="phases">${PHASES.map(phase).join("")}</div>
+      <div class="foot"><button type="button" class="btn ghost small" id="check-reset">Clear my ticks</button></div></div>`;
+  document.querySelectorAll("[data-some]").forEach(x => { x.indeterminate = true; });
+  if (focus) { const f = document.querySelector(`[data-check="${focus}"]`); if (f) f.focus({preventScroll: true}); }
 }
 document.addEventListener("change", e => {
   const c = e.target.closest && e.target.closest("[data-check]");
   if (!c || !status) return;
-  const m = ticks(status.next); m[c.dataset.check] = c.checked; store.set("osse-hub-check-S" + status.next, JSON.stringify(m)); dmBody();
+  const m = ticks(status.next), li = c.closest("li"), inner = li.querySelectorAll("ul [data-check]:not(:disabled)");
+  (inner.length ? [...inner] : [c]).forEach(x => { m[x.dataset.check] = c.checked; });
+  store.set("osse-hub-check-S" + status.next, JSON.stringify(m)); dmBody();
 });
 document.addEventListener("click", e => {
   if (e.target.id === "check-reset" && status) { store.del("osse-hub-check-S" + status.next); dmBody(); }

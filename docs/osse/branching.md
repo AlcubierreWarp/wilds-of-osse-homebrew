@@ -1,6 +1,6 @@
 # Branching: how plans become paths
 
-Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planning board: one board per player character, plus The Party and Around the party. This page sets the rules behind it and how they sit on the vault. Examples are made up.
+Session planner, once called Paths ahead (`vault/paths.html`, built by `tools/osse/paths.py`) is Tom's planning board: one board per player character, plus The Party and Around the party. This page sets the rules behind it and how they sit on the vault. Examples are made up.
 
 ## What the research says, and what we took
 

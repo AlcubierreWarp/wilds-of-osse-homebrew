@@ -61,7 +61,7 @@ def store():
     if "items" not in doc:
         if not doc.get("lanes"):
             print("No boards saved yet."); sys.exit()
-        sys.exit("These boards were saved before everything had one copy. Open the Paths ahead page once (it converts and saves them), then run this again.")
+        sys.exit("These boards were saved before everything had one copy. Open the Session planner page once (it converts and saves them), then run this again.")
     return doc
 
 

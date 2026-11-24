@@ -1,9 +1,9 @@
 ---
 name: paths
-description: Draft onto Tom's Paths ahead planning boards from a brain dump, clean up what is on them, or bring them into the Ossë vault. Use when Tom brain dumps scenes, decisions, beats or a session framework, asks to build out, tidy or fix something on Paths ahead, or asks to read, sync, formalize or "bring in" the board, the paths, his branches or the cards he added.
+description: Draft onto Tom's Session planner boards (once called Paths ahead) from a brain dump, clean up what is on them, or bring them into the Ossë vault. Use when Tom brain dumps scenes, decisions, beats or a session framework, asks to build out, tidy or fix something on the Session planner or Paths ahead, or asks to read, sync, formalize or "bring in" the board, the paths, his branches or the cards he added.
 ---
 
-# Work on the Paths ahead boards
+# Work on the Session planner boards
 
 | Tom asks for | Do |
 | --- | --- |
@@ -24,7 +24,7 @@ description: Draft onto Tom's Paths ahead planning boards from a brain dump, cle
 
 # Bring the boards into the vault
 
-Tom plans on the Paths ahead page (`vault/paths.html`): one tab per session; he places plans on a session's canvas, draws links, adds, edits and deletes cards, and drops plans. The page saves to the Gus relay; the vault does not change until this skill runs. Rules: `docs/osse/branching.md` and `docs/osse/plans.md`.
+Tom plans on the Session planner page (`vault/paths.html`): one tab per session; he places plans on a session's canvas, draws links, adds, edits and deletes cards, and drops plans. The page saves to the Gus relay; the vault does not change until this skill runs. Rules: `docs/osse/branching.md` and `docs/osse/plans.md`.
 
 ## Step 1: Read
 `python3 tools/osse/paths_sync.py show` (add a board name to see one). Everything has one copy and is listed once, under the first board it is on:

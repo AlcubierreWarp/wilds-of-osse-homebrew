@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Paths ahead: the DM's planning board (vault/paths.html). Built by pages.py on every build; never edit the page by hand.
+"""Session planner (once called Paths ahead): the DM's planning board (vault/paths.html). Built by pages.py on every build; never edit the page by hand.
 
 One board per player character, plus The Party and Around the party. Each board has a tab and a canvas per session
 (the next sessions, then Later). The first tab starts from the end of the last played session; each later tab starts
@@ -186,10 +186,10 @@ def page(site):
                      and str(n.get("state") or "").lower() not in build.GONE), key=lambda x: ({"pc": 0, "party": 1, "npc": 2}.get(x["t"], 3), x["n"]))
     payload = {"cur": cur, "plans": data, "facts": facts, "lanes": lanes, "gone": sorted(build.GONE), "places": places, "people": people}
     js_data = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
-    head = pages.head("Paths ahead", False).replace('<div class="wrap">', '<div class="wrap wide">')
-    return (head + f"<style>{CSS}</style>" + pages.topbar(site, "Paths ahead") +
+    head = pages.head("Session planner", False).replace('<div class="wrap">', '<div class="wrap wide">')
+    return (head + f"<style>{CSS}</style>" + pages.topbar(site, "Session planner") +
             '<main class="sheet paths">'
-            '<div class="ptop"><h1>Paths ahead</h1><nav class="lanes" id="lanes" role="tablist" aria-label="Boards"></nav></div>'
+            '<div class="ptop"><h1>Session planner</h1><nav class="lanes" id="lanes" role="tablist" aria-label="Boards"></nav></div>'
             '<div class="bar"><div class="whatif"><b>What-ifs</b><span id="wi-list" class="muted"></span>'
             '<button id="wi-reset" class="mini" hidden>Clear</button></div>'
             '<div class="tools"><button class="mini" data-act="scene">+ Scene</button><button class="mini" data-act="card">+ Card</button><span id="save" class="save"></span></div></div>'

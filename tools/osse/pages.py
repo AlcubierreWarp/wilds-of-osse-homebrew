@@ -467,7 +467,7 @@ def index(site):
             'Session recaps are in the <a href="../chronicle/">chronicle</a>.' if P else
             f"Every note in the vault as a DM page, after S{site.cur}. Game secrets, prep and plans are here: "
             "this is a DM screen, never one for players. "
-            '<a href="paths.html">Paths ahead</a> draws the live plans as branches under each player character.')
+            '<a href="paths.html">Session planner</a> draws the live plans as branches under each player character.')
     out = [head(title, P), topbar(site), '<main class="sheet index">', f"<h1>{title}</h1>", f'<p class="summary">{lede}</p>',
            '<div class="tabs" role="tablist"><button role="tab" data-tab="world" aria-selected="true">In the world</button>'
            '<button role="tab" data-tab="rules" aria-selected="false">Rules and items</button></div>',
