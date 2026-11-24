@@ -22,6 +22,7 @@ Change model: Direct. Commit to main.
 - `tools/osse/`: the Ossë vault's tools. `osse.py` answers questions compactly, `build.py` rebuilds and checks the vault, `graph.py` walks it, `vocab.py` maps every type and link to a standard term.
 - `docs/osse/`: the vault's rules (README first). Examples are made up.
 - `.claude/skills/post-session/`: the post-session sync. Follow it after every session.
+- `tools/transcript.py`: turns a Craig recording (Discord, one track per person) into a transcript labelled by speaker, with Whisper on the Mac. Run it with `uv run`. Transcripts and `speakers.json` stay out of this repo, in `iCloud Drive/Ossë transcripts/`.
 - `.claude/skills/gus-document/`: how to write a new Gus document and file it, sealed, in Gus's archive. Follow it for every new one.
 - `.github/workflows/build-homebrew.yml`: rebuilds and commits the combined file when `src/` changes.
 

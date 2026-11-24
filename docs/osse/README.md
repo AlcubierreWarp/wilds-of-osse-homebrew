@@ -83,7 +83,7 @@ Every type, kind, property and link type maps to a standard term in `tools/osse/
 
 ## Before a session
 1. Mark the plans Tom will use as `ready` and give them `target`. The build lists them on the board and on `Home.md`.
-2. Run `python3 tools/osse/build.py`, then give the transcript bot the new names from the vault's `Glossary.md`, as in step 8 of the `post-session` skill (additions only). This catches names added during prep, so the transcript spells them right.
+2. Run `python3 tools/osse/build.py`, so the vault's `Glossary.md` holds the names added during prep. `tools/transcript.py` reads it when it makes the transcript (step 8 of the `post-session` skill), so the transcript spells them right.
 3. Build the session screen (the `session-screen` skill) and work through the checklist in the hub's game master section.
 
 The game master screen pages in `screen/` are built from the plans marked ready (see the `session-screen` skill); the vault is where to look up who and what is involved.

@@ -7,7 +7,7 @@ description: Run the end-of-session sync for the Wilds of Ossë campaign. Reads 
 
 The rules are in `docs/osse/` (README first, then `notes.md` and `plans.md`). This skill is the order of work. Everything runs from this repo; the vault is read and written as files. Mind the two boundaries in `docs/osse/README.md`: the chronicle is a player screen, so it shows only what came out in play.
 
-Sources: from S14 on, a Discord bot records the voice channel and gives a transcript labelled by speaker. Sessions up to S13 came from Notion AI summaries; their canon is already in the vault, so Notion is no longer read.
+Sources: from S14 on, Craig (a Discord bot) records the voice channel, one track per person, and `tools/transcript.py` turns that into a transcript labelled by speaker. Sessions up to S13 came from Notion AI summaries; their canon is already in the vault, so Notion is no longer read.
 
 ## Rules that never bend
 - **Propose before writing.** Show Tom the whole proposal and wait for a clear yes. Then write, build, and report.
@@ -18,12 +18,17 @@ Sources: from S14 on, a Discord bot records the voice channel and gives a transc
 - Tom often works by voice on his phone. Keep messages short and scannable; group questions into one numbered list.
 
 ## Step 1: Pick the session
-The session is the one after the current session (`osse.py brief`), unless Tom named one. Get its transcript: the Discord bot's speaker-labelled export, as a file Tom gives or points to. If there is none, ask for it and stop. Also take the screen's Export if Tom gives it (what was reached, which clues were found, the fight).
+The session is the one after the current session (`osse.py brief`), unless Tom named one. Get its transcript:
+1. **Already made?** It lives outside this public repo, in iCloud Drive: `~/Library/Mobile Documents/com~apple~CloudDocs/Ossë transcripts/S<n>.txt`. If it is there, use it.
+2. **If not, make it.** After `/stop`, Craig sends Tom a direct message with a download link (kept 7 days). Tom picks **FLAC**, multi-track zip; it lands in `~/Downloads` or iCloud Drive's Downloads. Then run `uv run tools/transcript.py --session <n>` in the background (it takes the newest Craig zip in Downloads, or pass the zip's path). It takes about 11 minutes per hour of speech on the M1 (longer if the Mac is busy). Leave Craig's normalize option off. If there is no zip, ask Tom for it and stop.
+3. **Speakers.** The script maps each Discord username through `speakers.json` (same folder) to a player, then the pc notes' `player` property to a character; Tom is the DM. Craig records usernames, not server nicknames. An unknown username is listed at the top of the file: ask Tom who it is, add it to `speakers.json`, and rerun with `--render` (no new transcription).
+
+The file is one line per utterance, `[01:12:34] Peter (Gabriele): we go to the docks`, with times from the start of the recording, sorted across speakers. Its header lists the names Whisper was prompted with; its last lines list the names it corrected and the ones to check. Also take the screen's Export if Tom gives it (what was reached, which clues were found, the fight).
 
 Read the transcript yourself; there is no AI summary to lean on any more.
-- **Speakers.** Map each speaker to a character with the `player` property of the pc notes (`osse.py card` on each PC). Tom is the DM: he narrates and voices every NPC, so name the NPC from context when he speaks in character. A line you cannot place goes to Tom as a question.
+- **Speakers.** Each line already names the player and character. Tom is the DM: he narrates and voices every NPC, so name the NPC from context when he speaks in character. A line you cannot place goes to Tom as a question.
 - **In play or out.** Table talk, rules talk and out-of-character jokes are not canon. When a line could be either, ask.
-- **Spelling.** Speech-to-text garbles names. Match each to `Glossary.md` and `osse.py find`; list the ones you had to guess.
+- **Spelling.** Speech-to-text garbles names. The script fixes close misses against `Glossary.md` and lists the rest under "Names to check". Match those and any other odd name to `Glossary.md` and `osse.py find`; list the ones you had to guess.
 - Write the session's own summary for the session note (`summary`, What happened, What changed) from the transcript.
 
 ## Step 2: Read what was planned
@@ -66,7 +71,7 @@ Follow the `chronicle` skill: write `Chronicle/S<n> - <title>.md` with `tools/ch
 
 ## Step 8: Names for the transcript bot
 Run this again before each session, after prep (see `docs/osse/README.md`, Before a session).
-The build rewrites the vault's `Glossary.md`: every proper noun in canon and prep. If the transcript bot takes a word list or custom vocabulary, give it the names from `Glossary.md` (additions only; never remove or respell). Until the bot is set up, `Glossary.md` is only the spelling reference for Step 1.
+The build rewrites the vault's `Glossary.md`: every proper noun in canon and prep. Craig takes no word list; `tools/transcript.py` reads `Glossary.md` itself each time it runs. It prompts Whisper with the party, then the names from the last two session notes, then the rest as room allows (about 45 names), and fixes near-misses against the whole Glossary afterward. So the only step is `python3 tools/osse/build.py`, so the Glossary holds every name added during prep. Never remove or respell a Glossary name to suit the transcript.
 
 ## Output style
 Plain prose and short bullets. No em dashes. No "it's not X, it's Y". Never claim a write landed without checking it.
