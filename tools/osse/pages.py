@@ -10,6 +10,7 @@ codex/   the players' screen: only what has come out in play. A note is in it on
          link notes, summaries, roles and plans. A line that links an unrevealed secret or a plan is dropped.
 Both index pages search the vault and the System Reference Document (live, through Open5e) at once, with a filter per type (rules.js).
 vault/paths.html (Session planner, from paths.py) draws the live plans as branching trees per player character.
+vault/arcs.html (Arc planner, from arcs.py) lays the campaign out as a row per arc, with session cards in each.
 vault/status.json tells the hub where the campaign stands. Only files whose content changed are rewritten."""
 import html, json, os, re, sys, unicodedata
 
@@ -386,7 +387,7 @@ def head(title, player):
 
 # The site navigation. Player pages never name or link a DM page; DM pages link only DM pages. Both link the table hub.
 NAV_PLAYER = [("hub", "Table hub", "../"), ("chronicle", "Chronicle", "../chronicle/"), ("index", "Codex", "index.html")]
-NAV_DM = [("hub", "Table hub", "../"), ("index", "Vault", "index.html"), ("paths", "Session planner", "paths.html"), ("screen", "DM screen", "screen.html")]
+NAV_DM = [("hub", "Table hub", "../"), ("index", "Vault", "index.html"), ("paths", "Session planner", "paths.html"), ("arcs", "Arc planner", "arcs.html"), ("screen", "DM screen", "screen.html")]
 
 
 def topbar(site, crumb="", here="index"):
@@ -777,10 +778,11 @@ def build_set(g, out_dir, player):
     changed += write(os.path.join(out_dir, "rules.js"), RULES_JS)
     changed += write(os.path.join(out_dir, "index.html"), index(site))
     if not player:   # Session planner: live plans as branching trees, one lane per player character (tools/osse/paths.py)
-        import paths
-        keep |= {"paths.html", "screen.html"}
+        import arcs, paths
+        keep |= {"paths.html", "screen.html", "arcs.html"}
         changed += write(os.path.join(out_dir, "screen.html"), SCREEN_HTML)
         changed += write(os.path.join(out_dir, "paths.html"), paths.page(site))
+        changed += write(os.path.join(out_dir, "arcs.html"), arcs.page(site))   # Arc planner: the campaign, an arc to a row (tools/osse/arcs.py)
     for nid in site.slugs:
         f = site.slugs[nid] + ".html"; keep.add(f)
         changed += write(os.path.join(out_dir, f), page(site, site.nodes[nid]))

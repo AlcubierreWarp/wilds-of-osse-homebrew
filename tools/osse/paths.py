@@ -1668,7 +1668,7 @@ function pack() {
 }
 /* Saving. The relay holds one copy, and another device or a session with Claude may have saved since this page read it:
    every save first looks, and merges record by record what changed there with what changed here (here wins on the same thing). */
-const PARTS = ["sessions", "items", "cards", "edits", "edges", "order", "seeded"];
+const PARTS = ["sessions", "items", "cards", "edits", "edges", "order", "seeded", "arcs"];   // arcs: the Arc planner's part (vault/arcs.html), carried untouched
 let timer = null, dirty = false, unread = false, rev = null, base = null, ticks = 0, busy = null, held = false;
 const copyOf = x => JSON.parse(JSON.stringify(x)), same = (a, b) => canon(a) === canon(b), isMap = x => !!x && typeof x === "object" && !Array.isArray(x);
 const canon = x => JSON.stringify(x, (k, v) => isMap(v) ? Object.fromEntries(Object.keys(v).sort().map(q => [q, v[q]])) : v) ?? "";
@@ -1712,8 +1712,11 @@ async function save(leaving) {
   }
   const work = (async () => {
     try {
-      if (leaving !== true) { const got = await peek(); if (held) { later(); return; } if (got.items && got.saved_at !== rev && absorb(got)) showNew(); }
-      const at = ticks, sent = pack(), body = JSON.stringify(sent);   // keepalive only when leaving: browsers allow 64 KB of it in all, then refuse
+      let fresh = null;
+      if (leaving !== true) { const got = fresh = await peek(); if (held) { later(); return; } if (got.items && got.saved_at !== rev && absorb(got)) showNew(); }
+      const at = ticks, sent = pack();
+      if (fresh && fresh.arcs) sent.arcs = doc.arcs = fresh.arcs;   // this page never changes the Arc planner's part: send back the relay's own
+      const body = JSON.stringify(sent);   // keepalive only when leaving: browsers allow 64 KB of it in all, then refuse
       const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body, keepalive: leaving === true && new Blob([body]).size < 60000});
       if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status);
       rev = (await r.json()).saved_at; base = partsOf(JSON.parse(body));
@@ -1745,6 +1748,7 @@ async function load() {
   if (!some(got)) { try { const loc = JSON.parse(store.get("osse-paths-local") || "null"); if (some(loc)) { got = loc; if (KEY && !unread) dirty = true; } } catch (e) {} }
   if (got && got.items) { if (!dirty) { base = partsOf(got); rev = got.saved_at; } for (const f of PARTS) { if (got[f]) doc[f] = got[f]; } }
   else if (some(got)) { migrate(got); dirty = true; }
+  if (got && got.arcs) doc.arcs = got.arcs;
   doc.sessions = (doc.sessions.length ? doc.sessions : defaults()).filter(t => t === "Later" || sessNum(t) > CUR || Object.values(doc.items).some(o => o.s === t));
   sortSessions();
   recut();

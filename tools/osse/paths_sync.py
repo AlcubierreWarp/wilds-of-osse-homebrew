@@ -9,6 +9,7 @@ The store holds one copy of everything (items, cards, edits, edges); `lanes` are
   python3 tools/osse/paths_sync.py tidy                drop Tom's links the vault now says itself, and plans no longer live (run after build.py)
   python3 tools/osse/paths_sync.py settle              clear Tom's edits and drops once the vault holds them (run after build.py)
   python3 tools/osse/paths_sync.py export DIR          write each board as a .canvas file (JSON Canvas 1.0)
+  python3 tools/osse/paths_sync.py arcs                the Arc planner: each arc, what it starts and ends on, and its session cards in order
 Add --mock to use the local relay stand-in (relay/gus/mock.py, key test-gm).
 The game master key is read from the macOS Keychain inside this process and never printed. Writes only to the relay."""
 import copy, json, os, re, subprocess, sys, urllib.request
@@ -374,6 +375,32 @@ def export(folder):
         print(path)
 
 
+def arcs():
+    """The Arc planner's part of the store (vault/arcs.html), read only."""
+    A = call("GET").get("arcs")
+    if not A or not A.get("order"):
+        print("No arcs saved yet. Opening the Arc planner once saves the first outline."); return
+    st = json.load(open(os.path.join(os.path.dirname(os.path.dirname(HERE)), "vault", "status.json"), encoding="utf-8"))
+    cur, titles = st["current"], st.get("titles", {})
+    prev = 0
+    for i, aid in enumerate(A["order"], 1):
+        a = A["list"].get(aid, {})
+        print(f"Arc {i}: {a.get('title') or 'Untitled arc'}" + ("  (Claude's draft)" if a.get("by") == "claude" else ""))
+        print(f"  starts: {a.get('starts', '')}\n  ends:   {a.get('ends', '')}")
+        if a.get("about"):
+            print(f"  about:  {a['about']}")
+        for cid in a.get("cards", []):
+            c = A["cards"].get(cid)
+            if not c:
+                continue
+            m = re.fullmatch(r"S(\d+)", c.get("link") or "")
+            n = int(m.group(1)) if m else prev + 1
+            prev = max(prev, n)
+            tag = ("played" if n <= cur else "planned") if m else "idea"
+            print(f"  - S{n} {tag}: {c.get('title') or titles.get(str(n), 'Untitled session')}" + (f": {c['text']}" if c.get("text") else ""))
+        print()
+
+
 if __name__ == "__main__":
     a = [x for x in sys.argv[1:] if x not in ("--mock", "--write")]
     WRITE = "--write" in sys.argv
@@ -395,5 +422,7 @@ if __name__ == "__main__":
         tidy()
     elif a[0] == "export" and len(a) == 2:
         export(a[1])
+    elif a[0] == "arcs":
+        arcs()
     else:
         print(__doc__); sys.exit(1)
