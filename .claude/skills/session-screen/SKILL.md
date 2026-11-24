@@ -87,6 +87,7 @@ NPCs: every move must be a published mechanic, or a baseline rule with new flavo
 - The hub's tokens: `--ink:#0b0908`, `--panel:#16110e`, `--panel-2:#1d1612`, `--gold:#d2a851`, `--gold-hi:#f0d494`, `--gold-lo:#8d6829`, `--velvet:#6b1220`, `--text:#ece2cf`, `--muted:#a99a82`. Cinzel for headings, Spectral for text, Plex Mono for labels and numbers. Panels are the hub's cards; buttons are its gold buttons. Keep the PC colours from the last screen.
 - Nothing the game master needs in the moment may sit behind a scroll in Spotlight. The main control of a view sits in its header and never scrolls away. Next names where it goes.
 - The top bar ends, at the right, with the DM navigation: `<a class="home" href="../">Table hub</a><a class="home" href="../vault/">Vault</a><a class="home" href="../vault/paths.html">Planner</a>`, styled to the screen.
+- Every screen has the game master lock. Put these lines in its `<head>`, exactly (the same as `DM_HEAD` in `tools/osse/pages.py`): `<style>html:not(.dm-ok) body>*:not(#dmlock){display:none!important}</style><script>try{var k=localStorage,g=k.getItem("gus-key-gm");if(!k.getItem("osse-hub-dm")&&g)k.setItem("osse-hub-dm",g);if(k.getItem("osse-hub-dm"))document.documentElement.classList.add("dm-ok")}catch(e){}</script><script src="../assets/dm.js" defer></script>`
 - Anything that wipes state needs a second tap. Numbers that change often get a typed field as well as buttons.
 - Body text 16px or larger on the iPad, 18px or larger on the tall screen.
 - Canadian English. No em dashes.

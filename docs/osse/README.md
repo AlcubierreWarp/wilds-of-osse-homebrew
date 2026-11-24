@@ -7,7 +7,7 @@ Nothing about Ossë is a real-world secret. Vault notes, game secrets and plans 
 
 | Boundary | Rule |
 | --- | --- |
-| **Player screens vs DM screens** | A player screen (the chronicle, the codex, the player half of the hub, Gus's view of his archive, anything pushed to a player's device) shows only what has come out in play. Unrevealed secrets, prep, plans and DM notes go only on DM screens (the hub's game master section, `screen/` pages, `vault/` pages, the archive's game master view). A secret becomes player-safe once play reveals it (`revealed: S<n>`). Never link a DM screen from a player screen. |
+| **Player screens vs DM screens** | A player screen (the chronicle, the codex, the player half of the hub, Gus's view of his archive, anything pushed to a player's device) shows only what has come out in play. Unrevealed secrets, prep, plans and DM notes go only on DM screens (the hub's game master section, `screen/` pages, `vault/` pages, the archive's game master view). A secret becomes player-safe once play reveals it (`revealed: S<n>`). Never link a DM screen from a player screen. Every DM screen opens behind the game master lock (`assets/dm.js`), a curtain over content that is still in this public repository. |
 | **Real-world secrets vs game secrets** | Real-world secrets never enter the repo: keys, tokens, passwords, signed URLs, relay codes, and personal details such as emails, phone numbers and addresses. `python3 tools/check_secrets.py` checks for them and runs before every commit. A game secret is only a secret inside the world. |
 
 | Doc | Read it when |

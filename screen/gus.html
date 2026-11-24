@@ -434,11 +434,12 @@ const tab = {
 /* Access links: #gm=<key> for the game master, #k=<key> for the player. Saved on this device, then cleared from the address bar. */
 (function readKeys(){
   const p = new URLSearchParams(location.hash.slice(1));
-  if (p.get("gm")) store.set("gus-key-gm", p.get("gm"));
+  if (p.get("gm")) { store.set("gus-key-gm", p.get("gm")); store.set("osse-hub-dm", p.get("gm")); }
   if (p.get("k")) store.set("gus-key-player", p.get("k"));
   if (p.get("gm") || p.get("k")) history.replaceState(null, "", location.pathname + location.search);
 })();
-const gmKey = () => store.get("gus-key-gm");
+/* The game master's unlock is shared with the hub and the DM pages in this browser; locking any of them locks them all. */
+const gmKey = () => store.get("osse-hub-dm") || store.get("gus-key-gm");
 const playerKey = () => store.get("gus-key-player");
 function decideView(){ S.view = gmKey() && tab.get("gus-view") !== "player" ? "dm" : "player"; }
 const key = () => S.view === "dm" ? gmKey() : (playerKey() || gmKey());
@@ -663,6 +664,7 @@ async function unlock(e){
   if (gm === null || player === null) { msg.textContent = "The archive can't be reached. Check the connection."; return; }
   if (!gm && !player) { msg.textContent = "That code was not accepted."; $("#code").select(); return; }
   store.set(gm ? "gus-key-gm" : "gus-key-player", code);
+  if (gm) store.set("osse-hub-dm", code);
   if (gm) tab.set("gus-view", "dm");
   decideView(); S.link = "connecting"; S.primed = false; S.pick = true; lastView = ""; render(); poll();
 }
@@ -1070,7 +1072,7 @@ document.addEventListener("click", e => {
     render();
   }
   else if (a === "lock") {
-    store.del("gus-key-gm"); store.del("gus-key-player");
+    store.del("osse-hub-dm"); store.del("gus-key-gm"); store.del("gus-key-player");
     decideView(); S.vault = {}; S.shelf = {}; S.sel = null; S.edit = null; lastView = ""; poll(); toast("Locked. This device needs its access link again.");
   }
 });

@@ -371,13 +371,17 @@ def chips(site, n, fm):
     return "".join(c)
 
 
+# The game master lock (assets/dm.js): hidden until unlocked, so nothing shows while the page loads. An unlock made in Gus's archive counts too.
+DM_HEAD = '<style>html:not(.dm-ok) body>*:not(#dmlock){display:none!important}</style><script>try{var k=localStorage,g=k.getItem("gus-key-gm");if(!k.getItem("osse-hub-dm")&&g)k.setItem("osse-hub-dm",g);if(k.getItem("osse-hub-dm"))document.documentElement.classList.add("dm-ok")}catch(e){}</script><script src="../assets/dm.js" defer></script>'
+
+
 def head(title, player):
     return (f'<!doctype html><html lang="en-CA"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
             f'<meta name="robots" content="noindex"><title>{html.escape(title)} · {"The Codex" if player else "Ossë vault"}</title>'
             '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">'
-            '<link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="../assets/nav.css"></head><body><div class="wrap">')
+            '<link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="../assets/nav.css">' + ("" if player else DM_HEAD) + '</head><body><div class="wrap">')
 
 
 # The site navigation. Player pages never name or link a DM page; DM pages link only DM pages. Both link the table hub.
@@ -399,7 +403,7 @@ try { const s = JSON.parse(sessionStorage.getItem(k) || "null"); if (s && /^inde
 c.addEventListener("click", e => { if (e.metaKey || e.ctrlKey || e.shiftKey) return; try { sessionStorage.setItem(k + ":back", "1"); } catch (x) {} });
 addEventListener("keydown", e => { if (e.key === "Escape") c.click(); }); })();"""
 
-# The DM screen link: the next session's screen once it is built, else the last one built (from status.json).
+# The DM screen link (the screen it opens has the lock): the next session's screen once it is built, else the last one built (from status.json).
 SCREEN_HTML = """<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>DM screen · Ossë vault</title><link rel="stylesheet" href="pages.css"></head><body><div class="wrap"><p id="m">Opening the DM screen</p>
 <script>fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(s=>{const n=s.screens.includes(s.next)?s.next:Math.max(...s.screens);if(n>0)location.replace("../screen/s"+n+".html");else throw 0;})

@@ -169,7 +169,7 @@ footer{margin-top:48px;display:flex;flex-direction:column;align-items:center;gap
       <p class="msg" id="dm-msg" role="alert"></p>
     </div>
     <div id="dm" hidden>
-      <div class="dm-head"><span class="next" id="dm-next">Loading</span><button type="button" class="btn ghost small" id="dm-out">Lock this section</button></div>
+      <div class="dm-head"><span class="next" id="dm-next">Loading</span><button type="button" class="btn ghost small" id="dm-out">Lock this browser</button></div>
       <div id="dm-body"></div>
     </div>
   </section>
@@ -197,7 +197,7 @@ const PLAYER = [
    text: "Everyone and everything the party has met, as far as play has shown, plus a rules and items lookup.", href: "codex/", open: "Open the codex"},
   {title: "Gus's memory archive", who: "Shane · Gus",
    text: "Gus's documents from Marshal Intelligence. Open it on your own device and enter the code your game master gave you.",
-   href: "screen/gus.html", open: "Open the archive", gm: true},
+   href: "screen/gus.html", open: "Open the archive"},
 ];
 /* Game master section. The session, its screen and the automatic ticks come from vault/status.json (rebuilt by
    tools/osse/build.py) and chronicle/chronicle.json, so nothing here changes from one session to the next. */
@@ -254,7 +254,7 @@ let codes = null;
 function playerCards(){
   $("#player-cards").innerHTML = PLAYER.map(c => `<article class="card">
     <span class="who">${esc(c.who)}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p>
-    <div class="row"><a class="btn" href="${esc(c.href)}"${c.gm ? ' data-gm="1"' : ""}>${esc(c.open || "Open")}</a></div>
+    <div class="row"><a class="btn" href="${esc(c.href)}">${esc(c.open || "Open")}</a></div>
   </article>`).join("");
 }
 
@@ -329,7 +329,7 @@ function normCode(v){
   return c.length === 8 && t.length <= 11 ? c.slice(0, 4) + "-" + c.slice(4) : t;
 }
 async function check(code){
-  try { return (await fetch(RELAY + "/gm", {headers: {"x-gus-key": code}, cache: "no-store"})).ok; }
+  try { const r = await fetch(RELAY + "/gm", {headers: {"x-gus-key": code}, cache: "no-store"}); return r.ok ? true : r.status === 401 || r.status === 403 ? false : null; }
   catch(e) { return null; }
 }
 function showDm(on){
@@ -346,9 +346,12 @@ $("#dm-form").addEventListener("submit", async e => {
   if (ok === null) { msg.textContent = "The relay can't be reached. Check the connection."; return; }
   if (!ok) { msg.textContent = "That passcode was not accepted."; $("#dm-code").select(); return; }
   msg.textContent = ""; $("#dm-code").value = "";
-  store.set("osse-hub-dm", code); showDm(true);
+  store.set("osse-hub-dm", code); store.set("gus-key-gm", code); showDm(true);
 });
-$("#dm-out").addEventListener("click", () => { store.del("osse-hub-dm"); showDm(false); });
+/* One unlock for this browser: the hub, the DM pages (assets/dm.js) and Gus's archive share it, and locking one locks them all. */
+const lockAll = () => { store.del("osse-hub-dm"); store.del("gus-key-gm"); showDm(false); };
+$("#dm-out").addEventListener("click", lockAll);
+addEventListener("storage", e => { if (e.key === "osse-hub-dm" || e.key === null) showDm(!!store.get("osse-hub-dm")); });
 
 document.addEventListener("click", async e => {
   const c = e.target.closest("[data-copy]");
@@ -358,9 +361,6 @@ document.addEventListener("click", async e => {
     catch(err) { c.textContent = "Copy failed"; }
     setTimeout(() => { c.textContent = label; }, 1600);
   }
-  /* Gus's archive shares this site's storage, so the game master view can open already unlocked. */
-  const g = e.target.closest("a[data-gm]");
-  if (g) { const code = store.get("osse-hub-dm"); if (code) { store.set("gus-key-gm", code); } }
 });
 
 function theme(name){
@@ -373,10 +373,11 @@ document.querySelectorAll("[data-theme-set]").forEach(b => b.addEventListener("c
 theme(store.get("osse-theme"));
 
 playerCards();
-const saved = store.get("osse-hub-dm");
+const saved = store.get("osse-hub-dm") || store.get("gus-key-gm");
 if (saved) {
+  store.set("osse-hub-dm", saved);
   showDm(true);
-  check(saved).then(ok => { if (ok === false) { store.del("osse-hub-dm"); showDm(false); } });
+  check(saved).then(ok => { if (ok === false) lockAll(); });
 }
 </script>
 </body>
