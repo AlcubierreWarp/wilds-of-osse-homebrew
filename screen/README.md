@@ -3,13 +3,13 @@
 The site's home page, `index.html`, gathers every link: https://osse.thomashuet.ca once its DNS record is in place, https://alcubierrewarp.github.io/wilds-of-osse-homebrew/ until then. Links open in the same tab; Command-click opens one in a new tab.
 
 - **Theme**: the footer switches between Original and Cover poster (the campaign poster, `assets/poster.webp`). Each browser remembers its choice.
-- **For the players**: D&D Beyond, Roll20, the chronicle, the codex (what the party knows, with a rules lookup) and Gus's archive. No codes here.
+- **For the players**: D&D Beyond, Roll20, Discord, the chronicle, the codex (what the party knows, with a rules lookup) and Gus's archive. No codes here.
 - **Game master**: behind a passcode (Keychain service `osse-dm-passcode`; change it with `relay/gus/deploy.sh --new-dm-passcode`, or pipe a chosen one into `--set-dm-passcode`). It keeps players from wandering in; it is not strong security. Inside:
-  - Gus's archive: the game master view (opens already unlocked) and Shane's code to hand him. The code comes from the relay (`hub.json`, game master only), so it never sits in this repository. `relay/gus/deploy.sh --new-player-code` changes the code and the hub at once.
-  - A launchboard: the next session's screen (iPad and Tall), the Ossë vault and its rules lookup, Roll20, Discord, D&D Beyond and the player views.
-  - A set-up checklist for the next session. Three items tick themselves from `vault/status.json` and `chronicle/chronicle.json` (last session synced, plans marked ready, screen built); the rest are ticked by hand and kept in the browser per session.
-  - Past screens and the homebrew raw link, small, at the bottom.
-  - The session number, the screens and the ticks come from `vault/status.json`, which `tools/osse/build.py` rewrites. Nothing in `index.html` changes from one session to the next; its tool list is `TOOLS` and its checklist `CHECKLIST`.
+  - Gus's archive code, to hand to Shane. While the section is unlocked, the players' archive button opens the game master view. The code comes from the relay (`hub.json`, game master only), so it never sits in this repository. `relay/gus/deploy.sh --new-player-code` changes the code and the hub at once.
+  - Links: the next session's screen (iPad and Tall) and past screens, the Ossë vault and the Session planner. Nothing from the players' section is repeated.
+  - A checklist for the next session in phases. Two items tick themselves from `vault/status.json` and `chronicle/chronicle.json` (previous session synced, DM screen drafted); the rest are ticked by hand and kept in the browser per session.
+  - The homebrew file's link, small, at the bottom.
+  - The session number, the screens and the ticks come from `vault/status.json`, which `tools/osse/build.py` rewrites. Nothing in `index.html` changes from one session to the next; its links are `GM_LINKS` and its checklist `CHECKLIST` and `PHASES`.
 
 # Session screens
 

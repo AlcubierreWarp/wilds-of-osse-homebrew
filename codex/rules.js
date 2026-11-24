@@ -1,24 +1,43 @@
-/* Search tabs for the Ossë pages: "In the world" filters this page; "Rules and items" asks Open5e (SRD only). */
+/* Search and filters for the Ossë pages. One box searches this page ("In the world") and Open5e ("Rules and items", SRD only) together;
+   a filter shows one type only. The search and filter live in the address, so closing an entry comes back to the same list. */
 (() => {
-const $ = s => document.querySelector(s), API = "https://api.open5e.com/v2/";
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)], API = "https://api.open5e.com/v2/";
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const q = $("#q"), tabs = document.querySelectorAll("[data-tab]");
-let tab = "world", timer = 0, seq = 0, conds = null;
+const q = $("#q"), KEY = "osse-list:" + location.pathname.replace(/[^/]*$/, ""), types = $$("#filters [data-f]").map(b => b.dataset.f);
+let f = "all", timer = 0, seq = 0, conds = null, hits = null, asked = "";
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e) {} } };
-function show(t){
-  tab = t;
-  tabs.forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
-  $("#world").hidden = t !== "world"; $("#rules").hidden = t !== "rules";
-  q.placeholder = t === "world" ? "Find a name, alias or summary" : "Find a rule, spell, item, creature or condition";
-  if (location.hash !== "#" + t && (t === "rules" || location.hash === "#rules")) history.replaceState(null, "", t === "rules" ? "#rules" : location.pathname);
-  run();
+const here = { get(k){ try { return sessionStorage.getItem(k); } catch(e) { return null; } }, set(k,v){ try { sessionStorage.setItem(k,v); } catch(e) {} }, del(k){ try { sessionStorage.removeItem(k); } catch(e) {} } };
+const typed = () => q.value.trim();
+function address(){
+  const v = typed(), u = (v ? "?q=" + encodeURIComponent(v) : "") + (f === "all" ? "" : "#" + f);
+  history.replaceState(null, "", location.pathname + u); here.set(KEY, JSON.stringify({url: "index.html" + u, y: scrollY}));
+}
+function pickFilter(t){ f = types.includes(t) && t !== f ? t : "all"; run(); }
+function run(now){
+  const v = typed();
+  $$("#filters [data-f]").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === f));
+  $("#world").hidden = f === "rules"; $("#rules").hidden = f !== "rules" && !(f === "all" && v.length > 1);
+  $("#rules").classList.toggle("mixed", f === "all"); $("#results").classList.toggle("both", f === "all" && v.length > 1);
+  world(); address(); clearTimeout(timer);
+  if (f === "rules" || v.length > 1) timer = setTimeout(rules, now === true ? 0 : 300); else { seq++; hits = null; asked = ""; $("#rlist").innerHTML = ""; shut(); }
+  counts();
 }
 function world(){
-  const v = q.value.trim().toLowerCase();
-  document.querySelectorAll(".entries li").forEach(li => { li.hidden = v && !li.dataset.k.includes(v); });
-  let any = false;
-  document.querySelectorAll("#world section").forEach(s => { const on = !v || s.querySelector("li:not([hidden])"); s.hidden = !on; any = any || on; });
-  $("#none").hidden = any;
+  const v = typed().toLowerCase(); let n = 0, all = 0;
+  $$("#world .entries li").forEach(li => { li.hidden = !!v && !li.dataset.k.includes(v); });
+  $$("#world section").forEach(s => { const c = s.querySelectorAll("li:not([hidden])").length, on = c && (f === "all" || f === s.id); s.hidden = !on; all += c; if (on) n += c;
+    const h = s.querySelector("h2 span"); if (h) h.textContent = c; });
+  $("#wband").hidden = !(v && f === "all"); $("#wband span").textContent = all ? all + (all === 1 ? " entry" : " entries") : "";
+  const label = f === "all" || f === "rules" ? "" : $(`#filters [data-f="${f}"]`).firstChild.textContent.trim();
+  $("#none").hidden = !!n;
+  $("#none").innerHTML = label ? `Nothing in ${esc(label)} by that name. <a href="#all" data-go="all">Search everything</a>` : "Nothing in the world by that name.";
+}
+function counts(){   // while searching, each filter says how many it would show
+  const v = typed();
+  $$("#filters [data-f]").forEach(b => { const s = b.querySelector("small"); if (!s) return;
+    if (b.dataset.f === "rules") { s.textContent = v.length > 1 && asked === v && hits ? hits.length + (hits.length >= 30 ? "+" : "") : ""; return; }
+    const c = document.getElementById(b.dataset.f).querySelectorAll("li:not([hidden])").length; s.textContent = c; b.classList.toggle("zero", !c); });
+  $("#rules .band span").textContent = v.length > 1 && asked === v && hits ? (hits.length ? `${hits.length >= 30 ? "the first " : ""}${hits.length} from the System Reference Document` : "") : "";
 }
 function md(s){
   const lines = String(s || "").split("\n"), out = []; let list = null, table = null;
@@ -71,35 +90,46 @@ function detail(o, model){
   return h.join("");
 }
 async function open(route, key, model){
-  const box = $("#rshow"); box.innerHTML = "<p class='muted'>Opening</p>";
-  try { const r = await fetch(API + route.replace(/^v2\//, "") + encodeURIComponent(key) + "/"); box.innerHTML = r.ok ? detail(await r.json(), model) : "<p>Could not open that entry.</p>"; }
-  catch(e) { box.innerHTML = "<p>Open5e can't be reached. Check the connection.</p>"; }
+  const box = $("#rshow"), x = '<button type="button" class="close" data-rx title="Close (Esc)">✕ Close</button>'; $("#rules").classList.add("reading"); box.innerHTML = x + "<p class='muted'>Opening</p>";
+  try { const r = await fetch(API + route.replace(/^v2\//, "") + encodeURIComponent(key) + "/"); box.innerHTML = x + (r.ok ? detail(await r.json(), model) : "<p>Could not open that entry.</p>"); }
+  catch(e) { box.innerHTML = x + "<p>Open5e can't be reached. Check the connection.</p>"; }
+  if (innerWidth < 700) box.scrollIntoView({block: "start", behavior: "smooth"});
 }
 async function rules(){
-  const v = q.value.trim(), ed = document.querySelector("[name=ed]:checked").value, me = ++seq, list = $("#rlist");
+  const v = typed(), ed = document.querySelector("[name=ed]:checked").value, me = ++seq, list = $("#rlist");
   $("#ddb").href = "https://www.dndbeyond.com/search?q=" + encodeURIComponent(v);
-  if (v.length < 2) { list.innerHTML = "<li class='muted'>Type at least two letters.</li>"; return; }
+  if (v.length < 2) { hits = null; asked = ""; list.innerHTML = "<li class='muted'>Type at least two letters above to find a rule, spell, item, creature or condition.</li>"; counts(); return; }
   list.innerHTML = "<li class='muted'>Searching</li>";
   try {
     if (!conds) { conds = []; try { const c = await (await fetch(API + "conditions/?limit=60&fields=key,name")).json(); conds = c.results.filter(x => !x.key.includes("_")).map(x => ({route: "v2/conditions/", object_pk: x.key, object_name: x.name, object_model: "Condition"})); } catch(e) {} }
     const j = await (await fetch(API + "search/?limit=30&document_pk=" + ed + "&query=" + encodeURIComponent(v))).json();
     if (me !== seq) return;
     const lv = v.toLowerCase(), rank = r => { const n = r.object_name.toLowerCase(); return n === lv ? 0 : n.startsWith(lv) ? 1 : n.includes(lv) ? 2 : 3; };
-    const hits = conds.filter(c => c.object_name.toLowerCase().includes(lv)).concat(j.results || []).sort((a, b) => rank(a) - rank(b));
+    hits = conds.filter(c => c.object_name.toLowerCase().includes(lv)).concat(j.results || []).sort((a, b) => rank(a) - rank(b));
     list.innerHTML = hits.length ? hits.map((r, i) => `<li><button data-r="${esc(r.route)}" data-k="${esc(r.object_pk)}" data-m="${esc(r.object_model)}"><b>${esc(r.object_name)}</b><span>${esc(r.object_model.replace(/([a-z])([A-Z])/g, "$1 $2"))}</span></button></li>`).join("")
       : "<li class='muted'>Nothing in the SRD. Try D&amp;D Beyond below.</li>";
-    const first = list.querySelector("button"); if (first && rank(hits[0]) <= 1) first.click(); else if (!first) $("#rshow").innerHTML = "";
+    if (asked !== v) shut();
+    asked = v; counts();
+    const first = list.querySelector("button"); if (f === "rules" && innerWidth >= 700 && first && rank(hits[0]) <= 1) first.click();
   } catch(e) { if (me === seq) list.innerHTML = "<li class='muted'>Open5e can't be reached. Check the connection.</li>"; }
 }
-function run(){ if (tab === "world") world(); else { clearTimeout(timer); timer = setTimeout(rules, 250); } }
 q.addEventListener("input", run);
-tabs.forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
+$("#filters").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) pickFilter(b.dataset.f); });
+const shut = () => { $("#rshow").innerHTML = ""; $("#rules").classList.remove("reading"); $$("#rlist button").forEach(x => x.classList.remove("on")); };
 document.addEventListener("click", e => {
-  const b = e.target.closest("#rlist button"); if (b) { document.querySelectorAll("#rlist button").forEach(x => x.classList.toggle("on", x === b)); open(b.dataset.r, b.dataset.k, b.dataset.m); }
-  const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); show(g.dataset.go); }
+  const b = e.target.closest("#rlist button"); if (b) { $$("#rlist button").forEach(x => x.classList.toggle("on", x === b)); open(b.dataset.r, b.dataset.k, b.dataset.m); }
+  const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); f = g.dataset.go; run(true); }
+  if (e.target.closest("[data-rx]")) shut();
+  if (e.target.closest(".entries a")) address();
 });
+addEventListener("keydown", e => { if (e.key === "Escape" && $("#rshow").innerHTML) shut(); });
+addEventListener("pagehide", () => { const s = here.get(KEY); if (s) here.set(KEY, JSON.stringify({...JSON.parse(s), y: scrollY})); });
 document.querySelectorAll("[name=ed]").forEach(r => r.addEventListener("change", () => { store.set("osse-rules-ed", r.value); run(); }));
 const ed = store.get("osse-rules-ed"); if (ed) { const r = document.querySelector(`[name=ed][value="${ed}"]`); if (r) r.checked = true; }
+const was = here.get(KEY), back = here.get(KEY + ":back"); here.del(KEY + ":back");
 const p = new URLSearchParams(location.search); if (p.get("q")) q.value = p.get("q");
-show(location.hash === "#rules" ? "rules" : "world");
+const h = location.hash.slice(1); if (types.includes(h)) f = h;
+run(true);
+if (back && was) { try { scrollTo(0, JSON.parse(was).y || 0); } catch (e) {} }
+addEventListener("hashchange", () => { const t = location.hash.slice(1); f = types.includes(t) ? t : "all"; run(true); });
 })();

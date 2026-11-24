@@ -1,0 +1,4 @@
+<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>DM screen · Ossë vault</title><link rel="stylesheet" href="pages.css"></head><body><div class="wrap"><p id="m">Opening the DM screen</p>
+<script>fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(s=>{const n=s.screens.includes(s.next)?s.next:Math.max(...s.screens);if(n>0)location.replace("../screen/s"+n+".html");else throw 0;})
+.catch(()=>{document.getElementById("m").innerHTML='No DM screen could be opened. <a href="index.html">Back to the vault</a>';});</script></div></body></html>

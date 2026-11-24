@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/nav.css">
 <style>
 :root{
   /* One quiet night-blue frame around one bright page: the parchment is the only light surface. */
@@ -34,8 +35,6 @@ header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1
 .eyebrow{font:500 11px/1.4 var(--f-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
 h1{margin:.1em 0 0;font:600 clamp(24px,4vw,32px)/1.1 var(--f-display);letter-spacing:.06em;color:var(--gold-hi)}
 .sub{margin:2px 0 0;color:var(--muted);font-style:italic;font-size:15px}
-.home{font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:10px 12px;white-space:nowrap}
-.home:hover{color:var(--gold-hi);border-color:var(--line-2)}
 
 /* Layout */
 .layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;align-items:start}
@@ -149,7 +148,7 @@ footer{margin-top:30px;text-align:center;font:500 11px/1.4 var(--f-mono);letter-
     font:600 16px/1.2 var(--f-display);letter-spacing:.03em;
     background:var(--ink-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c9a45a' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center}
   header{grid-template-columns:auto 1fr}
-  .home{grid-column:1/-1;justify-self:start}
+  .sitenav{grid-column:1/-1;justify-self:start}
   .crest{width:40px;height:48px}
 }
 @media (max-width:520px){
@@ -178,7 +177,7 @@ footer{margin-top:30px;text-align:center;font:500 11px/1.4 var(--f-mono);letter-
       <h1>The Chronicle</h1>
       <p class="sub">What the party has lived through, session by session.</p>
     </div>
-    <a class="home" href="../" title="Back to the Wilds of Ossë table hub">← Table hub</a>
+    <nav class="sitenav" aria-label="Site"><a href="../">Table hub</a><a href="./" aria-current="page">Chronicle</a><a href="../codex/">Codex</a></nav>
   </header>
 
   <div class="layout">

@@ -86,7 +86,7 @@ NPCs: every move must be a published mechanic, or a baseline rule with new flavo
 - One file. The hub's Google Fonts link (Cinzel, Spectral, IBM Plex Mono) is the only outside resource; no other fonts, scripts or images. State lives in `localStorage` under a key unique to the session (`osse-sNN-v1`), so both layouts on one device stay in step. The iPad and the tall screen are separate devices and keep separate state.
 - The hub's tokens: `--ink:#0b0908`, `--panel:#16110e`, `--panel-2:#1d1612`, `--gold:#d2a851`, `--gold-hi:#f0d494`, `--gold-lo:#8d6829`, `--velvet:#6b1220`, `--text:#ece2cf`, `--muted:#a99a82`. Cinzel for headings, Spectral for text, Plex Mono for labels and numbers. Panels are the hub's cards; buttons are its gold buttons. Keep the PC colours from the last screen.
 - Nothing the game master needs in the moment may sit behind a scroll in Spotlight. The main control of a view sits in its header and never scrolls away. Next names where it goes.
-- The top bar ends, at the right, with the site-wide button back to the hub: `<a class="home" href="../">← Table hub</a>`, styled to the screen.
+- The top bar ends, at the right, with the DM navigation: `<a class="home" href="../">Table hub</a><a class="home" href="../vault/">Vault</a><a class="home" href="../vault/paths.html">Planner</a>`, styled to the screen.
 - Anything that wipes state needs a second tap. Numbers that change often get a typed field as well as buttons.
 - Body text 16px or larger on the iPad, 18px or larger on the tall screen.
 - Canadian English. No em dashes.
@@ -102,7 +102,7 @@ Run the `screen` preview server (`.claude/launch.json`) and check in the browser
 
 ## 6. Publish
 
-1. Run `python3 tools/osse/pages.py`. It lists the screens in `vault/status.json`, and the hub's game master section then shows the iPad and Tall buttons for the next session and ticks "screen built". Do not edit `index.html` for a new session.
+1. Run `python3 tools/osse/pages.py`. It lists the screens in `vault/status.json`, and the hub's game master section then shows the iPad and Tall buttons for the next session and ticks "Draft DM screen". Do not edit `index.html` for a new session.
 2. Run the pre-commit check from `CLAUDE.md`. If the build only changed timestamps in `wilds-of-osse.json`, do not commit that file.
 3. Commit to main and push.
 4. Wait for GitHub Pages, then confirm `https://osse.thomashuet.ca/screen/sNN.html` returns 200 and matches the committed file.

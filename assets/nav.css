@@ -1,0 +1,10 @@
+/* The site navigation, the same on every page: players' pages list only players' pages, DM pages only DM pages (and both, the table hub).
+   Colours come from the page it sits on. */
+.sitenav{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center}
+.sitenav a{font:500 11px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;white-space:nowrap;
+  color:var(--muted,#8e8a82);border:1px solid var(--line,rgba(201,170,110,.16));border-radius:4px;padding:11px 12px}
+.sitenav a:hover{color:var(--gold-hi,#e6cc8f);border-color:var(--line-2,rgba(201,170,110,.32))}
+.sitenav a[aria-current]{color:var(--gold-hi,#e6cc8f);border-color:var(--gold-lo,#7c6033);background:rgba(201,164,90,.08)}
+.sitenav a:focus-visible{outline:2px solid var(--arcane,#86b8e6);outline-offset:2px}
+@media (max-width:700px){.sitenav{justify-content:flex-start}.sitenav a{padding:11px 10px;letter-spacing:.06em}}
+@media print{.sitenav{display:none}}

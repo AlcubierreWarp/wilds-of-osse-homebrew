@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Session planner (once called Paths ahead): the DM's planning board (vault/paths.html). Built by pages.py on every build; never edit the page by hand.
 
-One board per player character, plus The Party and Around the party. Each board has a tab and a canvas per session
-(the next sessions, then Later). The first tab starts from the end of the last played session; each later tab starts
+Two views of the whole session, Running order and Canvas, show everything planned for it; under them sits one board per player
+character and one for the World (what moves without the party). Each board has a tab and a canvas per session (the next sessions,
+then Later). In the store the session canvas is the lane "The Party" and the World is "world". The first tab starts from the end of the last played session; each later tab starts
 from the end of the one before, as planned. Each board's live plans wait in a tray beside it; Tom drags the ones he
 wants onto a session's canvas, draws links between cards, adds, edits and deletes cards, and adds or deletes sessions.
 Plans that already have a `target` start in that session's tab. Edits to a plan's text and plans he drops are kept as
@@ -11,8 +12,8 @@ behind the hub's game master passcode; `tools/osse/paths_sync.py` reads it so Cl
 vault plans (see the `paths` skill). The vault stays the truth: the board only places and connects.
 
 Which plans sit in a board's tray: plans whose `for:` names that character; else plans that name the character in
-their Links or Requires; else plans that touch someone tied to the character at weight 5; else The Party's board when
-they name The Party; else Around the party. The tray can also show every live plan.
+their Links or Requires; else plans that touch someone tied to the character at weight 5; else the session canvas when
+they name The Party; else the World. The tray can also show every live plan.
 The rules for kinds, options and branching are in docs/osse/branching.md."""
 import json, re
 
@@ -160,14 +161,14 @@ def lanes_data(site, pcs, data):
     party = nodes.get("The Party")
     if party:
         top, recent = _latest(_secs(site.text("The Party")).get("Now", []), cur)
-        out.append({"key": "The Party", "short": "The party", "kind": "party",
+        out.append({"key": "The Party", "short": "Whole party", "kind": "party",
                     "now": {"title": "The whole party", "href": site.slugs.get("The Party", "") + ".html",
                             "location": _plain(party.get("location", "")), "state": party.get("state", ""),
                             "members": [{"name": p["id"], "sheet": sheet(p)} for p in pcs],
                             "summary": _plain(last.get("summary")) if last else "", "recent": recent[:3], "recent_at": top}})
     opens = next((v for k, v in last_secs.items() if k.startswith("Open going into")), [])
-    out.append({"key": "world", "short": "Around the party", "kind": "world",
-                "now": {"title": "Around the party", "href": site.slugs.get(last["id"], "") + ".html" if last else "",
+    out.append({"key": "world", "short": "World", "kind": "world",
+                "now": {"title": "The world", "about": "What moves without the party knowing, and could still reach them.", "href": site.slugs.get(last["id"], "") + ".html" if last else "",
                         "summary": _plain(last.get("summary")) if last else "",
                         "recent": [_plain(x) for x in _bullets(opens)][:6], "recent_at": cur, "open": True}})
     for ln in out:
@@ -187,25 +188,25 @@ def page(site):
     payload = {"cur": cur, "plans": data, "facts": facts, "lanes": lanes, "gone": sorted(build.GONE), "places": places, "people": people}
     js_data = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
     head = pages.head("Session planner", False).replace('<div class="wrap">', '<div class="wrap wide">')
-    return (head + f"<style>{CSS}</style>" + pages.topbar(site, "Session planner") +
+    return (head + f"<style>{CSS}</style>" + pages.topbar(site, here="paths") +
             '<main class="sheet paths">'
-            '<div class="ptop"><h1>Session planner</h1><nav class="lanes" id="lanes" role="tablist" aria-label="Boards"></nav></div>'
-            '<div class="bar"><div class="whatif"><b>What-ifs</b><span id="wi-list" class="muted"></span>'
-            '<button id="wi-reset" class="mini" hidden>Clear</button></div>'
-            '<div class="tools"><button class="mini" data-act="scene">+ Scene</button><button class="mini" data-act="card">+ Card</button><span id="save" class="save"></span></div></div>'
+            '<div class="ptop"><h1>Session planner</h1><div class="views"><span>Whole session</span><nav id="views" role="tablist" aria-label="Whole session"></nav></div>'
+            '<div class="tools"><span id="save" class="save"></span><button class="mini" data-act="scene">+ Scene</button><button class="mini" data-act="card">+ Card</button></div></div>'
+            '<div class="bar"><nav class="lanes" id="lanes" role="tablist" aria-label="Boards"></nav>'
+            '<div class="whatif"><b>What-ifs</b><span id="wi-list" class="muted"></span><button id="wi-reset" class="mini" hidden>Clear</button></div></div>'
             '<div class="runw" id="runw" hidden><div class="stage"><nav class="sess" id="rsess" role="tablist" aria-label="Sessions"></nav>'
             '<div class="run" id="run" aria-label="Running order"></div></div>'
             '<aside class="tray" id="loose"></aside></div>'
             '<div class="work" id="work"><div class="stage"><nav class="sess" id="sess" role="tablist" aria-label="Sessions"></nav>'
             '<div class="board" id="board" aria-label="Planning board">'
             '<div class="world" id="world"><svg id="wires" class="wires"></svg><div id="nodes"></div></div>'
-            '<div class="float"><button class="fb" data-act="zout" title="Zoom out" aria-label="Zoom out">−</button><button class="fb" data-act="zin" title="Zoom in" aria-label="Zoom in">+</button><button class="fb" data-act="fit" title="Fit to the window" aria-label="Fit to the window">'
+            '<div class="float"><button class="fb" data-act="line" id="lineup" hidden title="Lay the scenes out left to right in running order">Line up</button><button class="fb" data-act="zout" title="Zoom out" aria-label="Zoom out">−</button><button class="fb" data-act="zin" title="Zoom in" aria-label="Zoom in">+</button><button class="fb" data-act="fit" title="Fit to the window" aria-label="Fit to the window">'
             '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>'
             '<button class="fb" data-act="legend" title="Key" aria-label="Key">Key</button></div>'
             '<div class="keyp" id="keyp" hidden></div>'
             '<div class="hint" id="hint"></div></div></div>'
             '<aside class="tray" id="tray"><div class="trayh"><b>Not placed yet</b>'
-            '<label class="all"><input type="checkbox" id="tray-all"> every live plan</label></div>'
+            '<label class="all" id="tray-alll"><input type="checkbox" id="tray-all"> every live plan</label></div>'
             '<input id="tray-q" type="search" placeholder="Find a plan" autocomplete="off">'
             '<div id="tray-list" class="tlist"></div></aside></div>'
             '<aside id="drawer" class="drawer" hidden></aside>'
@@ -221,11 +222,24 @@ CSS = r"""
 .wrap.wide{max-width:none}
 .paths{padding:clamp(14px,2.4vw,26px)}
 .ptop{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px}
-.lanes{display:flex;flex-wrap:wrap;gap:4px}
-.lanes button{font:600 13px/1 var(--f-display);letter-spacing:.06em;color:var(--vmuted);background:rgba(255,255,255,.35);border:1px solid var(--vline);border-radius:999px;padding:9px 13px;cursor:pointer}
-.lanes button small{color:inherit;font:500 11px var(--f-mono);margin-left:5px;opacity:.75}
-.lanes button[aria-selected=true]{background:var(--vink);color:var(--vellum);border-color:var(--vink)}
-.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin:12px 0 10px}
+.ptop .tools{margin-left:auto}
+.views{display:flex;align-items:stretch;border:2px solid #3f5a3c;border-radius:7px;overflow:hidden;background:#e7efe3}
+.views>span{display:flex;align-items:center;padding:0 12px;font:500 10.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#3f5a3c;border-right:2px solid #3f5a3c}
+.views nav{display:flex}.views button{display:inline-flex;align-items:center;gap:8px;font:600 14px/1 var(--f-display);letter-spacing:.05em;color:#3f5a3c;background:none;border:0;padding:11px 16px;cursor:pointer}
+.views button+button{border-left:1px solid #9bb397}.views button:hover{background:#d8e5d2}.views svg{flex:none}
+.views button[aria-selected=true]{background:#3f5a3c;color:var(--vellum)}
+.lanes{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.lanes .lb{font:500 10.5px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--vmuted);margin-right:3px}
+.lanes .sep{width:1px;height:24px;background:var(--vrule);margin:0 7px}
+.lanes button{display:inline-flex;align-items:center;font:600 13px/1 var(--f-display);letter-spacing:.06em;color:var(--vmuted);background:rgba(255,255,255,.35);border:1px solid var(--vline);border-radius:999px;padding:8px 13px;cursor:pointer}
+.lanes button i{width:11px;height:11px;border-radius:50%;background:var(--c);border:1px solid rgba(42,29,18,.45);margin-right:8px}
+.lanes button small{color:inherit;font:500 11px var(--f-mono);margin-left:6px;opacity:.75}
+.lanes button:hover{border-color:var(--vink)}.lanes button[aria-selected=true]{background:var(--vink);color:var(--vellum);border-color:var(--vink)}
+.lanes button.wb{border-radius:6px;border-color:rgba(61,90,128,.5);color:#3d5a80}.lanes button.wb[aria-selected=true]{background:#3d5a80;border-color:#3d5a80;color:var(--vellum)}.lanes .wb svg{margin-right:7px}
+.paths.whole .sess button[aria-selected=true]{color:#3f5a3c}.paths.whole .board,.paths.whole .run{border-color:#7f977b}
+.wires path.run{stroke:#7f977b;stroke-width:5;stroke-linecap:round;opacity:.7}
+.ord{display:inline-grid;place-items:center;min-width:26px;height:26px;margin-right:8px;border-radius:50%;background:#3f5a3c;color:var(--vellum);font:600 14px/1 var(--f-display)}
+.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin:10px 0}
 .whatif{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:14.5px}
 .whatif b,.trayh b{font:600 11.5px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--vred)}
 .wi{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border-radius:999px;background:var(--vink);color:var(--vellum);font-size:13.5px}
@@ -234,7 +248,7 @@ CSS = r"""
 .mini{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--vrule);background:rgba(255,255,255,.45);color:var(--vred);border-radius:4px;padding:8px 10px;cursor:pointer}
 .mini:hover{background:#fff}
 .save{font:500 11.5px var(--f-mono);color:var(--vmuted);margin-left:4px;max-width:420px}.save.bad{color:var(--vred)}
-.work{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 200px);min-height:480px}
+.work{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 252px);min-height:480px}
 .stage{display:flex;flex-direction:column;min-height:0;min-width:0}
 .sess{display:flex;gap:2px;align-items:flex-end;overflow-x:auto;padding-left:6px}
 .sess button{font:600 13px/1 var(--f-display);letter-spacing:.08em;color:var(--vmuted);background:rgba(255,255,255,.3);border:1px solid var(--vrule);border-bottom:0;border-radius:6px 6px 0 0;padding:10px 14px 9px;cursor:pointer;white-space:nowrap}
@@ -351,9 +365,7 @@ CSS = r"""
 .drawer .tabs2 button{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--vline);background:none;border-radius:4px;padding:7px 10px;cursor:pointer;color:var(--vmuted)}
 .drawer .tabs2 button[aria-selected=true]{border-color:var(--vink);color:var(--vink);background:rgba(255,255,255,.5)}
 .work[hidden],.runw[hidden]{display:none}
-.lanes button.runb{color:#3f5a3c;border-color:#9bb397;background:#e7efe3}
-.lanes button.runb[aria-selected=true]{background:#3f5a3c;color:var(--vellum);border-color:#3f5a3c}
-.runw{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 200px);min-height:480px}
+.runw{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 252px);min-height:480px}
 .run{flex:1;min-height:0;overflow:auto;border:1px solid var(--vrule);border-radius:0 8px 8px 8px;background:#f6eed8;padding:14px clamp(10px,2vw,22px) 40px}
 .runh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 14px;margin:0 0 10px;font-size:14.5px;color:var(--vmuted)}
 .runh b{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:#3f5a3c}
@@ -366,7 +378,7 @@ CSS = r"""
 .rc .rb{min-width:0;cursor:grab}
 .rc .rt{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}.rc .rt b{font-weight:600;font-size:15.5px;line-height:1.25}
 .rc .rw{font-size:13px;color:var(--vmuted);margin-top:1px}
-.pcs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.pcs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px}.pcs .none{margin:0 4px 0 0}
 .pcx{font:700 10.5px/1.55 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:0 7px;border-radius:4px;border:2px solid var(--c);color:#1b1410;background:color-mix(in srgb,var(--c) 18%,#fbf5e6);white-space:nowrap}
 .pcx.in{background:var(--c)}.pcx.off{border-style:dashed;background:none;opacity:.85}.pcx.plus{--c:#9a8c74;border-style:dashed;background:none;color:var(--vmuted)}.pcx.plus.on{border-style:solid;background:var(--vink);color:var(--vellum)}.pcs .none{font-size:13px;font-style:italic;color:var(--vmuted)}
 .addsc{display:block;width:100%;max-width:760px;margin:4px 0 0;padding:12px;border:1.5px dashed #7f977b;border-radius:6px;background:none;color:#3f5a3c;font:600 13px var(--f-display);letter-spacing:.06em;cursor:pointer}.addsc:hover{background:#e7efe3}
@@ -437,6 +449,7 @@ const tabOf = {};   // board -> open session tab
    scene with rx, ry (a card inside a scene: its place in the box, the same on every board) */
 const sessNum = s => +(String(s).match(/^S(\d+)$/i) || [])[1] || 0;
 function defaults() { return [1, 2, 3].map(i => "S" + (CUR + i)).concat("Later"); }
+const WHOLE = "The Party";   // the session canvas: everything in the session, whoever it is for. As a home it means the whole party
 const L = () => doc;
 const it = id => doc.items[id];
 const live = id => !!it(id) && (id.startsWith("p:") ? !!P[id.slice(2)] : !!doc.cards[id.slice(2)]);   // a played or dropped plan stays stored, unseen
@@ -460,7 +473,10 @@ function lanesOf(id) {   // the boards an item shows on
   const o = it(id), ks = isScene(id) ? [...new Set([...o.homes, ...castLanes(id)])] : o.homes;
   return ks.length ? ks : [o.born || D.lanes[0].key];
 }
-const inTab = (t, k = lane) => Object.keys(doc.items).filter(i => live(i) && sessOf(i) === t && lanesOf(i).includes(k));
+const onBoard = (id, k = lane) => k === WHOLE || lanesOf(id).includes(k);
+const boardsOf = id => [...new Set([...lanesOf(id), WHOLE])];
+const mineHome = () => runMode || lane === WHOLE ? undefined : lane;   // the board a card taken out of a scene stays on
+const inTab = (t, k = lane) => Object.keys(doc.items).filter(i => live(i) && sessOf(i) === t && onBoard(i, k));
 function measure(ids) {   // card heights, off screen: needed for boards not drawn yet
   const m = $("#meas"); m.innerHTML = ids.map(cardHtml).join("");
   m.querySelectorAll(".bn").forEach(el => { hs[el.dataset.id] = el.offsetHeight; const h = el.querySelector(".sh"); if (h) hsh[el.dataset.id] = h.offsetHeight; });
@@ -481,7 +497,21 @@ function freeSpot(t, k = lane) {
 function ensureAt(t, k = lane) {   // everything that belongs on board k has a place there
   const ids = inTab(t, k), miss = ids.filter(i => hs[i] === undefined);
   if (miss.length) withLane(k, () => measure(miss));
+  if (k === WHOLE) { lineUp(t, ids.filter(i => !sceneOf(i) && !(it(i).at ||= {})[k])); return; }
   ids.filter(i => !sceneOf(i) && !(it(i).at ||= {})[k]).sort((a, b) => isScene(b) - isScene(a)).forEach(i => { it(i).at[k] = freeSpot(t, k); });
+}
+function lineUp(t, ids) {   // the session canvas: scenes left to right in running order, then what is in no scene, a column per board, underneath
+  if (!ids.length) return;
+  const put = new Set(ids), all = inTab(t, WHOLE).filter(i => !sceneOf(i)), at = i => it(i).at[WHOLE];
+  const kept = all.filter(i => !put.has(i)), bx = i => box(i, WHOLE);
+  let x = FIRSTX; kept.filter(isScene).forEach(i => { const b = bx(i); x = Math.max(x, snap(b.x + b.w) + 88); });
+  scenesIn(t).filter(i => put.has(i)).forEach(i => { it(i).at[WHOLE] = {x, y: SY}; x = snap(x + (it(i).w || SCW)) + 88; });
+  const sc = all.filter(isScene).map(bx), y0 = sc.length ? snap(Math.max(...sc.map(b => b.y + b.h))) + 88 : SY;
+  const cols = D.lanes.map(l => l.key).filter(k => all.some(i => !isScene(i) && lanesOf(i)[0] === k));
+  ids.filter(i => !isScene(i)).forEach(i => {
+    const cx = FIRSTX + Math.max(0, cols.indexOf(lanesOf(i)[0])) * (CARDW + 44), under = all.filter(o => o !== i && !isScene(o) && at(o)).map(bx).filter(b => b.y >= y0 - 1 && b.x < cx + CARDW && b.x + b.w > cx);
+    it(i).at[WHOLE] = {x: cx, y: under.length ? snap(Math.max(...under.map(b => b.y + b.h))) + 22 : y0};
+  });
 }
 function setPos(id, x, y) {
   const o = it(id), sc = sceneOf(id);
@@ -497,14 +527,14 @@ function join(id, sid, rx, ry) { const o = it(id); o.scene = sid; o.rx = rx; o.r
 function release(id, k) {   // out of its scene: it stays on its own boards, and on board k where it was taken out, where it stood
   const o = it(id), so = it(o.scene), hs0 = o.homes.length ? o.homes : [o.born || D.lanes[0].key];
   o.homes = [...new Set([...hs0, ...(k ? [k] : [])])]; o.at = {};
-  if (so) { o.s = so.s; o.homes.forEach(ln => { const a = (so.at || {})[ln]; if (a) o.at[ln] = {x: a.x + (o.rx || 0), y: a.y + (o.ry || 0)}; }); }
+  if (so) { o.s = so.s; [...new Set([...o.homes, WHOLE])].forEach(ln => { const a = (so.at || {})[ln]; if (a) o.at[ln] = {x: a.x + (o.rx || 0), y: a.y + (o.ry || 0)}; }); }
   delete o.scene; delete o.rx; delete o.ry;
 }
 function capture(sid) {   // after a scene is moved or resized on this board: what it encloses is in it, what it leaves out is not
   const sb = box(sid);
   inTab(sessOf(sid)).filter(i => !isScene(i)).forEach(i => {
     const at = sceneAt(i);
-    if (sceneOf(i) === sid && at !== sid) { const b = box(i), inside = b.x + b.w / 2 > sb.x && b.x + b.w / 2 < sb.x + sb.w && b.y + 20 > sb.y && b.y + 20 < sb.y + sb.h; if (!inside) release(i, lane); }
+    if (sceneOf(i) === sid && at !== sid) { const b = box(i), inside = b.x + b.w / 2 > sb.x && b.x + b.w / 2 < sb.x + sb.w && b.y + 20 > sb.y && b.y + 20 < sb.y + sb.h; if (!inside) release(i, mineHome()); }
     else if (!sceneOf(i) && at === sid) { const b = box(i); join(i, sid, b.x - sb.x, b.y - sb.y); }
   });
 }
@@ -514,7 +544,7 @@ function growScene(sid, w, h, except) {   // a scene got bigger: make room aroun
 }
 function makeRoom(sid, ow, oh, except) {
   const o = it(sid), dw = o.w - ow, dh = o.h - oh; if (dw <= 0 && dh <= 0) return;
-  lanesOf(sid).filter(k => k !== except && (o.at || {})[k]).forEach(k => {
+  boardsOf(sid).filter(k => k !== except && (o.at || {})[k]).forEach(k => {
     const a = o.at[k];
     inTab(o.s, k).filter(i => i !== sid && !sceneOf(i) && (it(i).at || {})[k]).forEach(i => {
       const b = box(i, k), p = it(i).at[k];
@@ -558,7 +588,7 @@ function extras(o) {   // what a scene or clock adds to its card
   return h;
 }
 
-/* ---------- session plan: every scene of a session, in running order ---------- */
+/* ---------- running order: every scene of a session, in running order ---------- */
 const RUN = "@session", PCS = D.lanes.filter(l => l.kind === "pc");
 let runMode = false, runTab = null;
 const opened = new Set(), HOMELESS = (D.lanes.find(l => l.kind === "party") || D.lanes[0]).key;   // where a scene with no players waits
@@ -572,7 +602,7 @@ function pcOf(name) {   // a player character's key, "party", or null
 }
 function withLane(k, fn) { const keep = lane; lane = k; try { return fn(); } finally { lane = keep; } }
 const shortOf = k => (D.lanes.find(l => l.key === k) || {}).short || k;
-const boardName = k => k === "world" ? "Around the party" : shortOf(k) + "’s board";
+const boardName = k => k === WHOLE ? "the session canvas" : k === "world" ? "the World board" : shortOf(k) + "’s board";
 const runSessions = () => doc.sessions.filter(t => t !== "Later");
 const scenesIn = t => {
   const all = Object.keys(doc.items).filter(i => live(i) && isScene(i) && sessOf(i) === t), ord = (doc.order || {})[t] || [];
@@ -581,10 +611,10 @@ const scenesIn = t => {
 const looseIn = t => Object.keys(doc.items).filter(i => live(i) && !isScene(i) && !sceneOf(i) && sessOf(i) === t);
 function runOrder() { const o = {}; runSessions().forEach(t => { const s = scenesIn(t); if (s.length) o[t] = s; }); return o; }
 function pills(id) {   // the boards a scene is on: filled, listed as present; outlined, on their board only
-  const cast = castLanes(id), homes = it(id).homes, ks = lanesOf(id), ed = casting === id;
+  const cast = castLanes(id), ks = lanesOf(id), ed = casting === id;
   if (ed) return D.lanes.filter(l => l.kind !== "world").map(l => `<button class="pcx${cast.includes(l.key) ? " in" : " off"}" aria-pressed="${cast.includes(l.key)}" style="--c:${esc(l.colour || "#b9ab95")}" data-cast="${esc(l.key)}" data-id="${esc(id)}">${cast.includes(l.key) ? "✓ " : "+ "}${esc(l.kind === "party" ? "Everyone" : l.short)}</button>`).join("") +
     `<button class="pcx plus on" data-casting="${esc(id)}">Done</button>`;
-  return (homes.length || cast.length ? D.lanes.filter(l => ks.includes(l.key)).map(l => `<button class="pcx${cast.includes(l.key) ? " in" : ""}" style="--c:${esc(l.colour || "#b9ab95")}" data-go="${esc(l.key)}" data-id="${esc(id)}" ` +
+  return (ks.some(k => k !== WHOLE) ? D.lanes.filter(l => l.kind !== "party" && ks.includes(l.key)).map(l => `<button class="pcx${cast.includes(l.key) ? " in" : ""}" style="--c:${esc(l.colour || "#b9ab95")}" data-go="${esc(l.key)}" data-id="${esc(id)}" ` +
     `title="${esc(cast.includes(l.key) || l.kind !== "pc" ? "" : "Not listed as present. ")}Open this scene on ${esc(boardName(l.key))}">${esc(l.short)}</button>`).join("") : `<span class="none">No players yet</span>`) +
     `<button class="pcx plus" data-casting="${esc(id)}" title="Add or remove players">+ Players</button>`;
 }
@@ -628,7 +658,7 @@ function togglePlayer(id, k) {   // in or out of a scene; "The Party" stands for
   const cast = castLanes(id);
   if ((k === "The Party" && everyone) || (k !== "The Party" && (lead || everyone))) o.homes = o.homes.filter(h => h !== k);   // out of the scene: off that board too
   if (!o.homes.length && !cast.length) o.born = HOMELESS;
-  const now = lanesOf(id); before.forEach(b => { if (!now.includes(b) && o.at) delete o.at[b]; });
+  const now = lanesOf(id); before.forEach(b => { if (!now.includes(b) && b !== WHOLE && o.at) delete o.at[b]; });
   changed(); drawRun(); if (shown === id) open(id, mode);
 }
 function newScene() {   // a scene for this session, on no board until it has players
@@ -702,7 +732,7 @@ function toggleRun(u) {
 function expand(el, on) {
   el.querySelector(".rm").hidden = !on; const x = el.querySelector(".rx"); x.setAttribute("aria-expanded", on); x.textContent = (on ? "▾ " : "▸ ") + x.textContent.slice(2);
 }
-function openHere(id) {   // its panel, without leaving the session plan
+function openHere(id) {   // its panel, without leaving the running order
   const ks = it(id) ? lanesOf(id) : P[id.slice(2)].lanes; if (!ks.includes(lane)) lane = ks[0] || D.lanes[0].key;
   open(id); $$("[data-card]").forEach(x => x.classList.toggle("on", x.dataset.card === id));
 }
@@ -934,7 +964,7 @@ function nowCard(n, kind) {
   const head = n.open ? `Open going into S${CUR + 1}` : `Lately${n.recent_at ? " · S" + n.recent_at : ""}`;
   return `<div class="k"><span>End of S${CUR} · as played${esc(asof)}</span>${n.player ? `<span>${esc(n.player)}</span>` : ""}</div>` +
     `<div class="t">${n.href ? `<a href="${esc(n.href)}">${esc(n.title)}</a>` : esc(n.title)}</div>` +
-    (n.class ? `<div class="s">${esc(n.class)}</div>` : "") + (n.summary ? `<div class="s">${esc(n.summary)}</div>` : "") +
+    (n.about ? `<div class="s"><i>${esc(n.about)}</i></div>` : "") + (n.class ? `<div class="s">${esc(n.class)}</div>` : "") + (n.summary ? `<div class="s">${esc(n.summary)}</div>` : "") +
     (rows.length ? `<dl>${rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("")}</dl>` : "") +
     (n.recent && n.recent.length ? `<div class="k"><span>${head}</span></div><ul>${n.recent.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : "");
 }
@@ -972,7 +1002,11 @@ function cardHtml(id) {
     const pid = id.slice(2), p = view_of(pid);
     inner = planCard(pid); cls = `k-${p.kind}${p.edited ? " edited" : ""}${cut[pid] ? " cut" : ""}`;
   }
-  const several = it(id) && !sceneOf(id) && lanesOf(id).length > 1;
+  const several = it(id) && lane !== WHOLE && !sceneOf(id) && lanesOf(id).length > 1;
+  if (lane === WHOLE && it(id)) {
+    if (sc) { const n = scenesIn(sessOf(id)).indexOf(id) + 1; if (n && sessOf(id) !== "Later") inner = inner.replace('<div class="t">', `<div class="t"><span class="ord" title="Its place in the running order">${n}</span>`); }
+    else if (!sceneOf(id)) inner += `<div class="chips">${D.lanes.filter(l => l.kind !== "party" && lanesOf(id).includes(l.key)).map(l => `<span class="pcx in" style="--c:${esc(l.colour || "#9db4cf")}">${esc(l.short)}</span>`).join("") || `<span class="pcx plus">Whole party</span>`}</div>`;
+  }
   const xt = several ? "Take it off this board" : mine ? "Delete this card" : "Back to the tray";
   return `<div class="bn ${esc(cls)}${sc ? " scene" : ""}" data-id="${esc(id)}" style="left:${b.x}px;top:${b.y}px${sc ? `;width:${b.w}px;height:${b.h}px` : ""}">` +
     (sc ? `<div class="sh">${inner}</div><span class="rz" title="Drag to resize the scene"></span>` : inner) +
@@ -1013,7 +1047,7 @@ function erase(id) {   // off every board; what it held stays, on its home board
   if (id.startsWith("c:")) delete doc.cards[id.slice(2)];
 }
 function unplace(pid) { erase("p:" + pid); changed(); closeDrawer(); draw(); }
-const names = ks => ks.map(boardName).join(", ").replace(/, ([^,]*)$/, " and $1");
+const names = ks => (ks.some(k => k !== WHOLE) ? ks.filter(k => k !== WHOLE) : ks).map(boardName).join(", ").replace(/, ([^,]*)$/, " and $1");
 function deleteCard(id) {
   const c = doc.cards[id.slice(2)], ks = lanesOf(id);
   if (!c || ((c.title || c.text || ks.length > 1) && !confirm(`Delete “${c.title || "this card"}”${ks.length > 1 ? ` from ${names(ks)}` : ""}? This cannot be undone.`))) return;
@@ -1025,6 +1059,12 @@ function setPresent(id, list) {
 }
 function takeOff(id, k = lane) {   // the × on a card, or a drag to the tray
   const o = it(id), ks = sceneOf(id) ? [] : lanesOf(id);
+  if (k === WHOLE || runMode) {   // the whole session: off it means off every board
+    const on = ks.filter(x => x !== WHOLE);
+    if (id.startsWith("c:")) deleteCard(id);
+    else if (!on.length || confirm(`Take “${titleOf(id)}” out of ${sessOf(id)}? It goes back to the tray, off ${names(on)}.`)) unplace(id.slice(2));
+    return;
+  }
   if (ks.length > 1) {
     const rest = ks.filter(x => x !== k);
     if (isScene(id)) {
@@ -1078,13 +1118,13 @@ function curve(a, b, inside, off = 0) {   // off: how far to fan out, when sever
   return {d: `M${x1},${y1} C${x1 + dx},${y1 + off} ${x2 - dx},${y2 + off} ${x2},${y2}`, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 + off * .75};
 }
 function wires(temp) {
-  const tab = T(), ti = doc.sessions.indexOf(tab), order = x => doc.sessions.indexOf(x), here = id => live(id) && lanesOf(id).includes(lane);
+  const tab = T(), ti = doc.sessions.indexOf(tab), order = x => doc.sessions.indexOf(x), here = id => live(id) && onBoard(id);
   let svg = '<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="rgba(124,22,34,.75)"/></marker></defs>', labels = "";
   const carried = new Set(), es = genEdges(), count = {}, seen = {};
   es.forEach(e => { const k = e.from + ">" + e.to; count[k] = (count[k] || 0) + 1; });
   es.forEach(e => {
     const key = e.from + ">" + e.to, nth = seen[key] = (seen[key] ?? -1) + 1;
-    if (e.from.startsWith("start")) { if (e.lane && e.lane !== lane) return; e = {...e, from: "start"}; }
+    if (e.from.startsWith("start")) { if (e.lane && e.lane !== lane && lane !== WHOLE) return; e = {...e, from: "start"}; }
     if (!here(e.to) || (e.from !== "start" && !here(e.from))) return;
     const fs = e.from === "start" ? tab : sessOf(e.from), ts = sessOf(e.to);
     if (ts !== tab) return;
@@ -1099,6 +1139,9 @@ function wires(temp) {
     if (e.own && from === e.from) svg += `<path class="hit" data-edge="${esc(e.id)}" d="${c.d}"/>`;
     if (lab || e.own) labels += `<div class="wl ${e.own && from === e.from ? "own" : ""}" ${e.own && from === e.from ? `data-edge="${esc(e.id)}"` : ""} style="left:${c.mx}px;top:${c.my}px">${esc(lab || "add a label")}</div>`;
   });
+  if (lane === WHOLE && tab !== "Later") scenesIn(tab).forEach((s, i, all) => {   // the running order, scene to scene
+    const a = i && box(all[i - 1]), b = i && box(s); if (a && b) svg = svg.replace("</defs>", `</defs><path class="run" d="${curve(a, b).d}"/>`);
+  });
   if (temp) svg += `<path class="temp" d="${temp}"/>`;
   $("#wires").innerHTML = svg;
   $$("#nodes .wl").forEach(x => x.remove());
@@ -1110,17 +1153,21 @@ function wires(temp) {
 function tray() {
   const all = $("#tray-all").checked, q = $("#tray-q").value.trim().toLowerCase();
   const list = Object.values(P).filter(p => { const id = "p:" + p.id, o = it(id);
+    if (lane === WHOLE) return !o && !(doc.edits[p.id] || {}).drop && (!q || (p.id + " " + p.summary).toLowerCase().includes(q));
     return !(o && lanesOf(id).includes(lane)) && !(doc.edits[p.id] || {}).drop && (all || (!(o && sceneOf(id)) && p.lanes.includes(lane))) &&
       (!q || (p.id + " " + p.summary).toLowerCase().includes(q)); });
+  $("#tray-alll").hidden = lane === WHOLE;
+  const whom = p => lane === WHOLE ? p.lanes.filter(k => k !== WHOLE).map(k => `<span class="ch">${esc(shortOf(k))}</span>`).join("") : "";
   const elsewhere = p => { const id = "p:" + p.id, sc = it(id) && sceneOf(id); return !it(id) ? "" : `<span class="ch move">${esc(sc ? `in “${titleOf(sc)}”` : `on ${names(lanesOf(id))}`)} · ${esc(sessOf(id))}</span>`; };
   let h = "";
   PLANKINDS.forEach(k => {
     const ps = list.filter(p => (view_of(p.id).kind || "beat") === k).sort((a, b) => (a.status !== "ready") - (b.status !== "ready") || a.id.localeCompare(b.id));
     if (!ps.length) return;
     h += `<h4>${KINDS[k]}s</h4>` + ps.map(p => `<div class="ti k-${esc(k)} ${cut[p.id] ? "cut" : ""}" data-plan="${esc(p.id)}"><span class="g" title="Drag onto the board or a session tab">⠿</span><div>` +
-      `<div class="t">${esc(p.id)}</div><div class="s">${esc(view_of(p.id).summary)}</div><div class="chips">${p.status === "ready" ? '<span class="ch ready">ready</span>' : ""}${p.target ? `<span class="ch">${esc(p.target)}</span>` : ""}${elsewhere(p)}` +
+      `<div class="t">${esc(p.id)}</div><div class="s">${esc(view_of(p.id).summary)}</div><div class="chips">${p.status === "ready" ? '<span class="ch ready">ready</span>' : ""}${p.target ? `<span class="ch">${esc(p.target)}</span>` : ""}${whom(p)}${elsewhere(p)}` +
       secReq(p).map(r => `<span class="ch">secret: ${esc(r.a)}</span>`).join("") + `</div></div></div>`).join("");
   });
+  if (!h && lane === WHOLE) h = `<p class="empty">${q ? "No unplaced plan matches." : "Every live plan is placed."}</p>`;
   if (!h) h = `<p class="empty">${Object.keys(doc.items).some(i => live(i) && lanesOf(i).includes(lane)) ? "Every plan for this board is placed." : "No live plans for this board yet."} ${all ? "" : "Tick “every live plan” to pull one from another board, or add a card."}</p>`;
   const s = doc, gone = Object.keys(s.edits).filter(id => s.edits[id].drop && P[id]);
   if (gone.length) h += `<h4>Dropped here</h4>` + gone.map(id => `<div class="gone"><s>${esc(id)}</s><button class="mini" data-undrop="${esc(id)}">Undo</button></div>`).join("") +
@@ -1149,8 +1196,8 @@ function fit() {
   const r = board.getBoundingClientRect(), bs = ["start", ...$$("#nodes .bn").map(e => e.dataset.id)].map(i => box(i)).filter(Boolean);
   const x0 = Math.min(...bs.map(b => b.x)) - 30, y0 = Math.min(...bs.map(b => b.y)) - 30;
   const x1 = Math.max(...bs.map(b => b.x + b.w)) + 40, y1 = Math.max(...bs.map(b => b.y + b.h)) + 40;
-  const k = Math.min(1, Math.max(.3, Math.min((r.width - 20) / (x1 - x0), (r.height - 20) / (y1 - y0))));
-  view = {k, x: 10 - x0 * k, y: 10 - y0 * k}; applyView();
+  const k = Math.min(1, Math.max(.3, Math.min((r.width - 20) / (x1 - x0), (r.height - 58) / (y1 - y0))));
+  view = {k, x: 10 - x0 * k, y: 48 - y0 * k}; applyView();   // clear of the buttons at the top right
 }
 let pan = null;
 board.addEventListener("pointerdown", e => {
@@ -1231,7 +1278,7 @@ function settle(id, x, y) {   // a card let go at x, y on this board: into the s
   const to = sceneAt(id), was = sceneOf(id);
   if (to === was) return;
   if (to) { const sb = box(to); join(id, to, x - sb.x, y - sb.y); }
-  else { release(id, lane); it(id).at[lane] = {x, y}; }
+  else { release(id, mineHome()); it(id).at[lane] = {x, y}; }
 }
 function insideSpot(sid) {   // the next free place inside a scene; the scene grows to fit
   const ms = membersOf(sid), o = it(sid);
@@ -1240,7 +1287,7 @@ function insideSpot(sid) {   // the next free place inside a scene; the scene gr
   return {rx: 22, ry: snap(y)};
 }
 function moveTo(id, t) {   // to another session, on every board it is on; a scene takes its cards along
-  if (sceneOf(id)) release(id, runMode ? undefined : lane);
+  if (sceneOf(id)) release(id, mineHome());
   const o = it(id); o.s = t; o.at = {}; if (isScene(id)) membersOf(id).forEach(m => { it(m).s = t; });
   doc.edges = doc.edges.filter(e => !(e.from.startsWith("start") && e.to === id));
   changed(); draw();
@@ -1266,14 +1313,15 @@ function addEdge(from, to, label) {
 }
 function place(pid, t, x, y) {
   const id = "p:" + pid, sc = P[pid].scene && "p:" + P[pid].scene; let o = it(id);
-  if (o && sceneOf(id)) release(id, lane);
+  if (o && sceneOf(id)) release(id, mineHome());
+  if (!o && lane === WHOLE) { putPlan(id, t); o = it(id); }   // on the session canvas a plan keeps the boards it is tied to
   if (!o) o = doc.items[id] = {s: t, homes: [], born: lane, at: {}};
-  if (!o.homes.includes(lane)) o.homes.push(lane);
+  if (lane !== WHOLE && !o.homes.includes(lane)) o.homes.push(lane);
   if (o.s !== t) { o.s = t; o.at = {}; }
   if (isScene(id)) { o.w ||= SCW; o.h ||= SCH; }
   if (x !== undefined) { o.at[lane] = {x: snap(x), y: snap(y)}; if (isScene(id)) capture(id); else settle(id, snap(x), snap(y)); }
   else if (sc && live(sc) && sessOf(sc) === t && !isScene(id)) { const f = insideSpot(sc); join(id, sc, f.rx, f.ry); }   // the vault's scene, when it is here
-  else if (!runMode) o.at[lane] = freeSpot(t);
+  else if (!runMode && lane !== WHOLE) o.at[lane] = freeSpot(t);
   changed(); draw();
 }
 function trayDrag(el) {
@@ -1311,7 +1359,7 @@ function newCard(x, y, kind) {
   const cid = Math.random().toString(36).slice(2, 10), id = "c:" + cid; x = snap(x); y = snap(y);
   doc.cards[cid] = {kind: kind || "note", title: "", text: ""};
   doc.items[id] = {s: T(), homes: [lane], born: lane, at: {[lane]: {x, y}}};
-  if (kind === "scene") { Object.assign(doc.items[id], {w: SCW, h: SCH}); Object.assign(doc.cards[cid], {where: "", present: lane === "world" ? [] : [lane]}); }
+  if (kind === "scene") { Object.assign(doc.items[id], {w: SCW, h: SCH}); Object.assign(doc.cards[cid], {where: "", present: lane === "world" || lane === WHOLE ? [] : [lane]}); if (lane === WHOLE) doc.items[id].homes = []; }
   else settle(id, x, y);
   changed(); draw(); open(id);
 }
@@ -1457,7 +1505,7 @@ function optsPanel(id) {   // a decision's options in its panel: one line per li
   return `<h4>Options</h4>` + (os.length ? `<ul class="req optl">${os.map((o, i) => `<li><span class="kk">option</span><span>${o.label ? esc(o.label) : "<i>choice not named</i>"} → <b>${esc(titleOf(o.to))}</b>${o.off ? " (not placed)" : ""}</span>` +
     `<span class="ob">${o.own ? `<button class="mini" data-eo="${esc(o.id)}">edit</button>` : ""}${o.off ? "" : `<button class="mini" data-oo="${i}" title="Another choice that leads to the same card">+ same outcome</button>`}` +
     `${[...plans].some(x => x !== o.to) ? `<button class="mini" data-pick="${i}">what if this?</button>` : ""}</span></li>`).join("")}</ul>`
-    : `<p class="muted" style="font-size:15px">Each link out of this card is an option. Drag from its + to the card a choice leads to (or, in the Session plan, drop that card on this one), and label the link with the choice.</p>`);
+    : `<p class="muted" style="font-size:15px">Each link out of this card is an option. Drag from its + to the card a choice leads to (or, in the Running order, drop that card on this one), and label the link with the choice.</p>`);
 }
 function optsBind(d, id) {
   const os = optionsOf(id);
@@ -1468,7 +1516,7 @@ function optsBind(d, id) {
 }
 function toScene(id) {   // after its kind changes: a scene needs a box and sits in no other; anything else holds no cards
   const o = it(id); if (!o) return;
-  if (isScene(id)) { if (o.scene) release(id, runMode ? undefined : lane); o.w ||= SCW; o.h ||= SCH; if (id.startsWith("c:")) { const c = doc.cards[id.slice(2)]; c.where ||= ""; c.present ||= lanesOf(id).filter(k => k !== "world"); } }
+  if (isScene(id)) { if (o.scene) release(id, mineHome()); o.w ||= SCW; o.h ||= SCH; if (id.startsWith("c:")) { const c = doc.cards[id.slice(2)]; c.where ||= ""; c.present ||= lanesOf(id).filter(k => k !== "world" && k !== WHOLE); } }
   else Object.keys(doc.items).filter(i => it(i).scene === id).forEach(i => release(i));
 }
 function cardEditor(id) {
@@ -1520,6 +1568,8 @@ function legend() {
   if (!k.hidden) { k.hidden = true; btn.classList.remove("on"); return; }
   k.innerHTML = `<button class="x" aria-label="Close">×</button><h3>Key</h3><dl>` +
     Object.keys(KINDS).map(x => `<dt>${KINDS[x]}</dt><dd>${esc(KDESC[x])}</dd>`).join("") +
+    `<dt>Whole session</dt><dd>Running order and Canvas show everything in a session, whoever it is for: one as a list, one as a canvas with the scenes numbered in that order. Line up lays the canvas out to match.</dd>` +
+    `<dt>Boards</dt><dd>One per player character, and the World for what moves without the party knowing. The same scenes and cards, only the ones that belong there.</dd>` +
     `<dt>Session tabs</dt><dd>One canvas per session. The first starts from the end of S${CUR} as played; each later one starts from the end of the one before, as planned. Later holds ideas with no session yet.</dd>` +
     `<dt>Scenes</dt><dd>Drag a scene by its header: the cards inside move with it. Drag its bottom-right corner to resize it. Drop a card inside a scene to set it there. A scene shows on the board of every player character listed as present, with its cards. There is one copy: change it on one board and it changes on all of them; only its place on each canvas is its own.</dd>` +
     `<dt>Moving a card</dt><dd>Drag it onto another session's tab, or pick the session in its panel.</dd>` +
@@ -1536,8 +1586,8 @@ function legend() {
 /* ---------- saving: JSON Canvas on the Gus relay ---------- */
 function toCanvas(k) { return withLane(k, () => canvasOf(k)); }
 function canvasOf(k) {   // one board as JSON Canvas (for Obsidian); the store itself is items, cards, edits and edges
-  const nodes = [], edges = [], off = t => Math.max(0, doc.sessions.indexOf(t)) * TABW, shown = new Set();
-  doc.sessions.forEach((t, i) => { ensureAt(t, k); nodes.push({id: "tab-" + t, type: "group", x: i * TABW, y: 0, width: TABW - 200, height: 2400, label: t}); });
+  const nodes = [], edges = [], TW = k === WHOLE ? TABW * 3 : TABW, off = t => Math.max(0, doc.sessions.indexOf(t)) * TW, shown = new Set();
+  doc.sessions.forEach((t, i) => { ensureAt(t, k); nodes.push({id: "tab-" + t, type: "group", x: i * TW, y: 0, width: TW - 200, height: 2400, label: t}); });
   nodes.push({id: "now", type: "text", x: SX, y: SY, width: 300, height: 220, text: `End of S${CUR}`, osse: {now: true, sessions: doc.sessions}});
   doc.sessions.flatMap(t => inTab(t, k)).sort((a, b) => isScene(b) - isScene(a)).forEach(id => {
     const b = box(id, k), o = it(id), t = sessOf(id), sc = sceneOf(id); if (!b) return;
@@ -1684,6 +1734,7 @@ async function load() {
   doc.sessions = (doc.sessions.length ? doc.sessions : defaults()).filter(t => t === "Later" || sessNum(t) > CUR || Object.values(doc.items).some(o => o.s === t));
   sortSessions();
   recut();
+  if (!doc.seeded.includes("@canvas")) { Object.values(doc.items).forEach(o => { if (o.at) delete o.at[WHOLE]; }); doc.seeded.push("@canvas"); }   // once: The Party's board became the session canvas
   D.lanes.forEach(l => { if (!doc.seeded.includes(l.key)) seed(l.key); });
   if (layNew()) dirty = true;
   if (dirty && KEY && !unread) save();
@@ -1693,18 +1744,27 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 /* ---------- boards ---------- */
 function pick(key) {
   if (lane && !runMode) views[lane + "|" + T()] = {...view};
+  const from = runMode ? runTab : lane === WHOLE ? tabOf[WHOLE] : null;   // the two whole-session views stay on the same session
   runMode = key === RUN;
+  if (from && key === WHOLE) tabOf[WHOLE] = from; if (from && runMode) runTab = from;
+  $(".paths").classList.toggle("whole", runMode || key === WHOLE); $("#lineup").hidden = key !== WHOLE;
   $("#runw").hidden = !runMode; $("#work").hidden = runMode; $$('.tools [data-act="card"]').forEach(b => { b.hidden = runMode; });
   store.set("osse-paths-lane", key); history.replaceState(null, "", "#" + encodeURIComponent(key));
-  $$("#lanes button").forEach(b => b.setAttribute("aria-selected", b.dataset.lane === key));
+  $$("[data-lane]").forEach(b => b.setAttribute("aria-selected", b.dataset.lane === key));
   closeDrawer();
   if (runMode) { if (!lane) lane = D.lanes[0].key; drawRun(); return; }
   lane = key; draw();
   const v = views[key + "|" + T()]; if (v) { view = {...v}; applyView(); } else fit();
 }
 function refresh() { recut(); draw(); if (shown) open(shown, mode); }
-$("#lanes").innerHTML = `<button role="tab" class="runb" data-lane="${RUN}" title="Every board's scenes for a session, in running order">Session plan</button>` + D.lanes.map(l => `<button role="tab" data-lane="${esc(l.key)}">${esc(l.short)}<small>${l.count}</small></button>`).join("");
-$$("#lanes button").forEach(b => b.onclick = () => pick(b.dataset.lane));
+const ICON = {list: '<path d="M7 4h10M7 10h10M7 16h10" /><path d="M3 4h.01M3 10h.01M3 16h.01" stroke-width="3" stroke-linecap="round"/>', map: '<rect x="2" y="3" width="6" height="5"/><rect x="12" y="3" width="6" height="5"/><rect x="12" y="12" width="6" height="5"/><path d="M8 5.5h4M15 8v4"/>',
+  globe: '<circle cx="10" cy="10" r="7.5"/><path d="M2.5 10h15M10 2.5c5 5 5 10 0 15M10 2.5c-5 5-5 10 0 15"/>'};
+const icon = n => `<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">${ICON[n]}</svg>`;
+$("#views").innerHTML = `<button role="tab" data-lane="${RUN}" title="The session's scenes, in the order you plan to run them">${icon("list")}Running order</button>` +
+  `<button role="tab" data-lane="${WHOLE}" title="The same session as a canvas: every scene and card, whoever it is for">${icon("map")}Canvas</button>`;
+$("#lanes").innerHTML = `<span class="lb">Boards</span>` + PCS.map(l => `<button role="tab" data-lane="${esc(l.key)}"><i style="--c:${esc(l.colour)}"></i>${esc(l.short)}<small>${l.count}</small></button>`).join("") + `<span class="sep"></span>` +
+  D.lanes.filter(l => l.kind === "world").map(l => `<button role="tab" class="wb" data-lane="${esc(l.key)}" title="What moves without the party knowing, and could still reach them">${icon("globe")}${esc(l.short)}<small>${l.count}</small></button>`).join("");
+$$("[data-lane]").forEach(b => b.onclick = () => pick(b.dataset.lane));
 $("#wi-reset").onclick = () => { ov.out = {}; ov.dead = {}; ov.drop = {}; refresh(); };
 $("#tray-all").onchange = tray; $("#tray-q").oninput = tray;
 $$("[data-act]").forEach(b => b.onclick = ev => {
@@ -1716,6 +1776,8 @@ $$("[data-act]").forEach(b => b.onclick = ev => {
     newCard(Math.max(SX + 344, w.x - cw / 2), w.y, a === "scene" ? "scene" : ""); }   // clear of the start card
   if (a === "zin" || a === "zout") zoomAt(view.k * (a === "zin" ? 1.25 : .8), r.left + r.width / 2, r.top + r.height / 2);
   if (a === "fit") fit();
+  if (a === "line" && confirm("Lay every scene out left to right in running order, with the other cards underneath? It replaces how you have arranged this canvas.")) {
+    inTab(T()).forEach(i => { if (!sceneOf(i)) delete (it(i).at || {})[WHOLE]; }); changed(); draw(); fit(); }
   if (a === "legend") legend();
 });
 $$(".float button").forEach(b => b.onpointerdown = ev => ev.stopPropagation());

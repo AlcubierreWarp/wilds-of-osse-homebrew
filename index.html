@@ -101,6 +101,8 @@ h2 small{font:500 11px/1.4 var(--f-mono);letter-spacing:.18em;text-transform:upp
 .check small{display:block;font-size:13px;color:var(--muted);text-decoration:none}
 .check .auto{font:500 10px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lo);margin-left:4px}
 .check .foot{display:flex;justify-content:flex-end;margin-top:8px}
+.quiet{margin:12px 4px 0;font-size:13.5px;color:var(--muted);text-align:right}.quiet a{color:var(--muted)}.quiet a:hover,.quiet button:hover{color:var(--gold-hi)}
+.quiet button{all:unset;cursor:pointer;text-decoration:underline;text-decoration-style:dotted}.quiet button:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
 footer{margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;font:500 11px/1.6 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .themes{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
 .themes span{margin-right:4px}
@@ -203,6 +205,7 @@ const GM_LINKS = [
   {title: "Ossë vault", text: "Every person, place, secret and plan, as DM pages.", href: "vault/", open: "Open the vault"},
   {title: "Session planner", text: "The boards, and the session's running order.", href: "vault/paths.html", open: "Open the planner"},
 ];
+const HOMEBREW = "https://raw.githubusercontent.com/AlcubierreWarp/wilds-of-osse-homebrew/main/wilds-of-osse.json";
 /* The session checklist: loose items, then phases. An item with items of its own is ticked when all of them are, and ticking it
    ticks them all. auto(s) ticks an item from the status files; the rest are ticked by hand and kept per session on this device. */
 const CHECKLIST = [
@@ -304,7 +307,8 @@ function dmBody(){
   $("#dm-body").innerHTML = `<div class="tiles">${tiles.join("")}</div>
     <div class="check"><div class="check-head"><h3>Session ${n} checklist</h3><span class="prog">${done} of ${all} done</span></div>
       <ul>${CHECKLIST.map(item).join("")}</ul><div class="phases">${PHASES.map(phase).join("")}</div>
-      <div class="foot"><button type="button" class="btn ghost small" id="check-reset">Clear my ticks</button></div></div>`;
+      <div class="foot"><button type="button" class="btn ghost small" id="check-reset">Clear my ticks</button></div></div>
+    <div class="quiet">5e.tools homebrew: <a href="${HOMEBREW}">open the file</a> · <button type="button" data-copy="${HOMEBREW}">copy its link</button></div>`;
   document.querySelectorAll("[data-some]").forEach(x => { x.indeterminate = true; });
   if (focus) { const f = document.querySelector(`[data-check="${focus}"]`); if (f) f.focus({preventScroll: true}); }
 }

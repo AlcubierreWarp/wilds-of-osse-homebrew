@@ -204,7 +204,7 @@ def apply(spec, doc, b, known):
             for x in cs:
                 add(x, i)
             if not b.cast(i):
-                warn.append(f"{what}: no players yet, so it waits on The Party's board")
+                warn.append(f"{what}: no players yet, so it waits on the session canvas")
         else:
             if c.get("cards"):
                 bad.append(f"{what}: only a scene holds cards")

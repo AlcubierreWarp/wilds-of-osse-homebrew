@@ -8,8 +8,8 @@ codex/   the players' screen: only what has come out in play. A note is in it on
          (first_seen, or revealed for a secret). On each page only lines stamped with a played session survive;
          untagged lines are prep by the vault's rules, so they are left out, as are DM callouts, prep links,
          link notes, summaries, roles and plans. A line that links an unrevealed secret or a plan is dropped.
-Both index pages have a Rules tab that searches the System Reference Document live through Open5e (rules.js).
-vault/paths.html (Paths ahead, from paths.py) draws the live plans as branching trees per player character.
+Both index pages search the vault and the System Reference Document (live, through Open5e) at once, with a filter per type (rules.js).
+vault/paths.html (Session planner, from paths.py) draws the live plans as branching trees per player character.
 vault/status.json tells the hub where the campaign stands. Only files whose content changed are rewritten."""
 import html, json, os, re, sys, unicodedata
 
@@ -377,14 +377,34 @@ def head(title, player):
             f'<meta name="robots" content="noindex"><title>{html.escape(title)} · {"The Codex" if player else "Ossë vault"}</title>'
             '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">'
-            '<link rel="stylesheet" href="pages.css"></head><body><div class="wrap">')
+            '<link rel="stylesheet" href="pages.css"><link rel="stylesheet" href="../assets/nav.css"></head><body><div class="wrap">')
 
 
-def topbar(site, crumb=""):
+# The site navigation. Player pages never name or link a DM page; DM pages link only DM pages. Both link the table hub.
+NAV_PLAYER = [("hub", "Table hub", "../"), ("chronicle", "Chronicle", "../chronicle/"), ("index", "Codex", "index.html")]
+NAV_DM = [("hub", "Table hub", "../"), ("index", "Vault", "index.html"), ("paths", "Session planner", "paths.html"), ("screen", "DM screen", "screen.html")]
+
+
+def topbar(site, crumb="", here="index"):
     who = "The Codex · what the party knows" if site.player else "Ossë vault · DM screen"
+    nav = "".join(f'<a href="{h}"{" aria-current=page" if k == here else ""}>{l}</a>' for k, l, h in (NAV_PLAYER if site.player else NAV_DM))
     return (f'<header><div><div class="eyebrow">{who} · after S{site.cur}</div>'
-            f'<nav class="crumbs"><a href="index.html">All entries</a>{(" / " + crumb) if crumb else ""}</nav></div>'
-            f'<a class="home" href="../" title="Back to the Wilds of Ossë table hub">← Table hub</a></header>')
+            + (f'<nav class="crumbs"><a href="index.html">All entries</a> / {crumb}</nav>' if crumb else "")
+            + f'</div><nav class="sitenav" aria-label="Site">{nav}</nav></header>')
+
+
+# Closing an entry goes back to the list as it was left: the search, the filter and the place on the page (rules.js saves them).
+CLOSE_JS = """(() => { const c = document.getElementById("close"), k = "osse-list:" + location.pathname.replace(/[^/]*$/, "");
+try { const s = JSON.parse(sessionStorage.getItem(k) || "null"); if (s && /^index\\.html([?#]|$)/.test(s.url)) c.href = s.url; } catch (e) {}
+c.addEventListener("click", e => { if (e.metaKey || e.ctrlKey || e.shiftKey) return; try { sessionStorage.setItem(k + ":back", "1"); } catch (x) {} });
+addEventListener("keydown", e => { if (e.key === "Escape") c.click(); }); })();"""
+
+# The DM screen link: the next session's screen once it is built, else the last one built (from status.json).
+SCREEN_HTML = """<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>DM screen · Ossë vault</title><link rel="stylesheet" href="pages.css"></head><body><div class="wrap"><p id="m">Opening the DM screen</p>
+<script>fetch("status.json",{cache:"no-store"}).then(r=>r.json()).then(s=>{const n=s.screens.includes(s.next)?s.next:Math.max(...s.screens);if(n>0)location.replace("../screen/s"+n+".html");else throw 0;})
+.catch(()=>{document.getElementById("m").innerHTML='No DM screen could be opened. <a href="index.html">Back to the vault</a>';});</script></div></body></html>
+"""
 
 
 def page(site, n):
@@ -392,7 +412,8 @@ def page(site, n):
     text = site.text(nid)
     fm = build.frontmatter(text)
     rows, past, plans, mentions, sessions = links_for(site, nid)
-    out = [head(nid, P), topbar(site, f'<a href="index.html#{t}">{html.escape(LABEL.get(t, t))}</a>'), '<main class="sheet">']
+    out = [head(nid, P), topbar(site, f'<a href="index.html#{t}">{html.escape(LABEL.get(t, t))}</a>'), '<main class="sheet">',
+           '<a class="close" id="close" href="index.html" title="Close and go back to the list (Esc)">✕ Close</a>']
     out.append(f'<h1>{html.escape(nid)}</h1>')
     al = site.aliases.get(nid, [])
     if al:
@@ -452,7 +473,7 @@ def page(site, n):
             foot.append(f'<code>{html.escape(n["term"])}</code>')
         if fm.get("notion"):
             foot.append(f'<a href="{html.escape(str(fm["notion"]))}" rel="noopener">old Notion page</a>')
-    out.append(f'<footer>{" · ".join(foot)}</footer></main></div></body></html>')
+    out.append(f'<footer>{" · ".join(foot)}</footer><script>{CLOSE_JS}</script></main></div></body></html>')
     return "".join(out)
 
 
@@ -464,17 +485,16 @@ def index(site):
             groups.setdefault(n["type"], []).append(n)
     title = "The Codex" if P else "The Ossë vault"
     lede = (f"Everyone and everything the party has met, as far as play has shown, up to S{site.cur}. "
-            'Session recaps are in the <a href="../chronicle/">chronicle</a>.' if P else
+            "The search also covers the rules, spells, items and creatures." if P else
             f"Every note in the vault as a DM page, after S{site.cur}. Game secrets, prep and plans are here: "
-            "this is a DM screen, never one for players. "
-            '<a href="paths.html">Session planner</a> draws the live plans as branches under each player character.')
-    out = [head(title, P), topbar(site), '<main class="sheet index">', f"<h1>{title}</h1>", f'<p class="summary">{lede}</p>',
-           '<div class="tabs" role="tablist"><button role="tab" data-tab="world" aria-selected="true">In the world</button>'
-           '<button role="tab" data-tab="rules" aria-selected="false">Rules and items</button></div>',
-           '<input id="q" type="search" placeholder="Find a name, alias or summary" autocomplete="off">',
-           '<div id="world">',
-           '<nav class="jump">' + " ".join(f'<a href="#{t}">{html.escape(l)} <small>{len(groups.get(t, []))}</small></a>'
-                                          for t, l in ORDER if groups.get(t)) + "</nav>"]
+            "this is a DM screen, never one for players. The search also covers the rules, spells, items and creatures.")
+    out = [head(title, P).replace('<div class="wrap">', '<div class="wrap list">'), topbar(site), '<main class="sheet index">', f"<h1>{title}</h1>", f'<p class="summary">{lede}</p>',
+           '<input id="q" type="search" placeholder="Search the world, the rules and items" autocomplete="off" aria-label="Search the world, the rules and items">',
+           '<div class="filters" id="filters" role="group" aria-label="Show only">'
+           + f'<button type="button" data-f="all" aria-pressed="true">All</button>'
+           + "".join(f'<button type="button" data-f="{t}" aria-pressed="false">{html.escape(l)} <small>{len(groups[t])}</small></button>' for t, l in ORDER if groups.get(t))
+           + '<button type="button" class="rf" data-f="rules" aria-pressed="false">Rules and items <small></small></button></div>',
+           '<div class="results" id="results"><div id="world"><div class="band" id="wband" hidden><b>In the world</b> <span></span></div>']
     for t, l in ORDER:
         ns = groups.get(t, [])
         if not ns: continue
@@ -495,38 +515,57 @@ def index(site):
                        + (f' <span class="st s-{slug(state)}">{html.escape(state)}</span>' if state else "")
                        + (f'<small>{site.inline(desc)}</small>' if desc else "") + "</li>")
         out.append("</ul></section>")
-    out.append('<p id="none" class="none" hidden>Nothing in the world by that name. Try <a href="#rules" data-go="rules">Rules and items</a>.</p></div>')
-    out.append('<div id="rules" hidden><div class="ed"><label><input type="radio" name="ed" value="srd-2024" checked> 2024 rules</label>'
+    out.append('<p id="none" class="none" hidden></p></div>')
+    out.append('<div id="rules" hidden><div class="band rb"><b>Rules and items</b> <span></span></div><div class="ed"><label><input type="radio" name="ed" value="srd-2024" checked> 2024 rules</label>'
                '<label><input type="radio" name="ed" value="srd-2014"> 2014 rules</label></div>'
                '<div class="rgrid"><ol id="rlist" class="rlist"></ol><article id="rshow" class="rshow"></article></div>'
                '<p class="credit">Rules, spells, items and creatures from the System Reference Document (5.1 and 5.2, CC BY 4.0 by Wizards of the Coast), '
                'searched live through <a href="https://open5e.com" rel="noopener">Open5e</a>. Not in the SRD? '
-               '<a id="ddb" href="https://www.dndbeyond.com/search" rel="noopener">Search D&amp;D Beyond</a> or <a href="https://5e.tools/" rel="noopener">open 5e.tools</a>.</p></div>')
+               '<a id="ddb" href="https://www.dndbeyond.com/search" rel="noopener">Search D&amp;D Beyond</a> or <a href="https://5e.tools/" rel="noopener">open 5e.tools</a>.</p></div></div>')
     out.append('<script src="rules.js"></script></main></div></body></html>')
     return "".join(out)
 
 
-RULES_JS = r"""/* Search tabs for the Ossë pages: "In the world" filters this page; "Rules and items" asks Open5e (SRD only). */
+RULES_JS = r"""/* Search and filters for the Ossë pages. One box searches this page ("In the world") and Open5e ("Rules and items", SRD only) together;
+   a filter shows one type only. The search and filter live in the address, so closing an entry comes back to the same list. */
 (() => {
-const $ = s => document.querySelector(s), API = "https://api.open5e.com/v2/";
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)], API = "https://api.open5e.com/v2/";
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const q = $("#q"), tabs = document.querySelectorAll("[data-tab]");
-let tab = "world", timer = 0, seq = 0, conds = null;
+const q = $("#q"), KEY = "osse-list:" + location.pathname.replace(/[^/]*$/, ""), types = $$("#filters [data-f]").map(b => b.dataset.f);
+let f = "all", timer = 0, seq = 0, conds = null, hits = null, asked = "";
 const store = { get(k){ try { return localStorage.getItem(k); } catch(e) { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e) {} } };
-function show(t){
-  tab = t;
-  tabs.forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
-  $("#world").hidden = t !== "world"; $("#rules").hidden = t !== "rules";
-  q.placeholder = t === "world" ? "Find a name, alias or summary" : "Find a rule, spell, item, creature or condition";
-  if (location.hash !== "#" + t && (t === "rules" || location.hash === "#rules")) history.replaceState(null, "", t === "rules" ? "#rules" : location.pathname);
-  run();
+const here = { get(k){ try { return sessionStorage.getItem(k); } catch(e) { return null; } }, set(k,v){ try { sessionStorage.setItem(k,v); } catch(e) {} }, del(k){ try { sessionStorage.removeItem(k); } catch(e) {} } };
+const typed = () => q.value.trim();
+function address(){
+  const v = typed(), u = (v ? "?q=" + encodeURIComponent(v) : "") + (f === "all" ? "" : "#" + f);
+  history.replaceState(null, "", location.pathname + u); here.set(KEY, JSON.stringify({url: "index.html" + u, y: scrollY}));
+}
+function pickFilter(t){ f = types.includes(t) && t !== f ? t : "all"; run(); }
+function run(now){
+  const v = typed();
+  $$("#filters [data-f]").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === f));
+  $("#world").hidden = f === "rules"; $("#rules").hidden = f !== "rules" && !(f === "all" && v.length > 1);
+  $("#rules").classList.toggle("mixed", f === "all"); $("#results").classList.toggle("both", f === "all" && v.length > 1);
+  world(); address(); clearTimeout(timer);
+  if (f === "rules" || v.length > 1) timer = setTimeout(rules, now === true ? 0 : 300); else { seq++; hits = null; asked = ""; $("#rlist").innerHTML = ""; shut(); }
+  counts();
 }
 function world(){
-  const v = q.value.trim().toLowerCase();
-  document.querySelectorAll(".entries li").forEach(li => { li.hidden = v && !li.dataset.k.includes(v); });
-  let any = false;
-  document.querySelectorAll("#world section").forEach(s => { const on = !v || s.querySelector("li:not([hidden])"); s.hidden = !on; any = any || on; });
-  $("#none").hidden = any;
+  const v = typed().toLowerCase(); let n = 0, all = 0;
+  $$("#world .entries li").forEach(li => { li.hidden = !!v && !li.dataset.k.includes(v); });
+  $$("#world section").forEach(s => { const c = s.querySelectorAll("li:not([hidden])").length, on = c && (f === "all" || f === s.id); s.hidden = !on; all += c; if (on) n += c;
+    const h = s.querySelector("h2 span"); if (h) h.textContent = c; });
+  $("#wband").hidden = !(v && f === "all"); $("#wband span").textContent = all ? all + (all === 1 ? " entry" : " entries") : "";
+  const label = f === "all" || f === "rules" ? "" : $(`#filters [data-f="${f}"]`).firstChild.textContent.trim();
+  $("#none").hidden = !!n;
+  $("#none").innerHTML = label ? `Nothing in ${esc(label)} by that name. <a href="#all" data-go="all">Search everything</a>` : "Nothing in the world by that name.";
+}
+function counts(){   // while searching, each filter says how many it would show
+  const v = typed();
+  $$("#filters [data-f]").forEach(b => { const s = b.querySelector("small"); if (!s) return;
+    if (b.dataset.f === "rules") { s.textContent = v.length > 1 && asked === v && hits ? hits.length + (hits.length >= 30 ? "+" : "") : ""; return; }
+    const c = document.getElementById(b.dataset.f).querySelectorAll("li:not([hidden])").length; s.textContent = c; b.classList.toggle("zero", !c); });
+  $("#rules .band span").textContent = v.length > 1 && asked === v && hits ? (hits.length ? `${hits.length >= 30 ? "the first " : ""}${hits.length} from the System Reference Document` : "") : "";
 }
 function md(s){
   const lines = String(s || "").split("\n"), out = []; let list = null, table = null;
@@ -579,37 +618,48 @@ function detail(o, model){
   return h.join("");
 }
 async function open(route, key, model){
-  const box = $("#rshow"); box.innerHTML = "<p class='muted'>Opening</p>";
-  try { const r = await fetch(API + route.replace(/^v2\//, "") + encodeURIComponent(key) + "/"); box.innerHTML = r.ok ? detail(await r.json(), model) : "<p>Could not open that entry.</p>"; }
-  catch(e) { box.innerHTML = "<p>Open5e can't be reached. Check the connection.</p>"; }
+  const box = $("#rshow"), x = '<button type="button" class="close" data-rx title="Close (Esc)">✕ Close</button>'; $("#rules").classList.add("reading"); box.innerHTML = x + "<p class='muted'>Opening</p>";
+  try { const r = await fetch(API + route.replace(/^v2\//, "") + encodeURIComponent(key) + "/"); box.innerHTML = x + (r.ok ? detail(await r.json(), model) : "<p>Could not open that entry.</p>"); }
+  catch(e) { box.innerHTML = x + "<p>Open5e can't be reached. Check the connection.</p>"; }
+  if (innerWidth < 700) box.scrollIntoView({block: "start", behavior: "smooth"});
 }
 async function rules(){
-  const v = q.value.trim(), ed = document.querySelector("[name=ed]:checked").value, me = ++seq, list = $("#rlist");
+  const v = typed(), ed = document.querySelector("[name=ed]:checked").value, me = ++seq, list = $("#rlist");
   $("#ddb").href = "https://www.dndbeyond.com/search?q=" + encodeURIComponent(v);
-  if (v.length < 2) { list.innerHTML = "<li class='muted'>Type at least two letters.</li>"; return; }
+  if (v.length < 2) { hits = null; asked = ""; list.innerHTML = "<li class='muted'>Type at least two letters above to find a rule, spell, item, creature or condition.</li>"; counts(); return; }
   list.innerHTML = "<li class='muted'>Searching</li>";
   try {
     if (!conds) { conds = []; try { const c = await (await fetch(API + "conditions/?limit=60&fields=key,name")).json(); conds = c.results.filter(x => !x.key.includes("_")).map(x => ({route: "v2/conditions/", object_pk: x.key, object_name: x.name, object_model: "Condition"})); } catch(e) {} }
     const j = await (await fetch(API + "search/?limit=30&document_pk=" + ed + "&query=" + encodeURIComponent(v))).json();
     if (me !== seq) return;
     const lv = v.toLowerCase(), rank = r => { const n = r.object_name.toLowerCase(); return n === lv ? 0 : n.startsWith(lv) ? 1 : n.includes(lv) ? 2 : 3; };
-    const hits = conds.filter(c => c.object_name.toLowerCase().includes(lv)).concat(j.results || []).sort((a, b) => rank(a) - rank(b));
+    hits = conds.filter(c => c.object_name.toLowerCase().includes(lv)).concat(j.results || []).sort((a, b) => rank(a) - rank(b));
     list.innerHTML = hits.length ? hits.map((r, i) => `<li><button data-r="${esc(r.route)}" data-k="${esc(r.object_pk)}" data-m="${esc(r.object_model)}"><b>${esc(r.object_name)}</b><span>${esc(r.object_model.replace(/([a-z])([A-Z])/g, "$1 $2"))}</span></button></li>`).join("")
       : "<li class='muted'>Nothing in the SRD. Try D&amp;D Beyond below.</li>";
-    const first = list.querySelector("button"); if (first && rank(hits[0]) <= 1) first.click(); else if (!first) $("#rshow").innerHTML = "";
+    if (asked !== v) shut();
+    asked = v; counts();
+    const first = list.querySelector("button"); if (f === "rules" && innerWidth >= 700 && first && rank(hits[0]) <= 1) first.click();
   } catch(e) { if (me === seq) list.innerHTML = "<li class='muted'>Open5e can't be reached. Check the connection.</li>"; }
 }
-function run(){ if (tab === "world") world(); else { clearTimeout(timer); timer = setTimeout(rules, 250); } }
 q.addEventListener("input", run);
-tabs.forEach(b => b.addEventListener("click", () => show(b.dataset.tab)));
+$("#filters").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) pickFilter(b.dataset.f); });
+const shut = () => { $("#rshow").innerHTML = ""; $("#rules").classList.remove("reading"); $$("#rlist button").forEach(x => x.classList.remove("on")); };
 document.addEventListener("click", e => {
-  const b = e.target.closest("#rlist button"); if (b) { document.querySelectorAll("#rlist button").forEach(x => x.classList.toggle("on", x === b)); open(b.dataset.r, b.dataset.k, b.dataset.m); }
-  const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); show(g.dataset.go); }
+  const b = e.target.closest("#rlist button"); if (b) { $$("#rlist button").forEach(x => x.classList.toggle("on", x === b)); open(b.dataset.r, b.dataset.k, b.dataset.m); }
+  const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); f = g.dataset.go; run(true); }
+  if (e.target.closest("[data-rx]")) shut();
+  if (e.target.closest(".entries a")) address();
 });
+addEventListener("keydown", e => { if (e.key === "Escape" && $("#rshow").innerHTML) shut(); });
+addEventListener("pagehide", () => { const s = here.get(KEY); if (s) here.set(KEY, JSON.stringify({...JSON.parse(s), y: scrollY})); });
 document.querySelectorAll("[name=ed]").forEach(r => r.addEventListener("change", () => { store.set("osse-rules-ed", r.value); run(); }));
 const ed = store.get("osse-rules-ed"); if (ed) { const r = document.querySelector(`[name=ed][value="${ed}"]`); if (r) r.checked = true; }
+const was = here.get(KEY), back = here.get(KEY + ":back"); here.del(KEY + ":back");
 const p = new URLSearchParams(location.search); if (p.get("q")) q.value = p.get("q");
-show(location.hash === "#rules" ? "rules" : "world");
+const h = location.hash.slice(1); if (types.includes(h)) f = h;
+run(true);
+if (back && was) { try { scrollTo(0, JSON.parse(was).y || 0); } catch (e) {} }
+addEventListener("hashchange", () => { const t = location.hash.slice(1); f = types.includes(t) ? t : "all"; run(true); });
 })();
 """
 
@@ -623,11 +673,9 @@ body{margin:0;min-height:100vh;color:var(--text);font:17px/1.6 var(--f-body);
   background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(30,44,74,.35),transparent 70%) fixed,var(--ink);padding:clamp(16px,4vw,36px) 16px 56px}
 a{color:var(--gold-hi)}:focus-visible{outline:2px solid var(--arcane);outline-offset:2px}
 .wrap{max-width:880px;margin:0 auto}
-header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:14px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;padding-bottom:14px;margin-bottom:20px;border-bottom:1px solid var(--line)}
 .eyebrow{font:500 11px/1.4 var(--f-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
 .crumbs{font-size:15px;color:var(--muted);margin-top:2px}.crumbs a{color:var(--muted);text-decoration:none}.crumbs a:hover{color:var(--gold-hi)}
-.home{font:500 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:10px 12px}
-.home:hover{color:var(--gold-hi);border-color:var(--line-2)}
 .sheet{background:linear-gradient(180deg,var(--vellum),var(--vellum-2));color:var(--vink);border-radius:6px;padding:clamp(20px,4vw,40px);box-shadow:0 18px 40px rgba(0,0,0,.45)}
 .sheet a{color:var(--vred);text-decoration-color:var(--vrule);text-underline-offset:2px}
 .nolink{font-weight:600}.muted{color:var(--vmuted)}
@@ -665,11 +713,19 @@ td{padding:6px 8px;border-bottom:1px solid var(--vline);vertical-align:top}.log 
 .lk .ty{color:var(--vmuted);font-style:italic}.lk .to small{margin-left:6px;font:11px var(--f-mono)}.lk .nt{grid-column:2/5;font-size:14px;color:var(--vmuted)}
 .also p{font-size:15.5px}
 footer{margin-top:28px;padding-top:10px;border-top:1px solid var(--vline);font-size:13px;color:var(--vmuted)}
-.tabs{display:flex;gap:4px;margin:18px 0 0;border-bottom:1px solid var(--vrule)}
-.tabs button{font:600 13px/1 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--vmuted);background:none;border:1px solid transparent;border-bottom:0;border-radius:4px 4px 0 0;padding:11px 14px;cursor:pointer;margin-bottom:-1px}
-.tabs button[aria-selected=true]{color:var(--vred);border-color:var(--vrule);background:rgba(255,255,255,.35)}
 #q{width:100%;font:16px var(--f-body);padding:10px 12px;margin:12px 0 6px;border:1px solid var(--vline);border-radius:4px;background:rgba(255,255,255,.55);color:var(--vink)}
-.jump{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px;margin:6px 0 10px}.jump a{text-decoration:none}.jump small{font:11px var(--f-mono)}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}
+.filters button{font:15px/1.2 var(--f-body);color:var(--vink);background:rgba(255,255,255,.35);border:1px solid var(--vline);border-radius:999px;padding:7px 13px;cursor:pointer}
+.filters button:hover{border-color:var(--vred)}.filters small{font:11px var(--f-mono);margin-left:3px}.filters .zero{opacity:.45}
+.filters button[aria-pressed=true]{background:var(--vred);border-color:var(--vred);color:var(--vellum)}.filters button[aria-pressed=true] small{color:inherit}
+.filters .rf{border-color:rgba(38,70,110,.45);color:#26466e}.filters .rf[aria-pressed=true]{background:#26466e;border-color:#26466e;color:var(--vellum)}
+.wrap.list{max-width:1120px}[hidden]{display:none!important}
+@media (min-width:860px){.results.both{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,390px);gap:30px;align-items:start}.results.both #rules{margin-top:0;position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}}
+.band{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin:14px 0 4px;padding:7px 12px;border-radius:4px;background:rgba(124,22,34,.1);border-left:4px solid var(--vred);color:var(--vred);font-size:14px}
+.band b{font:600 14px var(--f-display);letter-spacing:.1em;text-transform:uppercase}.band span{color:var(--vmuted)}
+.band.rb{background:rgba(38,70,110,.1);border-left-color:#26466e;color:#26466e}#rules{margin-top:22px}#rules.mixed .rgrid{grid-template-columns:1fr}#rules.mixed .rlist{max-height:60vh;border-right:0}#rules.mixed.reading .rlist{display:none}#rules:not(.mixed) .band{display:none}#rules .rshow h3{color:#26466e}
+.close{position:sticky;top:12px;float:right;z-index:3;margin:-6px -6px 8px 14px;display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid var(--vred);border-radius:999px;cursor:pointer;font:600 13px/1 var(--f-body);color:var(--vellum)!important;background:var(--vred);text-decoration:none;box-shadow:0 2px 8px rgba(42,29,18,.25)}.close:hover{background:var(--vink);border-color:var(--vink)}
+#rshow .close{position:static;min-height:34px;margin:0 0 6px 10px;background:#26466e;border-color:#26466e}
 .entries{list-style:none;padding:0;columns:2 320px;column-gap:28px}
 .entries li{break-inside:avoid;margin:0 0 10px}.entries li>a{font-weight:600}.entries small{display:block;font-size:14px;line-height:1.35}
 .st{font:500 11px var(--f-mono);padding:0 5px;border:1px solid var(--vline);border-radius:3px;margin-left:4px}
@@ -685,7 +741,7 @@ footer{margin-top:28px;padding-top:10px;border-top:1px solid var(--vline);font-s
 .credit{font-size:13px;color:var(--vmuted);margin-top:18px;border-top:1px solid var(--vline);padding-top:8px}
 @media (max-width:640px){.lk{grid-template-columns:52px 1fr auto}.lk .ty{grid-column:2/4}.lk .to{grid-column:1/3}.lk .wn{grid-row:2;grid-column:3}.lk .nt{grid-column:1/4}
   .props{grid-template-columns:1fr}.props dt{line-height:1.2;margin-top:6px}.rgrid{grid-template-columns:1fr}.rlist{max-height:40vh;border-right:0;border-bottom:1px solid var(--vline)}}
-@media print{body{background:#fff;padding:0}header{display:none}.sheet{box-shadow:none;background:#fff}}
+@media print{body{background:#fff;padding:0}header,.close{display:none}.sheet{box-shadow:none;background:#fff}}
 """
 
 
@@ -716,9 +772,10 @@ def build_set(g, out_dir, player):
     changed += write(os.path.join(out_dir, "pages.css"), CSS)
     changed += write(os.path.join(out_dir, "rules.js"), RULES_JS)
     changed += write(os.path.join(out_dir, "index.html"), index(site))
-    if not player:   # Paths ahead: live plans as branching trees, one lane per player character (tools/osse/paths.py)
+    if not player:   # Session planner: live plans as branching trees, one lane per player character (tools/osse/paths.py)
         import paths
-        keep.add("paths.html")
+        keep |= {"paths.html", "screen.html"}
+        changed += write(os.path.join(out_dir, "screen.html"), SCREEN_HTML)
         changed += write(os.path.join(out_dir, "paths.html"), paths.page(site))
     for nid in site.slugs:
         f = site.slugs[nid] + ".html"; keep.add(f)

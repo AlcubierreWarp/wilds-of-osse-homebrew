@@ -202,13 +202,13 @@ def show(only=None):
         say(e["to"], f'- NEW LINK {b.label(e["from"])} → {b.label(e["to"])}' + (f' · "{e["label"]}"' if e.get("label") else ""))
     for k, rows in out.items():
         if rows and (not only or only == k or any(b.live(i) and only in b.lanes(i) for i, _ in rows)):
-            print(f"\n## {k}")
+            print("\n## " + {"The Party": "Session canvas only (the whole party)", "world": "World"}.get(k, k))
             print("\n".join(t for i, t in rows if not only or only == k or (b.live(i) and only in b.lanes(i))))
     if not any(out.values()):
         print("nothing new")
     order = doc.get("order") or {}
     if order and not only:
-        print("\n## Running order (Session plan; for the session screen, nothing to write in the vault)")
+        print("\n## Running order (for the session screen, nothing to write in the vault)")
         for sess in sorted(order, key=lambda t: int(t[1:]) if t[1:].isdigit() else 1e9):
             print(f"{sess}:")
             for n, i in enumerate([x for x in order[sess] if b.live(x)], 1):
@@ -220,7 +220,7 @@ def known(b):
     g, _ = graph()
     boards = [*b.pcs, "The Party", "world"]
     alias = {a: k for k, names in b.pcs.items() for a in names}
-    alias.update({k.split()[0].lower(): k for k in b.pcs}, **{"the party": "The Party", "party": "The Party", "world": "world", "around the party": "world"})
+    alias.update({k.split()[0].lower(): k for k in b.pcs}, **{"the party": "The Party", "party": "The Party", "world": "world", "around the party": "world", "canvas": "The Party", "session canvas": "The Party"})
     names = lambda ok: {x.lower() for n in g["nodes"] if ok(n["type"]) for x in [n["id"], *(n.get("aliases") or [])]}
     return {"boards": boards, "alias": alias, "places": names(lambda t: t == "place"),
             "people": names(lambda t: t in ("npc", "pc", "party", "faction")) | {"the party", "the whole party"}}
