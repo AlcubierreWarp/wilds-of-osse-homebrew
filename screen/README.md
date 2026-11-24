@@ -2,7 +2,7 @@
 
 The site's home page, `index.html`, gathers every link: https://osse.thomashuet.ca once its DNS record is in place, https://alcubierrewarp.github.io/wilds-of-osse-homebrew/ until then. Links open in the same tab; Command-click opens one in a new tab.
 
-- **Theme**: the footer switches between Original and Cover poster (the campaign poster, `assets/poster.webp`). Each browser remembers its choice.
+- **Theme**: the footer switches between Original and Cover poster (the campaign cover, `assets/poster.webp`, full width behind the page, which rises over its lower third and sinks it into the dark as it scrolls). Each browser remembers its choice.
 - **For the players**: D&D Beyond, Roll20, Discord, the chronicle, the codex (what the party knows, with a rules lookup) and Gus's archive. No codes here.
 - **Game master**: behind a passcode (Keychain service `osse-dm-passcode`; change it with `relay/gus/deploy.sh --new-dm-passcode`, or pipe a chosen one into `--set-dm-passcode`). It keeps players from wandering in; it is not strong security. One unlock opens the hub's section, every DM page (`assets/dm.js`) and Gus's archive in that browser; Lock this browser closes them all. Inside:
   - Gus's archive code, to hand to Shane. While the section is unlocked, the players' archive button opens the game master view. The code comes from the relay (`hub.json`, game master only), so it never sits in this repository. `relay/gus/deploy.sh --new-player-code` changes the code and the hub at once.
