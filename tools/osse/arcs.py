@@ -178,8 +178,9 @@ def page(site, played=None):
     return (head + f"<style>{PANEL}{CSS}</style>" + pages.topbar(site, here="arcs") +
             '<main class="sheet arcs">'
             '<div class="atop"><div><h1>Arc planner</h1><p class="lede">The campaign, an arc to a row. Drag session cards to reorder them or move them '
-            'between arcs. Tap anything to edit it. Planned sessions are the ones in the Session planner: what you change here changes there.</p></div>'
-            '<div class="tools"><span id="save" class="save"></span><button class="mini" data-act="addarc">+ Arc</button></div></div>'
+            'between arcs. Tap anything to open it. Planned sessions are the ones in the Session planner: what you change here changes there.</p></div>'
+            '<div class="tools"><span id="save" class="save"></span><button class="mini" data-act="addarc">+ Arc</button>'
+            '<span class="rwt big" id="rw" role="group" aria-label="Side panels open to read or to edit"></span></div></div>'
             '<div class="strip" id="strip" aria-label="The campaign at a glance"></div>'
             '<div class="loose" id="loose" hidden></div>'
             '<div id="rows"></div>'
@@ -396,51 +397,76 @@ const plannerHref = s => "paths.html?" + new URLSearchParams({...Object.fromEntr
 
 /* ---------- editing ---------- */
 function touch(o) { if (o.by === "claude") o.by = "tom"; }
-function editor(which, keep) {
-  open = which; const d = $("#drawer"); d.hidden = false; mark();
+let rw = store.get("osse-paths-rw") === "edit" ? "edit" : "view", own = null;   // rw: the setting at the top, shared with the Session planner; own: the open panel's, until it closes
+const rwBtns = cur => ["view", "edit"].map(m => `<button data-rw="${m}" aria-pressed="${cur === m}">${m === "view" ? "Read" : "Edit"}</button>`).join("");
+function rwPaint() { $("#rw").innerHTML = rwBtns(rw); $$("#rw button").forEach(b => { b.title = b.dataset.rw === "view" ? "Panels open to read" : "Panels open to edit"; b.onclick = () => { rw = b.dataset.rw; own = null; store.set("osse-paths-rw", rw); rwPaint(); repaint(); }; }); }
+function repaint() { if (!open) return; $("#drawer").dataset.for = ""; editor({arc: open.arc, card: open.card}); }
+function clear() {   // the panel starts under the top bar while that shows, so Read and Edit stay in reach
+  const d = $("#drawer"); if (d.hidden) return;
+  d.style.top = innerWidth > 900 ? Math.max(14, Math.round($(".atop").getBoundingClientRect().bottom) + 8) + "px" : "";
+}
+addEventListener("scroll", clear, {passive: true}); addEventListener("resize", clear);
+function editor(which, keep) {   // an arc's panel or a session card's, to read or to edit; which.m: this one always opens that way
+  const was = open; open = which; const d = $("#drawer");
+  if (!was || was.arc !== which.arc || was.card !== which.card) own = null;
+  if (which.m) own = which.m;
+  const ed = (own || rw) === "edit"; d.hidden = false; mark(); clear();
   if (which.arc) {
     const a = A.list[which.arc]; if (!a) return closeEd();
-    const i = A.order.indexOf(which.arc);
-    if (keep && d.dataset.for === "arc:" + which.arc) return;
-    d.dataset.for = "arc:" + which.arc;
-    d.className = "drawer toedit"; d.innerHTML = head(`Arc ${i + 1}`, a.by === "claude" ? "Claude’s draft" : "", a.title, "Name this arc") + `<div class="pb">` +
-      box("Starts on", `<textarea data-f="starts" aria-label="Starts on" placeholder="Where it begins">${esc(a.starts)}</textarea>`) + box("Ends on", `<textarea data-f="ends" aria-label="Ends on" placeholder="Where it ends">${esc(a.ends)}</textarea>`) +
-      box("What happens", `<textarea data-f="about" aria-label="What happens" style="min-height:150px" placeholder="What the arc is about">${esc(a.about)}</textarea>`) +
-      `</div><div class="pf"><button data-arcmove="-1" ${i ? "" : "disabled"}>↑ Up</button><button data-arcmove="1" ${i < A.order.length - 1 ? "" : "disabled"}>↓ Down</button><button class="del" data-delarc>Delete</button></div>`;
-    grown(d);
-    if (which.focus) setTimeout(() => { const f = d.querySelector(`[data-f="${which.focus}"]`); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 30);
+    const i = A.order.indexOf(which.arc), key = `arc:${which.arc}:${ed}`;
+    if (keep && ed && d.dataset.for === key) return;
+    d.dataset.for = key;
+    const part = (lab, f, ph, st = "") => ed ? box(lab, `<textarea data-f="${f}" aria-label="${lab}"${st} placeholder="${ph}">${esc(a[f])}</textarea>`) : a[f] ? box(lab, para(a[f])) : "";
+    const cards = a.cards.filter(c => A.cards[c]), w = walk();
+    paint(d, ed, head(`Arc ${i + 1}`, a.by === "claude" ? "Claude’s draft" : "", a.title, "Name this arc", ed),
+      part("Starts on", "starts", "Where it begins") + part("Ends on", "ends", "Where it ends") + part("What happens", "about", "What the arc is about", ` style="min-height:150px"`) +
+      (ed || !cards.length ? "" : `<div class="ps"><h4>Sessions<span>${cards.length}</span></h4><div class="pc">${cards.map(c => `<button class="cl" data-open="${c}"><span><b>${w[c].linked ? "S" + w[c].n : "Idea"}</b> ${esc(titleOf(A.cards[c]))}</span></button>`).join("")}</div></div>`),
+      `<button data-arcmove="-1" ${i ? "" : "disabled"}>↑ Up</button><button data-arcmove="1" ${i < A.order.length - 1 ? "" : "disabled"}>↓ Down</button><button class="del" data-delarc>Delete</button>`);
+    if (ed && which.focus) setTimeout(() => { const f = d.querySelector(`[data-f="${which.focus}"]`); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 30);
     return;
   }
   const cid = which.card, c = A.cards[cid]; if (!c) return closeEd();
-  const aid = A.order.find(x => A.list[x].cards.includes(cid)), arr = A.list[aid].cards, pos = arr.indexOf(cid), w = walk()[cid] || {};
-  if (keep && d.dataset.for === "card:" + cid) { info(c); return; }
-  d.dataset.for = "card:" + cid;
+  const key = `card:${cid}:${ed}`;
+  if (keep && ed && d.dataset.for === key) { info(c, ed); return; }
+  d.dataset.for = key;
+  const aid = A.order.find(x => A.list[x].cards.includes(cid)), arr = A.list[aid].cards, pos = arr.indexOf(cid), w = walk()[cid] || {}, st8 = state(c);
   const used = new Set(Object.values(A.cards).map(x => x.link)), un = Link.unplaced(st, CUR), free = D.played.filter(x => !used.has("S" + x.n) || c.link === "S" + x.n), opt = (v, t) => `<option value="${v}" ${c.link === v ? "selected" : ""}>${esc(t)}</option>`;
-  const many = x => { const k = scenes(x).length; return k ? `, ${k} scene${k === 1 ? "" : "s"}` : ""; };
-  d.className = "drawer toedit"; d.innerHTML = head(w.linked ? `S${w.n} session` : "Session idea", (state(c) === "played" ? "played" : "") + (c.by === "claude" && state(c) !== "played" ? "Claude’s draft" : ""), c.title, titleOf({link: c.link}) || "Name") + `<div class="pb"><div class="ps"><div class="fr"><span class="fl">Session</span><div class="fv"><select data-link aria-label="Session">${opt("", `An idea, about S${w.linked ? w.n : w.n || CUR + 1}`)}` +
-    (c.link && state(c) === "planned" ? opt(c.link, `${c.link}, in the Session planner`) : `<option value="new">Bring it into the Session planner</option>`) +
+  const many = x => { const k = scenes(x).length; return k ? `, ${k} scene${k === 1 ? "" : "s"}` : ""; }, row = (lab, h) => `<div class="fr"><span class="fl">${lab}</span><div class="fv">${h}</div></div>`;
+  const pick = `<select data-link aria-label="Session">${opt("", `An idea, about S${w.linked ? w.n : w.n || CUR + 1}`)}` +
+    (c.link && st8 === "planned" ? opt(c.link, `${c.link}, in the Session planner`) : `<option value="new">Bring it into the Session planner</option>`) +
     (un.length ? `<optgroup label="It is a session already in the Session planner">${un.map(x => opt(x, x + many(x))).join("")}</optgroup>` : "") +
-    (free.length ? `<optgroup label="It was played as">${free.slice().reverse().map(x => opt("S" + x.n, `S${x.n} · ${x.title}`)).join("")}</optgroup>` : "") + `</select></div></div>` +
-    `<div class="fr"><span class="fl">Arc</span><div class="fv"><select data-movearc aria-label="Arc">${A.order.map((x, i) => `<option value="${x}" ${x === aid ? "selected" : ""}>Arc ${i + 1}: ${esc(A.list[x].title || "Untitled arc")}</option>`).join("")}</select></div></div></div>` +
-    box("What happens", `<textarea data-f="text" aria-label="What happens" placeholder="${esc(state(c) === "played" ? textOf({link: c.link}) : "Where it goes, what it is for")}">${esc(c.text)}</textarea>`) +
-    `<div class="ps" id="info"></div>` +
-    `</div><div class="pf"><button data-cardmove="-1" ${pos ? "" : "disabled"}>← Earlier</button><button data-cardmove="1" ${pos < arr.length - 1 ? "" : "disabled"}>Later →</button><button class="del" data-delcard>Delete</button></div>`;
-  grown(d);
-  info(c);
-  if (which.focus) setTimeout(() => { const f = d.querySelector(`[data-f="${which.focus}"]`); if (f) f.focus(); }, 30);
+    (free.length ? `<optgroup label="It was played as">${free.slice().reverse().map(x => opt("S" + x.n, `S${x.n} · ${x.title}`)).join("")}</optgroup>` : "") + `</select>`;
+  const arcs = `<select data-movearc aria-label="Arc">${A.order.map((x, i) => `<option value="${x}" ${x === aid ? "selected" : ""}>Arc ${i + 1}: ${esc(A.list[x].title || "Untitled arc")}</option>`).join("")}</select>`;
+  const said = st8 === "planned" ? `${c.link}, in the Session planner` : st8 === "played" ? `${c.link}, played` : `An idea, about S${w.n || CUR + 1}`;
+  paint(d, ed, head(w.linked ? `S${w.n} session` : "Session idea", (st8 === "played" ? "played" : "") + (c.by === "claude" && st8 !== "played" ? "Claude’s draft" : ""), ed ? c.title : titleOf(c), titleOf({link: c.link}) || "Name", ed),
+    `<div class="ps">${row("Session", ed ? pick : esc(said))}${row("Arc", ed ? arcs : `Arc ${A.order.indexOf(aid) + 1}: ${esc(A.list[aid].title || "Untitled arc")}`)}</div>` +
+    (ed ? box("What happens", `<textarea data-f="text" aria-label="What happens" placeholder="${esc(st8 === "played" ? textOf({link: c.link}) : "Where it goes, what it is for")}">${esc(c.text)}</textarea>`) : c.text ? box("What happens", para(c.text)) : "") +
+    `<div class="ps" id="info"></div>`,
+    `<button data-cardmove="-1" ${pos ? "" : "disabled"}>← Earlier</button><button data-cardmove="1" ${pos < arr.length - 1 ? "" : "disabled"}>Later →</button><button class="del" data-delcard>Delete</button>`);
+  info(c, ed);
+  if (ed && which.focus) setTimeout(() => { const f = d.querySelector(`[data-f="${which.focus}"]`); if (f) f.focus(); }, 30);
 }
-const head = (name, tag, title, ph) => `<div class="ph" style="--kc:#4d6b4a"><div class="ph1"><b>${esc(name)}</b>${tag ? `<span class="ch">${esc(tag)}</span>` : ""}<span class="sp"></span><button class="x" data-close aria-label="Close">×</button></div><input type="text" class="ttl" data-f="title" aria-label="Name" value="${esc(title)}" placeholder="${esc(ph)}"></div>`;
+function paint(d, ed, top, body, foot) {
+  const pb = d.querySelector(".pb"), y = pb && d.dataset.was === d.dataset.for ? pb.scrollTop : 0; d.dataset.was = d.dataset.for;
+  d.className = "drawer " + (ed ? "toedit" : "toread"); d.innerHTML = top + `<div class="pb">${body}</div>` + (ed ? `<div class="pf">${foot}</div>` : "");
+  d.querySelector(".pb").scrollTop = y;
+  d.querySelectorAll("[data-rw]").forEach(b => b.onclick = () => { own = b.dataset.rw; repaint(); });
+  d.querySelectorAll("[data-open]").forEach(b => b.onclick = ev => { ev.stopPropagation(); editor({card: b.dataset.open}); });
+  grown(d);
+}
+const para = t => `<div class="pc">${esc(t).replace(/\n/g, "<br>")}</div>`;
+const head = (name, tag, title, ph, ed) => `<div class="ph" style="--kc:#4d6b4a"><div class="ph1"><b>${esc(name)}</b>${tag ? `<span class="ch">${esc(tag)}</span>` : ""}<span class="sp"></span><span class="rwt" role="group" aria-label="This panel">${rwBtns(ed ? "edit" : "view")}</span><button class="x" data-close aria-label="Close">×</button></div>${ed ? `<input type="text" class="ttl" data-f="title" aria-label="Name" value="${esc(title)}" placeholder="${esc(ph)}">` : `<h3>${esc(title || "No name yet")}</h3>`}</div>`;
 const box = (lab, h) => `<div class="ps"><h4>${lab}</h4>${h}</div>`;
 const grown = d => d.querySelectorAll("textarea").forEach(t => { const g = () => { t.style.height = "auto"; t.style.height = Math.min(420, t.scrollHeight + 2) + "px"; }; t.addEventListener("input", g); g(); });
-function info(c) {
+function info(c, ed) {
   const el = $("#info"); if (!el) return;
   const part = (lab, n) => `<h4>${lab}${n ? `<span>${n}</span>` : ""}</h4><div class="info pc">`;
   const n = num(c.link), s = PLAYED.get(n), what = state(c);
   if (what === "played") el.innerHTML = part("Played") + `<b>S${n} · ${esc(s.title)}</b><br>${esc(s.summary)}${s.href ? `<br><a class="go" href="${esc(s.href)}">Open the session page</a>` : ""}</div>`;
   else if (what === "planned") { const sc = scenes(c.link); el.innerHTML = part("Scenes", sc.length || "") + `${sc.length ? `<ol>${sc.map(x => `<li>${esc(x)}</li>`).join("")}</ol>` : ""}<a class="go" href="${esc(plannerHref(c.link))}">Open ${c.link} in the Session planner</a></div>`; }
-  else el.innerHTML = `<div class="info pc"><button data-bring>Bring it into the Session planner</button></div>`;
+  else el.innerHTML = !ed ? "" : `<div class="info pc"><button data-bring>Bring it into the Session planner</button></div>`;
 }
-function closeEd() { open = null; const d = $("#drawer"); d.hidden = true; d.dataset.for = ""; mark(); }
+function closeEd() { open = own = null; const d = $("#drawer"); d.hidden = true; d.dataset.for = ""; mark(); }
 const arcOf = cid => A.order.find(x => A.list[x].cards.includes(cid));
 function moveCard(cid, toArc, before) {   // before: a card id, or null for the end
   const from = arcOf(cid); if (!from) return;
@@ -480,12 +506,12 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button,[data-edit-arc],[data-card]"); if (!t) return;
   if (t.matches("[data-close]")) return closeEd();
   if (t.matches("[data-bring]") && open && open.card) return relink(open.card, "new");
-  if (t.dataset.act === "addarc") { const aid = uid("a"); A.order.push(aid); A.list[aid] = {title: "", starts: "", ends: "", about: "", cards: []}; changed(); draw(); editor({arc: aid, focus: "title"}); document.getElementById("arc-" + aid).scrollIntoView({behavior: "smooth", block: "center"}); return; }
+  if (t.dataset.act === "addarc") { const aid = uid("a"); A.order.push(aid); A.list[aid] = {title: "", starts: "", ends: "", about: "", cards: []}; changed(); draw(); editor({arc: aid, focus: "title", m: "edit"}); document.getElementById("arc-" + aid).scrollIntoView({behavior: "smooth", block: "center"}); return; }
   if (t.dataset.go) { document.getElementById("arc-" + t.dataset.go).scrollIntoView({behavior: "smooth", block: "start"}); return; }
   if (t.dataset.fold) { folded[t.dataset.fold] = !folded[t.dataset.fold]; store.set("osse-arcs-open", JSON.stringify(folded)); draw(); return; }
-  if (t.dataset.add) { const cid = addCard(t.dataset.add); changed(); draw(); editor({card: cid, focus: "title"}); const el = $(`[data-card="${cid}"]`); if (el) el.scrollIntoView({behavior: "smooth", inline: "nearest", block: "nearest"}); return; }
-  if (t.dataset.place) { const n = +t.dataset.place, prevArc = A.order.slice().reverse().find(x => A.list[x].cards.some(c => A.cards[c] && num(A.cards[c].link) && num(A.cards[c].link) < n)) || A.order[0], cid = addCard(prevArc, "S" + n); changed(); draw(); editor({card: cid, focus: n > CUR ? "title" : ""}); return; }
-  if (t.dataset.gate) return editor({arc: t.dataset.arc, focus: t.dataset.gate});
+  if (t.dataset.add) { const cid = addCard(t.dataset.add); changed(); draw(); editor({card: cid, focus: "title", m: "edit"}); const el = $(`[data-card="${cid}"]`); if (el) el.scrollIntoView({behavior: "smooth", inline: "nearest", block: "nearest"}); return; }
+  if (t.dataset.place) { const n = +t.dataset.place, prevArc = A.order.slice().reverse().find(x => A.list[x].cards.some(c => A.cards[c] && num(A.cards[c].link) && num(A.cards[c].link) < n)) || A.order[0], cid = addCard(prevArc, "S" + n); changed(); draw(); editor({card: cid, focus: n > CUR ? "title" : "", ...(n > CUR ? {m: "edit"} : {})}); return; }
+  if (t.dataset.gate) return editor({arc: t.dataset.arc, focus: t.dataset.gate, ...(A.list[t.dataset.arc][t.dataset.gate] ? {} : {m: "edit"})});
   if (t.dataset.editArc) return editor({arc: t.dataset.editArc});
   if (t.dataset.card) { if (dragged) return; return editor({card: t.dataset.card}); }
   if (t.dataset.arcmove && open && open.arc) { const i = A.order.indexOf(open.arc), j = i + +t.dataset.arcmove; [A.order[i], A.order[j]] = [A.order[j], A.order[i]]; settled(); $("#drawer").dataset.for = ""; changed(); draw(); return; }
@@ -640,6 +666,7 @@ async function load() {
   const want = new URLSearchParams(location.search).get("card"); if (want && A.cards[want]) { editor({card: want}); const el = $(`[data-card="${want}"]`); if (el) el.scrollIntoView({inline: "center", block: "center"}); }
   if (dirty && KEY && !unread) save();
 }
+rwPaint();
 load();
 })();
 """
