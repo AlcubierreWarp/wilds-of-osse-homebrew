@@ -192,6 +192,8 @@ def scene(g, nodes, q=None):
     for ln in sections(text(n)).get("Idea", []):
         print("  " + plain(ln).lstrip("- "))
     print(f"Purpose: {n.get('purpose') or '(not set)'}")
+    for ln in sections(text(n)).get("Opens on", []):
+        if ln.strip(): print(f"  Opens on: {plain(ln).lstrip('- ')}")
     inn = {m["id"]: m for m in live if m.get("scene") == nid}
     needs, opts = {}, {}
     for m in inn.values():

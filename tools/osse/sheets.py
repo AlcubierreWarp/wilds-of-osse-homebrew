@@ -1,19 +1,18 @@
-"""Scene sheets: the Session planner's PDF. One printed Letter page per scene, to run it from at the table.
+"""Scene sheets: the Session planner's PDF. Each scene as printed Letter pages, to run it from at the table.
 
-Not the canvas and not the Running order: a prompt book, as a stage manager keeps one. What each part is for:
+Not the canvas and not the Running order: a prompt book, as a stage manager keeps one. Every scene has the same pages in the same order,
+in one type size, so the eye learns where each thing is:
 
-    the question     why the scene is here: the answer is its end, whatever the answer is
-    open on          the situation to frame it with; nothing that presumes what the players do
-    the spine        cue on the left, what it sets off on the right. Read it by what just happened at the table, in any order
-    forks            a decision's choices side by side, each with what follows from it, drawn and not described
-    any time         cards held in the hand: play one when its cue comes, or when the scene needs a push
-    people           how each person sounds, and what they want: enough to answer anything the players try
-    keep hidden      what must not slip out here
-    ways out         always at the foot of the page, lettered as the forks name them, then the next scene
+    Set the scene    the question the scene answers; Opens on, words to say and things to see, hear and smell; where things stand;
+                     what to keep hidden; what pushes in from outside; the people, how they sound and what they want
+    Play it          the spine: cue on the left, what it sets off on the right, read by what just happened at the table, in any order;
+                     a decision's choices side by side; Any time cards held at the side; the ways out at the foot of the last page
+
+A scene takes as many Play pages as it needs, up to four pages in all (MAX). Past that its sentences run on to save room, then each card
+keeps its first lines, and the preview says so. The type never shrinks.
 
 Type follows the research on checklists read under pressure: a sans in sentence case, black on white, bold only for what the eye must
-find, no italics, one thought to a line, colour never the only sign (every kind has its symbol too), and the same thing in the same
-place on every page. A sheet takes the largest size that fits its page. Boxes are for a pencil.
+find, no italics, one thought to a line, colour never the only sign (every kind has its symbol too). Boxes are for a pencil.
 
 CSS and JS go into the Session planner (paths.py); the JS uses its functions.
 """
@@ -33,7 +32,7 @@ CSS = r"""
 .pz{flex:none;position:relative;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 
 .pg{--ink:#111;--soft:#444;--hair:#b9b9b9;--f:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;--fc:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
-  width:8.5in;height:10.98in;padding:.38in .42in .32in;display:flex;flex-direction:column;background:#fff;color:var(--ink);font:400 11pt/1.28 var(--f);overflow:hidden;transform-origin:0 0;
+  width:8.5in;height:10.98in;padding:.38in .42in .32in;display:flex;flex-direction:column;background:#fff;color:var(--ink);font:400 10.5pt/1.32 var(--f);overflow:hidden;transform-origin:0 0;
   print-color-adjust:exact;-webkit-print-color-adjust:exact;text-align:left}
 .pg *{box-sizing:border-box}:where(.pg) p,:where(.pg) ul,:where(.pg) li,:where(.pg) h3,:where(.pg) h4{margin:0;padding:0}:where(.pg) p,:where(.pg) li{line-height:inherit;font-size:inherit;max-width:none}
 .pg .k-scene{--kc:#3f5a3c}.pg .k-beat{--kc:#5a4c38}.pg .k-reveal{--kc:#5e3d82}.pg .k-complication{--kc:#b04d12}.pg .k-decision{--kc:#8f1626}.pg .k-entrance{--kc:#1f6d66}.pg .k-exit{--kc:#111}.pg .k-clock{--kc:#2f4d75}.pg .k-pressure{--kc:#8d6500}.pg .k-bottleneck{--kc:#111}.pg .k-note{--kc:#7a6400}
@@ -46,20 +45,28 @@ CSS = r"""
 .dots{display:flex;gap:3pt;justify-content:flex-end;margin-top:4pt}.dots i{color:var(--ink);opacity:1;font:600 8.5pt/1 var(--f);font-style:normal;min-width:15pt;height:15pt;padding:0 3pt;display:grid;place-items:center;border:1pt solid var(--ink);border-radius:8pt}.dots i.on{background:var(--ink);color:#fff}.dots i.fl{border-style:dashed}
 .cast{display:flex;flex-wrap:wrap;gap:3pt 4pt;margin-top:4pt}.cast span{font:700 9.5pt/1 var(--f);padding:3pt 7pt;border:1.2pt solid var(--ink);border-radius:8pt;background:color-mix(in srgb,var(--c,#fff) 55%,#fff)}.cast span.in{border-style:dashed}.cast small{font:500 8pt/1 var(--f)}
 
-/* frame: the question, and what to open on */
-.fr8{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:0 .22in;padding:.1in 0 .1in;border-bottom:1pt solid var(--ink)}.fr8.one{grid-template-columns:1fr}
+.hd.sl{padding-bottom:.07in}.hd.sl .no{font-size:20pt;min-width:.36in;padding:.04in .08in .05in}.hd.sl h3{font-size:15pt}.hd.sl .dots{margin-top:2pt}
+
+/* set the scene */
+.st8{flex:1;min-height:0;display:flex;flex-direction:column;gap:.16in;padding-top:.13in}
+.qq{font:700 15pt/1.22 var(--f);text-wrap:balance}.qq+p{margin-top:3pt!important;color:var(--soft)}
+.op8{border:1.4pt solid var(--ink);border-radius:4pt;padding:.1in .14in .12in}.op8 .lb8{color:var(--ink);font-size:9pt}.op8 .al p{font:500 11.5pt/1.48 var(--f)}.op8 .al p+p{margin-top:.07in}
+.sn8{display:grid;grid-template-columns:1fr 1fr;gap:.09in .22in;margin-top:.11in;padding-top:.1in;border-top:.8pt solid var(--hair)}.sn8>div{display:grid;grid-template-columns:.74in minmax(0,1fr);gap:0 6pt}.sn8 b{font:700 8.5pt/1.5 var(--f);letter-spacing:.05em;text-transform:uppercase}
+.wln{height:19pt;border-bottom:.7pt solid var(--hair)}.op8 .al .wln{height:22pt}
+.tw{display:grid;grid-template-columns:minmax(0,1fr) 2.2in;gap:.22in;align-items:start}.tw>div{display:flex;flex-direction:column;gap:.14in}
+.ppl{display:grid;grid-template-columns:1fr 1fr;gap:.1in .24in}.bx .ppl>.pp{margin:0;break-inside:avoid}
+.pg .none{color:var(--soft);margin:0}
 .lb8{font:700 8pt/1.2 var(--f);letter-spacing:.07em;text-transform:uppercase;color:var(--soft);margin-bottom:2pt;display:block}
-.qq{font:700 1.3em/1.2 var(--f);text-wrap:balance}.qq+p{margin-top:3pt!important;color:var(--soft);font-size:.92em}
 :where(.pg) ul{padding-left:.95em;list-style:none}.pg li{position:relative}.pg li+li{margin-top:.1em}.pg li::before{content:"";position:absolute;left:-.8em;top:.55em;width:.28em;height:.28em;border-radius:50%;background:var(--ink)}.pg p+ul{margin-top:1pt}
 .say{font-weight:700}
 .pg.rn8 .lead:has(+ul){display:inline}.pg.rn8 .lead+ul,.pg.rn8 .lead+ul li{display:inline;padding:0}.pg.rn8 .lead+ul li::before{content:"•\00a0";position:static;width:auto;height:auto;background:none;margin-left:.3em}
 
-.bd8{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--side,2.2in);gap:.18in;padding-top:.11in}.mn,.sd{min-width:0;min-height:0;display:flex;flex-direction:column}
+.bd8{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 2.05in;gap:.18in;padding-top:.11in}.mn,.sd{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}.mn>*,.sd>.bx,.st8>:not(.nt8){flex:none}
 .mn>.lb8{margin-bottom:5pt}.mn>.lb8 b{color:var(--ink);text-transform:none;letter-spacing:0;font-weight:600}
 
 /* the spine: cue, symbol, what it sets off */
-.th{position:relative;padding-bottom:.35em}.th+.th{margin-top:.35em;border-top:1pt dashed var(--hair);padding-top:.6em}
-.pg.gist .bd8 .lead+ul{display:none}.pg.gist .bd8 .lead,.pg.gist .pp p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.sp8.th1{margin-top:.35em;border-top:1pt dashed var(--hair);padding-top:.6em}.sp8.th1:first-of-type{margin-top:0;border-top:0;padding-top:0}
+.pg.gist .bd8 .lead+ul{display:none}.pg.gist .bd8 .lead{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .sp8{break-inside:avoid;display:grid;grid-template-columns:1.1in 2em minmax(0,1fr);gap:0 6pt;position:relative;padding-bottom:.55em}
 .sp8 .cu{font:600 .95em/1.22 var(--fc);text-align:right;padding-top:2pt;text-wrap:balance}.sp8 .cu.lo{font-weight:400;color:var(--soft)}.sp8 .cu small{display:block;font:400 .82em/1.2 var(--fc);color:var(--soft)}
 .sp8 .nd{position:relative;display:flex;justify-content:center}.sp8:not(.end) .nd::after{content:"";position:absolute;top:1.85em;bottom:calc(-.55em - 1pt);width:1.5pt;background:var(--ink)}
@@ -73,10 +80,10 @@ CSS = r"""
 
 /* a fork: the choices side by side */
 .fk{margin:0 0 .6em;border-top:1.6pt solid #8f1626;position:relative;display:grid;gap:0 .12in;grid-template-columns:var(--cols);padding-top:.12in}
-.fk::before{content:"";position:absolute;left:calc(1.1in + 6pt + 1em - .75pt);top:-.6em;height:.6em;width:1.5pt;background:#8f1626}
+.fk.more::before{display:none}.fk::before{content:"";position:absolute;left:calc(1.1in + 6pt + 1em - .75pt);top:-.6em;height:.6em;width:1.5pt;background:#8f1626}
 .op{position:relative;border:1pt solid var(--hair);border-radius:3pt;padding:0 7pt 6pt;min-width:0;display:flex;flex-direction:column;gap:.45em}
 .op::before{content:"";position:absolute;left:50%;top:-.12in;height:.12in;width:1.5pt;background:#8f1626}
-.oh{margin:0 -7pt;padding:4pt 7pt;background:#f3e4e6;border-bottom:1pt solid #8f1626;font:700 1em/1.2 var(--f);border-radius:2pt 2pt 0 0}.oh::before{content:"If ";font-weight:400}.oh.nl::before{content:""}
+.oh{margin:0 -7pt;padding:4pt 7pt;background:#f3e4e6;border-bottom:1pt solid #8f1626;font:700 1em/1.2 var(--f);border-radius:2pt 2pt 0 0}.oh::first-letter{text-transform:uppercase}
 .fk.gos{grid-template-columns:1fr;gap:4pt;border-top:0;padding:2pt 0 0 calc(1.1in + 2em + 12pt)}.fk.gos::before{left:calc(1.1in + 6pt + 1em - .75pt);top:-.6em;height:calc(.6em + 2pt)}.fk.gos .op{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:0 8pt;align-items:center;padding:0 7pt 0 0;border-color:#8f1626}.fk.gos .op::before{left:calc(-1em - 6.75pt - 1pt);top:50%;width:calc(1em + 7pt);height:1.5pt}.fk.gos .op::after{content:"";position:absolute;left:calc(-1em - 7.75pt);top:-5pt;height:calc(50% + 6pt);width:1.5pt;background:#8f1626}.fk.gos .op:not(:last-child)::after{height:calc(100% + 6pt)}.fk.gos .oh{margin:0;height:100%;border:0;border-right:1pt solid #8f1626;border-radius:2pt 0 0 2pt;padding:3pt 7pt}.fk.gos .to8{padding:3pt 0}
 .mi{border-left:2pt solid var(--kc);padding-left:6pt}.mi .cu{font:600 .9em/1.2 var(--fc);color:var(--soft)}.mi .ct svg{flex:none;width:1em;height:1em;color:var(--kc);align-self:center}.mi .ct b{font-size:1em}
 .sub8{display:flex;flex-direction:column;gap:.4em;margin:.35em 0 0 6pt}.sub8>div{border-left:1.6pt solid #8f1626;padding-left:6pt;display:flex;flex-direction:column;gap:.3em}.sub8 .oh{margin:0;padding:1pt 0;background:none;border:0}
@@ -90,7 +97,7 @@ CSS = r"""
 .pp b{font:700 1em/1.2 var(--f)}.pp small{font:500 .82em/1 var(--f);color:var(--soft)}.pp p{font-size:.9em;line-height:1.26}.pp p span{font-weight:700;margin-right:.35em}
 .hush li{font-size:.94em}.hush li::before{border-radius:0;background:#8f1626}
 .cl8{display:flex;gap:2.5pt;margin-top:2pt}.cl8 i{width:11pt;height:11pt;border:1.1pt solid var(--ink);border-radius:50%}.cl8 i.f{background:var(--ink)}
-.nt8{flex:1;min-height:0;overflow:hidden}.nt8 div{height:19pt;border-bottom:.7pt solid var(--hair)}
+.nt8{flex:1;min-height:0;overflow:hidden}
 
 /* ways out: the foot of every page */
 .wy{flex:none;border-top:2.5pt solid var(--ink);padding-top:.08in;margin-top:.08in;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:.08in .14in}
@@ -109,10 +116,10 @@ CSS = r"""
 """
 
 JS = r"""
-/* ---------- scene sheets: one printed page per scene, to run it from ---------- */
+/* ---------- scene sheets: printed pages to run each scene from ---------- */
 const Sheets = (() => {
   const FONTS = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap";
-  const N = D.npcs || {}, SMALL = 8;
+  const N = D.npcs || {}, MAX = 4;
   let off = new Set(), at = "";
   /* words: one thought to a line; what is said aloud in bold */
   const thoughts = t => String(t || "").split(/\n+/).map(x => x.replace(/^\s*[-•]\s*/, "").trim()).filter(Boolean).map(x => /[.!?:;…"”’)]$/.test(x) ? x : x + ".")
@@ -160,12 +167,13 @@ const Sheets = (() => {
       if (x.off) return `<div class="to8"><span class="ar">→</span><span>${esc(titleOf(x.to))}</span><small>not placed</small></div>`;
       if (sceneOf(x.to) !== sid) return goTo({to: x.to});
       if (kindOf(x.to) === "exit") return wayOut(x.to);
-      return tr.par[x.to] === m ? mini(x.to) : `<div class="to8"><span class="ar">→</span><span>${esc(titleOf(x.to))}</span><small>${isAny(x.to) ? "any time" : "on this page"}</small></div>`;
+      return tr.par[x.to] === m ? mini(x.to) : `<div class="to8"><span class="ar">→</span><span>${esc(titleOf(x.to))}</span><small${isAny(x.to) ? ">any time" : ` data-to="${esc(x.to)}">in this scene`}</small></div>`;
     }
     const opHead = x => `<div class="oh${x.labels.length ? "" : " nl"}">${x.labels.length ? x.labels.map(esc).join(" <span style=\"font-weight:400\">or</span> ") : "Choice not named"}</div>`;
     function mini(m) {   // a card in a fork, and what follows it there
       const k = kindOf(m) || "beat", cue = fieldOf(objOf(m), "cue");
-      let h = `<div class="mi k-${k}">${cue ? `<div class="cu">${esc(cue)}</div>` : ""}${title(m).replace("%", icon(k, 13))}${facts(m)}</div>`;
+      let h = `<div class="mi k-${k}" data-m="${esc(m)}">${cue ? `<div class="cu">${esc(cue)}</div>` : ""}${title(m).replace("%", icon(k, 13))}${facts(m)}</div>`;
+      if (k === "decision" && below) { below.push(m); return `<div class="to8"><span class="ar">↓</span><span>${esc(titleOf(m))}</span><small data-to="${esc(m)}">below</small></div>`; }
       if (k === "decision") return h + `<div class="sub8">${choices(m).map(x => `<div>${opHead(x)}${outcome(m, x)}</div>`).join("")}</div>`;
       h += away(m).map(goTo).join("");
       return h + (tr.kids[m] || []).map(x => kindOf(x) === "exit" ? wayOut(x) : mini(x)).join("");
@@ -177,7 +185,7 @@ const Sheets = (() => {
       const w = Array.from({length: n}, (_, i) => Math.sqrt(Math.max(...hs.filter((h, j) => j % n === i).map(len)))), lo = Math.max(...w) * .62;
       return `<div class="fk" style="--cols:${w.map(x => `minmax(0,${Math.max(lo, x).toFixed(1)}fr)`).join(" ")}">${hs.map(h => `<div class="op">${h}</div>`).join("")}</div>`;
     }
-    let before = null;
+    let before = null, below = null;   // below: decisions met inside the fork being drawn
     function spine(m, last) {   // a card on the spine, then what follows it
       const k = kindOf(m) || "beat", c = objOf(m), cue = fieldOf(c, "cue"), lab = tr.lab[m] || [], par = tr.par[m], kids = tr.kids[m] || [];
       if (k === "exit") { const h = kids.map((x, i) => spine(x, last && i === kids.length - 1)).join(""); return par ? `<div class="sp8 end k-exit"><span></span><span></span>${wayOut(m)}</div>` + h : h; }
@@ -186,9 +194,11 @@ const Sheets = (() => {
       const after = par && before !== par ? `<small>after ${esc(titleOf(par))}</small>` : "";
       const more = also.length ? `<small>or after ${esc(also.map(titleOf).join(", "))}</small>` : "";
       before = m;
-      const fk = k === "decision" ? fork(m) : "", sub = k === "decision" ? [] : kids;
+      let fk = "", deeper = [];
+      if (k === "decision") { const was = below; below = deeper; fk = fork(m); below = was; }
+      const sub = k === "decision" ? [] : kids;
       const open = sub.length || fk;
-      return `<div class="sp8 k-${k}${isCrit(c) ? " crit" : ""}${open ? "" : " end"}"><div class="cu${cue ? "" : " lo"}">${left}${after}${more}</div><div class="nd"><i>${icon(k, 13)}</i></div><div>${title(m).replace("%", "")}${facts(m)}${hops}</div></div>` + fk +
+      return `<div class="sp8 k-${k}${isCrit(c) ? " crit" : ""}${open ? "" : " end"}" data-m="${esc(m)}"><div class="cu${cue ? "" : " lo"}">${left}${after}${more}</div><div class="nd"><i>${icon(k, 13)}</i></div><div>${title(m).replace("%", "")}${facts(m)}${hops}</div></div>` + fk + deeper.map(x => spine(x, last)).join("") +
         sub.map((x, i) => spine(x, last && i === sub.length - 1)).join("");
     }
     const roots = (tr.kids[""] || []).filter(m => kindOf(m) !== "exit" || (tr.kids[m] || []).length);
@@ -220,38 +230,80 @@ const Sheets = (() => {
     else ways.push(`<div class="wo8 nx"><span class="lt">~</span><div><div class="cu">Floating</div><b>Back to where you were</b><p>${limText(sid)}</p></div></div>`);
 
     const why = thoughts(o.purpose), qs = why.filter(x => x.endsWith("?")), rest = why.filter(x => !x.endsWith("?")), sit = textOf(sid);
-    const ask = why.length ? `<div><span class="lb8">${qs.length ? "The question" : "What it is for"}</span><div class="qq">${loud((qs.length ? qs : rest).join(" "))}</div>${qs.length && rest.length ? `<p>${loud(rest.join(" "))}</p>` : ""}</div>` : "";
-    const openOn = sit ? `<div><span class="lb8">Open on</span>${words(sit)}</div>` : "";
-    const strip = list.map(x => `<i class="${x === sid ? "on" : ""}${isFloat(x) ? " fl" : ""}">${numIn(x) || "~"}</i>`).join("");
-    return `<div class="pg"><div class="hd"><span class="no">${numIn(sid) || "~"}</span><div><h3>${esc(titleOf(sid))}</h3><div class="wh">${[o.where, o.when].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join("")}</div>` +
-      (pcs.length || later2.length ? `<div class="cast">${pcs.map(k => pill(k)).join("")}${later2.map(k => pill(k, 1)).join("")}</div>` : "") + `</div>` +
-      `<div class="rt8"><b>${esc(t)}</b>${esc(sName(t))}<div class="dots">${strip}</div></div></div>` +
-      (ask || openOn ? `<div class="fr8${ask && openOn ? "" : " one"}">${ask}${openOn}</div>` : "") +
-      `<div class="bd8"><div class="mn"><span class="lb8">When this happens, this follows${roots.length > 1 ? ` <b>· ${roots.length} threads, in any order</b>` : ""}</span>${flow}</div>` +
-      `<div class="sd">${bx("Any time", any.map(side).join(""))}${bx("People", folk.map(person).join(""))}${bx("Keep hidden", hush.length ? `<ul class="hush">${hush.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : "")}${bx("Pushing in", push.map(side).join(""))}<div class="nt8"></div></div></div>` +
-      `<div class="wy" style="--n:${Math.min(3, ways.length)}"><span class="lb8">Ways out</span>${ways.join("")}</div>` +
-      `<div class="ft8"><span>Wilds of Ossë · ${esc(t)}${sName(t) ? " · " + esc(sName(t)) : ""}</span><span>${numIn(sid) ? `Scene ${numIn(sid)} of ${list.filter(x => !isFloat(x)).length}` : "Floating scene"}</span></div></div>`;
+    const ask = `<div><span class="lb8">${qs.length || !why.length ? "The question" : "What it is for"}</span>${why.length ? `<div class="qq">${loud((qs.length ? qs : rest).join(" "))}</div>${qs.length && rest.length ? `<p>${loud(rest.join(" "))}</p>` : ""}` : `<div class="wln"></div>`}</div>`;
+    const [aloud, sense] = openOf(fieldOf(o, "opens")), blank = n => "<div class=\"wln\"></div>".repeat(n);
+    const opens = `<div class="op8"><span class="lb8">Opens on</span><div class="al">${aloud.length ? aloud.map(x => `<p>${esc(x)}</p>`).join("") : blank(3)}</div>` +
+      `<div class="sn8">${SENSES.map(k => `<div><b>${k}</b><div>${sense[k] ? esc(sense[k]) : blank(1)}</div></div>`).join("")}</div></div>`;
+    const none = `<p class="none">Nothing</p>`, strip = list.map(x => `<i class="${x === sid ? "on" : ""}${isFloat(x) ? " fl" : ""}">${numIn(x) || "~"}</i>`).join("");
+    const head = full => `<div class="hd${full ? "" : " sl"}"><span class="no">${numIn(sid) || "~"}</span><div><h3>${esc(titleOf(sid))}</h3>` + (full ? `<div class="wh">${[o.where, o.when].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join("")}</div>` +
+      (pcs.length || later2.length ? `<div class="cast">${pcs.map(k => pill(k)).join("")}${later2.map(k => pill(k, 1)).join("")}</div>` : "") : "") + `</div><div class="rt8"><b>${esc(t)}</b>${full ? esc(sName(t)) : ""}<div class="dots">${strip}</div></div></div>`;
+    const foot = `<div class="ft8"><span>Wilds of Ossë · ${esc(t)}${sName(t) ? " · " + esc(sName(t)) : ""}</span><span class="pn8"></span></div>`;
+    return {head, foot, flow, any: any.map(side), name: numIn(sid) ? `Scene ${numIn(sid)} of ${list.filter(x => !isFloat(x)).length}` : "Floating scene",
+      set: [ask, opens, `<div class="tw"><div>${bx("Where things stand", sit ? words(sit) : none)}</div><div>${bx("Keep hidden", hush.length ? `<ul class="hush">${hush.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : none)}${bx("Pushing in", push.map(side).join(""))}</div></div>`],
+      people: folk.length ? `<div class="bx"><h4>People</h4><div class="ppl">${folk.map(person).join("")}</div></div>` : bx("People", `<p class="none">Nobody yet</p>`),
+      label: `<span class="lb8">When this happens, this follows${roots.length > 1 ? ` <b>· ${roots.length} threads, in any order</b>` : ""}</span>`,
+      ways: `<div class="wy" style="--n:${Math.min(3, ways.length)}"><span class="lb8">Ways out</span>${ways.join("")}</div>`};
+  }
+  const SENSES = ["See", "Hear", "Smell", "Going on"];
+  function openOf(t) {   // Opens on: lines that begin See:, Hear:, Smell: or Going on: are the palette; the rest is said aloud
+    const aloud = [], sense = {};
+    String(t || "").split(/\n+/).map(x => x.trim()).filter(Boolean).forEach(x => { const m = x.match(/^(see|hear|smell|going on)\s*:\s*(.*)$/i), k = m && SENSES.find(y => y.toLowerCase() === m[1].toLowerCase()); if (k) sense[k] = (sense[k] ? sense[k] + " " : "") + m[2]; else aloud.push(x); });
+    return [aloud, sense];
   }
 
-  function fitPage(pg) {   // the largest type that fits the page
-    const over = () => ["mn", "sd"].some(c => { const e = pg.querySelector("." + c), kids = [...e.children].filter(x => !x.classList.contains("nt8")), end = kids.length ? Math.max(...kids.map(x => x.offsetTop + x.offsetHeight)) : 0; return end - e.offsetTop > e.clientHeight + 1 || e.scrollWidth > e.clientWidth + 1; }) || pg.scrollHeight > pg.clientHeight + 1;
-    const notes = pg.querySelector(".nt8"), set = x => { pg.style.fontSize = x + "pt"; };
-    const size = () => { let lo = 22, hi = 48; set(hi / 4); if (!over()) return 12; while (hi - lo > 1) { const m = (lo + hi) >> 1; set(m / 4); over() ? hi = m : lo = m; } return lo / 4; };   // in quarter points, 5.5 to 12
-    const tries = []; let best = 0;
-    for (const run of [0, 1]) for (const w of [2.2, 1.9, 1.65]) {   // wide and in lines first; a narrower side or run-on lines only when they buy bigger type
-      if (best >= 10.5 || (run && best >= 9.5)) break;
-      pg.classList.toggle("rn8", !!run); pg.style.setProperty("--side", w + "in");
-      const z = size(); best = Math.max(best, z); tries.push({run, w, z, score: z + Math.min(0, z - 9.5) - run * .6 - (2.2 - w) * .5});
+  /* pages: what does not fit goes on to the next one; the type never shrinks */
+  function build(host, sid, list) {
+    const P8 = page(sid, at, list), made = [];
+    const sheet = html => { const z = document.createElement("div"); z.className = "pz"; z.dataset.s = sid; z.innerHTML = `<div class="pg">${html}${P8.foot}</div>`; curl(z); host.append(z); made.push(z); return z.firstChild; };
+    const curl = e => { const w = document.createTreeWalker(e, 4); while (w.nextNode()) { const n = w.currentNode; if (n.data.includes("'")) n.data = n.data.replace(/(^|[\s(:])'(?=\S)/g, "$1‘").replace(/'/g, "’"); } return e; };
+    const kids = h => { const x = document.createElement("div"); x.innerHTML = h; return [...curl(x).children]; }, spill = e => e.scrollHeight > e.clientHeight + 1;
+    const lines = (box, cls = "bx") => { const n = document.createElement("div"); n.className = "nt8"; box.append(n); if (n.clientHeight > 66) n.innerHTML = `<h4>Notes</h4>` + "<div class=\"wln\"></div>".repeat(Math.floor((n.clientHeight - 20) / 25.4)); };
+    function lay1(mode) {
+      made.forEach(z => z.remove()); made.length = 0;
+      const on = h => { const pg = sheet(h); if (mode) pg.classList.add(...(mode > 1 ? ["rn8", "gist"] : ["rn8"])); return pg; };
+      let pg = on(`${P8.head(1)}<div class="st8">${P8.set.join("")}</div>`), st = pg.querySelector(".st8");
+      const ppl = kids(P8.people)[0]; st.append(ppl);
+      if (spill(st)) { ppl.remove(); lines(st); pg = on(`${P8.head(0)}<div class="st8"></div>`); st = pg.querySelector(".st8"); st.append(ppl); }
+      lines(st);
+      /* the spine, a card and its fork kept together */
+      const units = [];
+      kids(P8.flow).forEach(th => [...th.children].forEach((e, i) => { if (!i) e.classList.add("th1"); if (e.matches(".fk") && units.length) units[units.length - 1].push(e); else units.push([e]); }));
+      const anys = P8.any.flatMap(kids), play = () => { const g = on(`${P8.head(0)}<div class="bd8"><div class="mn">${P8.label}</div><div class="sd"></div></div>`), sd = g.querySelector(".sd");
+        if (anys.length) { const b = kids(`<div class="bx"><h4>Any time</h4></div>`)[0]; sd.append(b); while (anys.length) { b.append(anys[0]); if (spill(sd) && b.children.length > 2) { anys[0].remove(); break; } anys.shift(); } }
+        return g; };
+      pg = play(); let mn = pg.querySelector(".mn");
+      const fresh = () => { pg = play(); mn = pg.querySelector(".mn"); };
+      const tail = () => {   // the thread the page ends in, if it started here under another and is short
+        const e = [...mn.children].filter(x => x.matches(".th1")).pop(); if (!e || e === mn.children[1]) return [];
+        const out = []; for (let x = e; x; x = x.nextElementSibling) out.push(x);
+        return out[out.length - 1].getBoundingClientRect().bottom - e.getBoundingClientRect().top < mn.clientHeight * .4 * mn.getBoundingClientRect().height / (mn.offsetHeight || 1) ? out : []; };
+      for (const u of units) {
+        mn.append(...u); if (!spill(mn)) continue;
+        u.forEach(e => e.remove());
+        if (mn.children.length > 1) { const t8 = u[0].matches(".th1") ? [] : tail(); t8.forEach(e => e.remove()); fresh(); mn.append(...t8, ...u); if (t8.length && spill(mn)) { u.forEach(e => e.remove()); fresh(); mn.append(...u); } }
+        else mn.append(...u);
+        if (spill(mn) && u.length > 1) {   // a fork taller than a page: its choices one under the other, over as many pages as they take
+          const fk = u[1], ops = [...fk.children]; ops.forEach(x => x.remove()); fk.style.setProperty("--cols", "1fr"); let f = fk;
+          ops.forEach(x => { f.append(x); if (spill(mn) && f.children.length > 1) { x.remove(); fresh(); f = fk.cloneNode(false); f.classList.add("more"); mn.append(f); f.append(x); } });
+        }
+      }
+      if (!units.length) mn.append(...kids(`<p class="none">No cards in this scene yet</p>`));
+      while (anys.length) fresh();
+      const w = kids(P8.ways)[0]; pg.insertBefore(w, pg.querySelector(".ft8"));
+      if (spill(mn)) {   // the ways out need room: the last cards go with them to a new page
+        w.remove(); const move = []; pg.insertBefore(w, pg.querySelector(".ft8"));
+        while (spill(mn) && mn.children.length > 2) { let e = mn.lastElementChild; move.unshift(e); e.remove(); if (e.matches(".fk") && mn.lastElementChild.matches(".sp8")) { e = mn.lastElementChild; if (mn.children.length > 2) { move.unshift(e); e.remove(); } } }
+        if (move.length && !move[0].matches(".th1")) { const t8 = tail(); t8.forEach(e => e.remove()); move.unshift(...t8); }
+        w.remove(); fresh(); mn.append(...move); pg.insertBefore(w, pg.querySelector(".ft8"));
+      }
+      made.forEach(z => { const sd = z.querySelector(".sd"); if (sd) lines(sd); });
+      const pageOf = m => made.findIndex(z => z.querySelector(`[data-m="${CSS.escape(m)}"]`));
+      made.forEach((z, i) => z.querySelectorAll("small[data-to]").forEach(e => { const n = pageOf(e.dataset.to); e.textContent = n < 0 ? "in this scene" : n === i ? (e.compareDocumentPosition(z.querySelector(`[data-m="${CSS.escape(e.dataset.to)}"]`)) & 4 ? "below" : "above") : `page ${n + 1}`; }));
+      made.forEach((z, i) => { z.querySelector(".pn8").textContent = `${P8.name} · page ${i + 1} of ${made.length}${mode > 1 ? " · shortened to fit" : ""}`; });
+      return made.length;
     }
-    const t = tries.sort((x, y) => y.score - x.score)[0];
-    pg.classList.toggle("rn8", !!t.run); pg.style.setProperty("--side", t.w + "in"); set(t.z);
-    if (t.z < 7.25) {   // far too much for a page: each card keeps its first lines, and the sheet says so
-      pg.classList.remove("rn8"); pg.classList.add("gist"); pg.style.setProperty("--side", "1.9in"); t.z = size(); set(t.z); t.cut = true;
-      pg.querySelector(".ft8 span").textContent += " · Shortened to fit";
-    }
-    t.off = over();
-    notes.innerHTML = notes.clientHeight > 70 ? `<h4>Notes</h4>` + "<div></div>".repeat(Math.floor((notes.clientHeight - 18) / 25.4)) : "";
-    return t;
+    let n = lay1(0), mode = 0; while (n > MAX && mode < 2) n = lay1(++mode);
+    return {n, cut: mode > 1, off: made.some(z => [".mn", ".st8", ".sd"].some(c => { const e = z.querySelector(c); return e && spill(e); }))};
   }
   async function show(t) {
     at = t; const list = scenesIn(t);
@@ -269,13 +321,12 @@ const Sheets = (() => {
   }
   function lay() {
     const host = $("#pdf .pages"), list = scenesIn(at), on = list.filter(x => !off.has(x)), y = host.scrollTop;
-    host.innerHTML = on.map(x => `<div class="pz" data-s="${esc(x)}">${page(x, at, list)}</div>`).join("");
-    const tight = [], cut = [], over = [];
-    host.querySelectorAll(".pz").forEach(z => { const f = fitPage(z.firstChild), n = titleOf(z.dataset.s); if (f.off) over.push(n); else if (f.cut) cut.push(n); else if (f.z < SMALL) tight.push(n); });
+    host.innerHTML = ""; const cut = [], over = [], many = [];
+    on.forEach(x => { const f = build(host, x, list), n = titleOf(x); if (f.off) over.push(n); else if (f.n > MAX) many.push(`${n} (${f.n})`); else if (f.cut) cut.push(n); });
     scale(); host.scrollTop = y;
     const inAny = new Set(on.flatMap(sid => looseIn(at).filter(x => lanesOf(x).some(k => lanesOf(sid).includes(k) || k === HOMELESS)))), lost = looseIn(at).filter(x => !inAny.has(x));
-    $("#pdf .pnote").textContent = [list.length ? "" : "No scenes in this session yet.", over.length ? `Too much for one page, so the bottom is cut off: ${over.join(", ")}. Split ${over.length > 1 ? "each" : "it"} into two scenes.` : "", cut.length ? `Shortened to fit: ${cut.join(", ")}. Each card keeps its first lines.` : "",
-      tight.length ? `Small print: ${tight.join(", ")}. There is more in ${tight.length > 1 ? "these scenes" : "this scene"} than a page holds comfortably.` : "", on.length && lost.length ? `On no page, being in no scene: ${lost.map(titleOf).join(", ")}.` : ""].filter(Boolean).join(" ");
+    $("#pdf .pnote").textContent = [list.length ? "" : "No scenes in this session yet.", over.length ? `Something runs off a page in: ${over.join(", ")}.` : "", many.length ? `More than ${MAX} pages: ${many.join(", ")}. Split ${many.length > 1 ? "each" : "it"} into two scenes.` : "",
+      cut.length ? `Shortened to fit ${MAX} pages: ${cut.join(", ")}. Each card keeps its first lines.` : "", on.length && lost.length ? `On no page, being in no scene: ${lost.map(titleOf).join(", ")}.` : ""].filter(Boolean).join(" ");
     $("#pdf [data-print]").disabled = !on.length;
   }
   function scale() {   // on screen a page is as wide as the window lets it be; on paper it is Letter

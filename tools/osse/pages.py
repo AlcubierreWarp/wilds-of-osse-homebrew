@@ -31,7 +31,7 @@ SINGULAR = {"session": "Session", "pc": "Player character", "party": "Party", "n
             "place": "Place", "item": "Thing", "lore": "Lore", "secret": "Secret", "thread": "Thread", "plan": "Plan"}
 FAMILIES = ["kin", "social", "role", "place", "thing", "deed", "knowledge", "faith", "lore", "story", "related"]
 SKIP_SECTIONS = {"Connections", "Past"}          # shown from the graph instead
-PLAYER_SKIP = SKIP_SECTIONS | {"Idea", "Requires", "Links", "Log", "Plans", "Who knows"}
+PLAYER_SKIP = SKIP_SECTIONS | {"Idea", "Opens on", "Requires", "Links", "Log", "Plans", "Who knows"}
 PROPS = [("player", "Player"), ("class", "Class"), ("race", "Race"), ("pronouns", "Pronouns"), ("voice", "Voice"),
          ("wants", "Wants"), ("fear", "Fear"), ("leader", "Leader"), ("known_by", "Known by"), ("opened", "Opened"),
          ("closed", "Closed"), ("played_on", "Played on"), ("in_world", "In the world"), ("thread", "Thread"),

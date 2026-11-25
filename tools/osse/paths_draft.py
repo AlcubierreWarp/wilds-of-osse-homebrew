@@ -5,7 +5,7 @@ A draft is a JSON file. Every part is optional:
 {"session": "S14",                       the session new cards go to, unless a card names its own
  "cards": [
    {"key": "gala", "kind": "scene", "title": "The gala", "text": "the situation", "where": "Aerrowyn Manor", "when": "that night",
-    "present": ["GUS", "The Party"], "purpose": "force a choice",
+    "present": ["GUS", "The Party"], "purpose": "force a choice", "opens": "Said aloud.\\nSee: ...\\nHear: ...\\nSmell: ...\\nGoing on: ...",
     "cards": [{"key": "ask", "kind": "decision", "title": "...", "text": "...", "cue": "what triggers it", "critical": true}, "p:An existing plan",
               {"kind": "reveal", "title": "...", "cue": "...", "reveals": "A secret"}, {"kind": "entrance", "title": "...", "cue": "...", "who": ["Vigil"]},
               {"key": "out", "kind": "exit", "title": "...", "cue": "..."},                     an exit's links out are where it leads
@@ -25,7 +25,7 @@ import copy, json, os, random, re, string, tempfile, time
 
 KINDS = ("scene", "beat", "reveal", "complication", "decision", "entrance", "exit", "clock", "pressure", "bottleneck", "note")
 IN_SCENE = ("beat", "reveal", "complication", "decision", "entrance", "exit")
-FOR = {"where": ("scene",), "when": ("scene",), "present": ("scene",), "purpose": ("scene",), "cue": IN_SCENE, "who": IN_SCENE,
+FOR = {"where": ("scene",), "when": ("scene",), "present": ("scene",), "purpose": ("scene",), "opens": ("scene",), "cue": IN_SCENE, "who": IN_SCENE,
        "reveals": ("reveal",), "critical": ("decision",), "clock": ("clock",)}   # the kinds each extra field belongs on
 EXTRA = tuple(FOR)
 PLACE = ("anytime", "float", "after", "before")   # where it stands: in its scene's Any time section; a scene with no fixed place, and the scenes it must come after or before
@@ -438,6 +438,8 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
             out.append(f"     at {o.get('where') or '(where not set)'}" + (f" · {o['when']}" if o.get("when") else "") + f" · with {', '.join(o.get('present') or []) or 'nobody yet'} · boards: {', '.join(b.lanes(i))}")
             if o.get("purpose"):
                 out.append(f"     purpose: {o['purpose']}")
+            if o.get("opens"):
+                out += ["     opens on:", *(f"       {ln.strip()}" for ln in o["opens"].split("\n") if ln.strip())]
             txt = (o.get("text") if i.startswith("c:") else o.get("summary")) or ""
             out += [f"     {ln.strip()}" for ln in txt.split("\n") if ln.strip()]
             out += [f"     leads to: {name(e['to'])}" + (f' · "{e["label"]}"' if e.get("label") else "") + (f"  [{e['id']}]" if withids else "") for e in edges if e["from"] == i]

@@ -357,7 +357,7 @@ def notes(which, out=None):
         if i != sid:
             fm.append(f'scene: "{plan(sid)}"')
         for f in paths_draft.EXTRA:
-            if not paths_draft.has(o, f):
+            if not paths_draft.has(o, f) or f == "opens":
                 continue
             v = o[f]
             fm.append(f"{f}: " + ("[" + ", ".join(q(link(x)) for x in v) + "]" if isinstance(v, list) else "true" if v is True else q(link(v)) if f in ("where", "reveals") else v if f == "clock" else q(v)))
@@ -368,6 +368,8 @@ def notes(which, out=None):
         s = b.session(i)
         fm += ([f"target: {s}"] if s != "Later" else []) + [f"updated: {today}"]
         body = ["## Idea", *(f"- {ln.strip()}" for ln in (text or title(i)).split("\n") if ln.strip())]
+        if paths_draft.has(o, "opens"):
+            body += ["", "## Opens on", *(f"- {ln.strip()}" for ln in o["opens"].split("\n") if ln.strip())]
         if kind == "decision":
             body += ["", "## Options", *(f"- {plan(e['to'])} · {e.get('label') or '(not named)'}" for e in outs), *(f"- {x.get('label') or '(not named)'} · {x.get('text') or '(outcome not written)'}" for x in o.get("options") or [])]
         ins = [e for e in b.edges if e["to"] == i and not e["from"].startswith("start") and b.live(e["from"])]

@@ -117,7 +117,7 @@ def collect(site):
         data[pid] = {"id": pid, "path": n["path"], "href": site.slugs.get(pid, "") + ".html", "status": n.get("status"),
                      "kind": kind,
                      "where": _plain(n.get("where") or ""), "present": [_plain(x) for x in _list(n.get("present"))],
-                     "when": _plain(n.get("when") or ""), "purpose": _plain(n.get("purpose") or ""), "cue": _plain(n.get("cue") or ""),
+                     "when": _plain(n.get("when") or ""), "purpose": _plain(n.get("purpose") or ""), "opens": "\n".join(re.sub(r"^\s*[-*]\s+", "", _plain(x)) for x in sec.get("Opens on", [])).strip(), "cue": _plain(n.get("cue") or ""),
                      "who": [_plain(x) for x in _list(n.get("who"))], "reveals": ", ".join(_plain(x) for x in _list(n.get("reveals"))),
                      "critical": build.yes(n.get("critical")), "leads": [_plain(x).strip() for x in _list(n.get("leads_to"))],
                      "scene": _plain(n.get("scene") or ""), "clock": str(n.get("clock") or ""), "target": str(n.get("target") or ""),
@@ -471,7 +471,7 @@ const snap = v => Math.round(v / GRID) * GRID;
 const KINDS = {scene: "Scene", beat: "Beat", reveal: "Reveal", complication: "Complication", decision: "Decision", entrance: "Entrance", exit: "Exit", clock: "Clock", pressure: "Pressure", bottleneck: "Bottleneck", note: "Note"};
 const PLANKINDS = Object.keys(KINDS).filter(k => k !== "note");
 const INSCENE = ["beat", "reveal", "complication", "decision", "entrance", "exit"];   // the cards a scene is made of; each has a cue
-const FIELDS = {where: ["scene"], when: ["scene"], present: ["scene"], purpose: ["scene"], cue: INSCENE, who: INSCENE, reveals: ["reveal"], critical: ["decision"], clock: ["clock"]};   // what each kind adds
+const FIELDS = {where: ["scene"], when: ["scene"], present: ["scene"], purpose: ["scene"], opens: ["scene"], cue: INSCENE, who: INSCENE, reveals: ["reveal"], critical: ["decision"], clock: ["clock"]};   // what each kind adds
 const KDESC = {scene: "The situation (where, when, who is there, what is going on) and its purpose. A box on the board; the cards inside it happen during the scene.",
   beat: "A turn that could happen in a scene: one moment, set off by its cue.",
   reveal: "A beat where something comes out. Name the secret when the vault holds it.",
@@ -1878,6 +1878,7 @@ function details(o, id, ed) {   // what the kind adds, the same rows in the same
   const who = (scene ? o.present : o.who) || [];
   if ((scene || inS) && (ed || who.length)) h += row("Who", ed ? whoIn(WHOPH[k] || "Who it is about") : chips(scene ? whoTags(who, live(id) ? lanesOf(id) : []) : peopleTags(who)));
   if (scene && (ed || o.purpose)) h += row("Purpose", ed ? longField("purpose", o.purpose, "Reveal a clue, force a choice…") : esc(o.purpose));
+  if (scene && (ed || o.opens)) h += row("Opens on", ed ? `<textarea data-f="opens" aria-label="Opens on" placeholder="What you say to open it. Then, each on a line: See: … Hear: … Smell: … Going on: …">${esc(o.opens || "")}</textarea>` : esc(o.opens).replace(/^(See|Hear|Smell|Going on):/gim, "<b>$1</b>").replace(/\n/g, "<br>"));
   if (k === "reveal" && (ed || o.reveals)) h += row("Secret", ed ? field("reveals", o.reveals, "The secret it reveals", "dl-secrets") : `${esc(o.reveals)}${secretOut(o.reveals) ? ` <span class="ch">already out</span>` : ""}`);
   if (k === "clock") { const [f, n] = parseClock(o.clock); h += row("Clock", ed ? clockFields(o.clock) : `<span class="clk"><span class="rng">${ring(f, n, 30)}</span>${f} of ${n}</span>`); }
   if (k === "decision" && ed) h += row("Critical", `<label class="chk"><input type="checkbox" data-f="critical" ${o.critical ? "checked" : ""}>Can end or remake a character</label>`);
@@ -2158,7 +2159,7 @@ function legend() {
     `<dt>Session tabs</dt><dd>One canvas per session. The first starts from the end of S${CUR} as played; each later one starts from the end of the one before, as planned. Later holds ideas with no session yet.</dd>` +
     `<dt>Arc planner</dt><dd>A session’s name, what happens in it and its arc are one card, the same here and in the Arc planner. + Session brings in a session built there. Session numbers follow the order of the cards there; what is in a session goes along when its number changes. A session can also stay outside the arcs, and an idea can stay only there.</dd>` +
     `<dt>Scenes</dt><dd>Drag a scene by its header: the cards inside move with it. Drag its bottom-right corner to resize it. Drop a card inside a scene to set it there. A scene shows on the board of every player character who is in it or on one of its cards, with its cards. There is one copy: change it on one board and it changes on all of them; only its place on each canvas is its own.</dd>` +
-    `<dt>Situation and purpose</dt><dd>On the scene itself: where, when, who is there and what is going on when it opens; and what the scene is for.</dd>` +
+    `<dt>Situation and purpose</dt><dd>On the scene itself: where, when, who is there and what is going on when it opens; what the scene is for; and Opens on, the words and the sights, sounds and smells you open it with.</dd>` +
     `<dt>Cue</dt><dd>On every card in a scene: what triggers it at the table. With a cue, a card needs no arrow into it; draw arrows only where one thing has to follow another.</dd>` +
     `<dt>Any time</dt><dd>A section under a scene’s header for cards that can come at any point in the scene, on their cue. Drag a card onto the scene’s header to put it there, and drag it out to the canvas to give it a place. It folds up, and takes no room when empty.</dd>` +
     `<dt>Options</dt><dd>Open a decision (or press + option on it) to add and edit its options. An outcome is only listed until you make it a new card or pick one that is there.</dd>` +
