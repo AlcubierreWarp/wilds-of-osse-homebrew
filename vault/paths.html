@@ -322,7 +322,7 @@ header{padding-bottom:8px;margin-bottom:10px}
 .sd{gap:.1in;border-left:1pt solid var(--hair);padding-left:.14in}
 .pg h4{color:var(--ink);font:700 8.5pt/1.2 var(--f);letter-spacing:.07em;text-transform:uppercase;border-bottom:1.4pt solid var(--ink);padding-bottom:2pt;margin-bottom:4pt}
 .bx>div+div{margin-top:.5em}
-.hold{border:1.2pt solid var(--kc);border-radius:3pt;padding:4pt 6pt 5pt}.hold .cu{font:600 .92em/1.2 var(--fc)}.hold .cu::before{content:"When ";font-weight:400;color:var(--soft)}.hold .ct{gap:5pt}.hold .ct b{font-size:1em}.hold .ct svg{flex:none;width:1.1em;height:1.1em;color:var(--kc);align-self:center}
+.hold{border:1.2pt solid var(--kc);border-radius:3pt;padding:4pt 6pt 5pt}.hold .cu{font:600 .92em/1.2 var(--fc)}.hold .cu::before{content:"When ";font-weight:400;color:var(--soft)}.hold .ct{gap:2pt 5pt;flex-wrap:wrap}.hold .ct .tgs{order:9;flex-basis:100%;max-width:none;justify-content:flex-start}.hold .ct b{font-size:1em}.hold .ct svg{flex:none;width:1.1em;height:1.1em;color:var(--kc);align-self:center}
 .pp b{font:700 1em/1.2 var(--f)}.pp small{font:500 .82em/1 var(--f);color:var(--soft)}.pp p{font-size:.9em;line-height:1.26}.pp p span{font-weight:700;margin-right:.35em}
 .hush li{font-size:.94em}.hush li::before{border-radius:0;background:#8f1626}
 .cl8{display:flex;gap:2.5pt;margin-top:2pt}.cl8 i{width:11pt;height:11pt;border:1.1pt solid var(--ink);border-radius:50%}.cl8 i.f{background:var(--ink)}
@@ -2431,7 +2431,7 @@ const Sheets = (() => {
     return {head, foot, flow, any: any.map(side), name: numIn(sid) ? `Scene ${numIn(sid)} of ${list.filter(x => !isFloat(x)).length}` : "Floating scene",
       set: [ask, opens, `<div class="tw"><div>${bx("Where things stand", sit ? words(sit) : none)}</div><div>${bx("Keep hidden", hush.length ? `<ul class="hush">${hush.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : none)}${bx("Pushing in", push.map(side).join(""))}</div></div>`],
       people: folk.length ? `<div class="bx"><h4>People</h4><div class="ppl">${folk.map(person).join("")}</div></div>` : bx("People", `<p class="none">Nobody yet</p>`),
-      label: `<span class="lb8">When this happens, this follows${roots.length > 1 ? ` <b>· ${roots.length} threads, in any order</b>` : ""}</span>`,
+      label: `<span class="lb8">When this happens, this follows${roots.length > 1 ? ` <b>· ${roots.length} threads, each starts on its cue</b>` : ""}</span>`,
       ways: `<div class="wy" style="--n:${Math.min(3, ways.length)}"><span class="lb8">Ways out</span>${ways.join("")}</div>`};
   }
   const SENSES = ["See", "Hear", "Smell", "Going on"];
