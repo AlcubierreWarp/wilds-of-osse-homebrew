@@ -296,7 +296,7 @@ def plan_shape_checks(notes, problems):
                 problems.append(f"{nm}: present [[{t}]] points to a missing note")
         if any(fm.get(k) for k in ("where", "when", "present", "purpose")) and kind != "scene":
             problems.append(f"{nm}: where, when, present and purpose belong on a scene: set kind: scene or move them to the scene")
-        for key, kinds in (("cue", IN_SCENE), ("who", ("entrance", "exit")), ("reveals", ("reveal",)), ("leads_to", ("exit",)), ("critical", ("decision",)), ("anytime", IN_SCENE)):
+        for key, kinds in (("cue", IN_SCENE), ("who", IN_SCENE), ("reveals", ("reveal",)), ("leads_to", ("exit",)), ("critical", ("decision",)), ("anytime", IN_SCENE)):
             if fm.get(key) and (kind or "beat") not in kinds:
                 problems.append(f"{nm}: {key} belongs on {' or '.join(kinds)}, not {kind or 'beat'}")
         for v in aslist(fm.get("who")):

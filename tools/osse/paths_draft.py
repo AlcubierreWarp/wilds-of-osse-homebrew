@@ -25,7 +25,7 @@ import copy, json, os, random, re, string, tempfile, time
 
 KINDS = ("scene", "beat", "reveal", "complication", "decision", "entrance", "exit", "clock", "pressure", "bottleneck", "note")
 IN_SCENE = ("beat", "reveal", "complication", "decision", "entrance", "exit")
-FOR = {"where": ("scene",), "when": ("scene",), "present": ("scene",), "purpose": ("scene",), "cue": IN_SCENE, "who": ("entrance", "exit"),
+FOR = {"where": ("scene",), "when": ("scene",), "present": ("scene",), "purpose": ("scene",), "cue": IN_SCENE, "who": IN_SCENE,
        "reveals": ("reveal",), "critical": ("decision",), "clock": ("clock",)}   # the kinds each extra field belongs on
 EXTRA = tuple(FOR)
 PLACE = ("anytime", "float", "after", "before")   # where it stands: in its scene's Any time section; a scene with no fixed place, and the scenes it must come after or before

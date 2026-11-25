@@ -108,14 +108,20 @@ class Board:
         return self.items[self.scene(i) or i]["s"]
 
     def cast(self, i):
+        """The boards of the player characters in a scene: there when it opens, or on one of its cards (who it names, else the boards a plan is tied to)."""
         out = []
-        comers = [n for m in self.items if self.scene(m) == i and self.obj(m).get("kind") == "entrance" for n in self.obj(m).get("who") or []]
-        for n in (self.obj(i).get("present") or []) + comers:   # there when it opens, or who comes in
+        on = [n for m in self.items if self.live(m) and self.scene(m) == i for n in self.named(m)]
+        for n in (self.obj(i).get("present") or []) + on:
             low = n.strip().lower()
             if low in ("the party", "the whole party"):
                 out += [*self.pcs, "The Party"]
             out += [k for k, names in self.pcs.items() if low in names]
         return list(dict.fromkeys(out))
+
+    def named(self, m):
+        o = self.obj(m)
+        who = o.get("who") if (o.get("kind") or "beat") in paths_draft.IN_SCENE else None
+        return who or (self.data[m[2:]]["lanes"] if m.startswith("p:") and m[2:] in self.data else [])
 
     def lanes(self, i):
         sc = self.scene(i)
