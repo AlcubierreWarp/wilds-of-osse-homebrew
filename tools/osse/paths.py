@@ -205,10 +205,11 @@ def page(site):
                      and str(n.get("state") or "").lower() not in build.GONE), key=lambda x: ({"pc": 0, "party": 1, "npc": 2}.get(x["t"], 3), x["n"]))
     secrets = sorted(({"n": n["id"], "out": bool(build.snum(n.get("revealed") or "") is not None and build.snum(n.get("revealed")) <= cur)} for n in g if n["type"] == "secret"), key=lambda x: x["n"])
     import arcs
-    payload = {"secrets": secrets, "cur": cur, "plans": data, "facts": facts, "lanes": lanes, "gone": sorted(build.GONE), "places": places, "people": people}
+    import sheets
+    payload = {"npcs": sheets.npcs(site, build), "secrets": secrets, "cur": cur, "plans": data, "facts": facts, "lanes": lanes, "gone": sorted(build.GONE), "places": places, "people": people}
     js_data = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
     head = pages.head("Session planner", False).replace('<div class="wrap">', '<div class="wrap wide">')
-    return (head + f"<style>{arcs.PANEL}{CSS}</style>" + pages.topbar(site, here="paths") +
+    return (head + f"<style>{arcs.PANEL}{CSS}{sheets.CSS}</style>" + pages.topbar(site, here="paths") +
             '<main class="sheet paths">'
             '<div class="ptop"><h1>Session planner</h1><div class="views"><span>Whole session</span><nav id="views" role="tablist" aria-label="Whole session"></nav></div>'
             '<nav class="lanes" id="lanes" role="tablist" aria-label="Boards"></nav>'
@@ -221,14 +222,14 @@ def page(site):
             '<div class="board" id="board" aria-label="Planning board">'
             '<div class="world" id="world"><svg id="wires" class="wires"></svg><div id="nodes"></div></div>'
             '<button class="sname" id="sname" hidden title="This session’s name, what happens and its arc"></button>'
-            '<div class="float"><button class="fb" data-act="line" id="lineup" title="Tidy this canvas: scenes in running order, the cards in them by their arrows, the rest underneath">Line up</button><button class="fb" data-act="zout" title="Zoom out" aria-label="Zoom out">−</button><button class="fb" data-act="zin" title="Zoom in" aria-label="Zoom in">+</button><button class="fb" data-act="fit" title="Fit to the window" aria-label="Fit to the window">'
+            '<div class="float"><button class="fb" data-act="pdf" title="A printed page per scene, to run this session from">PDF</button><button class="fb" data-act="line" id="lineup" title="Tidy this canvas: scenes in running order, the cards in them by their arrows, the rest underneath">Line up</button><button class="fb" data-act="zout" title="Zoom out" aria-label="Zoom out">−</button><button class="fb" data-act="zin" title="Zoom in" aria-label="Zoom in">+</button><button class="fb" data-act="fit" title="Fit to the window" aria-label="Fit to the window">'
             '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>'
             '<button class="fb" data-act="legend" title="Key" aria-label="Key">Key</button></div>'
             '<div class="keyp" id="keyp" hidden></div>'
             '</div></div>'
             '<aside class="tray" id="tray"><div class="tsec grow" data-tray></div></aside></div>'
             '<aside id="drawer" class="drawer" hidden></aside>'
-            f'<script>const PATHS={js_data};</script><script>' + JS.replace('/*LINK*/', arcs.LINK) + '</script></main></div></body></html>')
+            f'<script>const PATHS={js_data};</script><script>' + JS.replace('/*LINK*/', arcs.LINK).replace('/*SHEETS*/', sheets.JS) + '</script></main></div></body></html>')
 
 
 CSS = r"""
@@ -408,7 +409,7 @@ header{padding-bottom:8px;margin-bottom:10px}
 .runw{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 300px);min-height:480px}
 .run{flex:1;min-height:0;overflow:auto;border:1px solid var(--vrule);border-radius:0 8px 8px 8px;background:#f6eed8;padding:14px clamp(10px,2vw,22px) 40px}
 .runh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 14px;margin:0 0 10px;font-size:14.5px;color:var(--vmuted)}
-.runh b{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:#3f5a3c}
+.rbt{display:flex;gap:6px}.runh b{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:#3f5a3c}
 .rc{display:grid;grid-template-columns:20px 30px 1fr auto;gap:2px 10px;align-items:start;max-width:760px;margin:0 0 8px;padding:8px 10px 8px 6px;
   background:#fbf5e6;border:1px solid var(--vline);border-left:5px solid #4d6b4a;border-radius:6px;box-shadow:0 1px 4px rgba(42,29,18,.1);user-select:none;-webkit-user-select:none}
 .rc.drag{position:relative;z-index:5;box-shadow:0 10px 24px rgba(42,29,18,.3);opacity:.95}
@@ -902,11 +903,12 @@ function drawRun() {
   $("#rsess [data-addsess]").onclick = addSession;
   $$("#rsess [data-rtab]").forEach(b => b.onclick = () => { runTab = b.dataset.rtab; closeDrawer(); drawRun(); $("#run").scrollTop = 0; });
   $("#run").innerHTML = `<div class="runh"><span><b>Running order</b> &nbsp;<button class="sname" data-sname title="This session’s name, what happens and its arc">${snHtml(t)}</button> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"}</span>` +
-    (scenes.length ? `<button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button>` : "") + `</div>` +
+    (scenes.length ? `<span class="rbt"><button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button><button class="mini" data-pdf title="A printed page per scene, to run this session from">PDF</button></span>` : "") + `</div>` +
     (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add the scenes first and fit beats, entrances and exits into them, or drag cards in later.</p>`) +
     `<button class="addsc" data-newscene>+ Add a scene to ${esc(t)}</button>`;
   $("#run").scrollTop = top;
   $("#run [data-sname]").onclick = () => sessPanel(t);
+  const pdf = $("#run [data-pdf]"); if (pdf) pdf.onclick = () => Sheets.show(t);
   drawLoose(t);
   $$("#run [data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); goto(b.dataset.go, t, b.dataset.id); });
   $$("#run [data-edit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openHere(b.dataset.edit); });
@@ -2359,12 +2361,14 @@ $$("#pal [data-pal]").forEach(b => palDrag(b, b.dataset.pal));
 const rwPaint = () => { $("#rw").innerHTML = rwBtns(rw); $("#rw").querySelectorAll("button").forEach(b => { b.title = b.dataset.rw === "view" ? "Cards open to read" : "Cards open to edit"; b.onclick = () => { rw = b.dataset.rw; own = null; store.set("osse-paths-rw", rw); rwPaint(); if (repaint) { draw(); repaint(); } }; }); };
 rwPaint();
 $$("[data-tray]").forEach(trayUi);
+/*SHEETS*/
 $$("[data-act]").forEach(b => b.onclick = ev => {
   ev.stopPropagation();
   const a = b.dataset.act;
   const r = board.getBoundingClientRect();
   if (a === "zin" || a === "zout") zoomAt(view.k * (a === "zin" ? 1.25 : .8), r.left + r.width / 2, r.top + r.height / 2);
   if (a === "fit") fit();
+  if (a === "pdf") Sheets.show(T());
   if (a === "line") tidy(T(), lane);
   if (a === "legend") legend();
 });
