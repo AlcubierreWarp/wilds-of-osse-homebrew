@@ -453,13 +453,17 @@ def export(folder):
 
 
 def arcs():
-    """The Arc planner's part of the store (vault/arcs.html), read only."""
-    A = call("GET").get("arcs")
+    """The Arc planner's part of the store (vault/arcs.html), read only. A linked card is that session's name in the Session planner;
+    unlinked ones count on, around the sessions no card has (the same rule as LINK in arcs.py)."""
+    doc = call("GET"); A = doc.get("arcs")
     if not A or not A.get("order"):
         print("No arcs saved yet. Opening the Arc planner once saves the first outline."); return
     st = json.load(open(os.path.join(os.path.dirname(os.path.dirname(HERE)), "vault", "status.json"), encoding="utf-8"))
     cur, titles = st["current"], st.get("titles", {})
-    prev = 0
+    num = lambda t: int((re.fullmatch(r"S(\d+)", t or "") or [0, 0])[1])
+    linked = {c.get("link") for c in A["cards"].values()}
+    alone = {num(t) for t in doc.get("sessions", []) if num(t) > cur and t not in linked}
+    prev = cur
     for i, aid in enumerate(A["order"], 1):
         a = A["list"].get(aid, {})
         print(f"Arc {i}: {a.get('title') or 'Untitled arc'}" + ("  (Claude's draft)" if a.get("by") == "claude" else ""))
@@ -470,12 +474,17 @@ def arcs():
             c = A["cards"].get(cid)
             if not c:
                 continue
-            m = re.fullmatch(r"S(\d+)", c.get("link") or "")
-            n = int(m.group(1)) if m else prev + 1
-            prev = max(prev, n)
+            m = n = num(c.get("link"))
+            if not n or n > cur:
+                prev += 1
+                while prev in alone:
+                    prev += 1
+                n = n or prev
             tag = ("played" if n <= cur else "planned") if m else "idea"
             print(f"  - S{n} {tag}: {c.get('title') or titles.get(str(n), 'Untitled session')}" + (f": {c['text']}" if c.get("text") else ""))
         print()
+    if alone:
+        print("In the Session planner, not in an arc: " + ", ".join(f"S{n}" for n in sorted(alone)))
 
 
 if __name__ == "__main__":

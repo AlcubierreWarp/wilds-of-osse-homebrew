@@ -194,21 +194,24 @@ def page(site):
     people = sorted(({"n": n["id"], "t": n["type"]} for n in g if n["type"] in ("pc", "npc", "party", "faction")
                      and str(n.get("state") or "").lower() not in build.GONE), key=lambda x: ({"pc": 0, "party": 1, "npc": 2}.get(x["t"], 3), x["n"]))
     secrets = sorted(({"n": n["id"], "out": bool(build.snum(n.get("revealed") or "") is not None and build.snum(n.get("revealed")) <= cur)} for n in g if n["type"] == "secret"), key=lambda x: x["n"])
+    import arcs
     payload = {"secrets": secrets, "cur": cur, "plans": data, "facts": facts, "lanes": lanes, "gone": sorted(build.GONE), "places": places, "people": people}
     js_data = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
     head = pages.head("Session planner", False).replace('<div class="wrap">', '<div class="wrap wide">')
     return (head + f"<style>{CSS}</style>" + pages.topbar(site, here="paths") +
             '<main class="sheet paths">'
             '<div class="ptop"><h1>Session planner</h1><div class="views"><span>Whole session</span><nav id="views" role="tablist" aria-label="Whole session"></nav></div>'
-            '<div class="tools"><span id="save" class="save"></span><button class="mini" data-act="scene">+ Scene</button><button class="mini" data-act="card">+ Card</button></div></div>'
+            '<div class="tools"><span id="save" class="save"></span></div></div>'
             '<div class="bar"><nav class="lanes" id="lanes" role="tablist" aria-label="Boards"></nav>'
             '<div class="whatif"><b>What-ifs</b><span id="wi-list" class="muted"></span><button id="wi-reset" class="mini" hidden>Clear</button></div></div>'
+            '<div class="pal" id="pal" role="toolbar" aria-label="Cards: click one to add it, or drag it into place"></div>'
             '<div class="runw" id="runw" hidden><div class="stage"><nav class="sess" id="rsess" role="tablist" aria-label="Sessions"></nav>'
             '<div class="run" id="run" aria-label="Running order"></div></div>'
             '<aside class="tray" id="loose"></aside></div>'
             '<div class="work" id="work"><div class="stage"><nav class="sess" id="sess" role="tablist" aria-label="Sessions"></nav>'
             '<div class="board" id="board" aria-label="Planning board">'
             '<div class="world" id="world"><svg id="wires" class="wires"></svg><div id="nodes"></div></div>'
+            '<button class="sname" id="sname" hidden title="This session’s name, what happens and its arc"></button>'
             '<div class="float"><button class="fb" data-act="line" id="lineup" hidden title="Lay the scenes out left to right in running order">Line up</button><button class="fb" data-act="zout" title="Zoom out" aria-label="Zoom out">−</button><button class="fb" data-act="zin" title="Zoom in" aria-label="Zoom in">+</button><button class="fb" data-act="fit" title="Fit to the window" aria-label="Fit to the window">'
             '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>'
             '<button class="fb" data-act="legend" title="Key" aria-label="Key">Key</button></div>'
@@ -224,7 +227,7 @@ def page(site):
             f'{sum(1 for p in plans.values() if p.get("status") == "played")} played. Nothing here is canon. '
             "Placing, linking, edits and new cards change only this board until you ask Claude to bring them into the vault. "
             "What-ifs change nothing anywhere. Rules: <code>docs/osse/branching.md</code>.</footer>"
-            f'<script>const PATHS={js_data};</script><script>{JS}</script></main></div></body></html>')
+            f'<script>const PATHS={js_data};</script><script>' + JS.replace('/*LINK*/', arcs.LINK) + '</script></main></div></body></html>')
 
 
 CSS = r"""
@@ -257,7 +260,19 @@ CSS = r"""
 .mini{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--vrule);background:rgba(255,255,255,.45);color:var(--vred);border-radius:4px;padding:8px 10px;cursor:pointer}
 .mini:hover{background:#fff}
 .save{font:500 11.5px var(--f-mono);color:var(--vmuted);margin-left:4px;max-width:420px}.save.bad{color:var(--vred)}
-.work{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 252px);min-height:480px}
+.pal{display:flex;flex-wrap:wrap;gap:5px;align-items:stretch;margin:0 0 10px}
+.pal button{display:inline-flex;align-items:center;gap:7px;font:500 13.5px/1 var(--f-body);color:var(--vink);background:#fbf5e6;border:1px solid var(--vline);border-left:4px solid var(--kc,var(--vmuted));border-radius:5px;padding:8px 10px 8px 8px;min-height:36px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.pal button svg{color:var(--kc,var(--vmuted));flex:none}.pal button:hover{background:#fff;border-color:var(--kc,var(--vink))}.pal button:active{cursor:grabbing}.pal button.drag{opacity:.45}
+@media (max-width:700px){.pal button span{display:none}.pal button{padding:8px}.pal button svg{width:20px;height:20px}}
+.pal .sep{width:1px;background:var(--vrule);margin:3px 5px}
+.k-scene{--kc:#4d6b4a}.k-beat{--kc:#6b5b45}.k-reveal{--kc:#6a4a8a}.k-complication{--kc:#b5561c}.k-decision{--kc:var(--vred)}.k-entrance{--kc:#2f7d76}.k-exit{--kc:var(--vink)}.k-clock{--kc:#3d5a80}.k-pressure{--kc:#b8860b}.k-bottleneck{--kc:var(--vink)}.k-note{--kc:#c9a400}
+.sname{display:inline-flex;align-items:center;gap:8px;font:500 14px/1 var(--f-body);color:var(--vink);background:rgba(251,245,230,.95);border:1px solid var(--vrule);border-radius:6px;padding:8px 10px;cursor:pointer;max-width:min(460px,calc(100% - 20px))}
+.sname[hidden]{display:none}.sname:hover{background:#fff}.sname b{font:600 13px/1 var(--f-display)!important;letter-spacing:.06em!important;text-transform:none!important;color:var(--vred)!important}.sname small,.sname .pen{color:var(--vmuted);font:500 11px var(--f-mono)}.sname i{color:var(--vmuted)}
+#sname{position:absolute;left:10px;top:10px;z-index:8;min-height:34px;box-shadow:0 2px 6px rgba(42,29,18,.15)}
+.pick{display:flex;gap:12px;align-items:baseline;width:100%;text-align:left;font:16px/1.3 var(--f-body);color:var(--vink);background:rgba(255,255,255,.45);border:1px solid var(--vline);border-left:4px solid #4d6b4a;border-radius:5px;padding:9px 11px;margin:5px 0 0;cursor:pointer}
+.pick:hover{background:#fff;border-color:#4d6b4a}.pick b{flex:none;min-width:34px;font:600 14px var(--f-display);color:#3f5a3c}.pick small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13.5px;color:var(--vmuted);margin-top:2px}.pick.new{border-left-style:dashed;background:none}
+.ki{vertical-align:-2px;margin-right:5px;flex:none}.keyp dt .ki{color:var(--kc)}.ghost .ki{color:var(--kc)}
+.work{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 300px);min-height:480px}
 .stage{display:flex;flex-direction:column;min-height:0;min-width:0}
 .sess{display:flex;gap:2px;align-items:flex-end;overflow-x:auto;padding-left:6px}
 .sess button{font:600 13px/1 var(--f-display);letter-spacing:.08em;color:var(--vmuted);background:rgba(255,255,255,.3);border:1px solid var(--vrule);border-bottom:0;border-radius:6px 6px 0 0;padding:10px 14px 9px;cursor:pointer;white-space:nowrap}
@@ -386,7 +401,7 @@ CSS = r"""
 .drawer .tabs2 button{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--vline);background:none;border-radius:4px;padding:7px 10px;cursor:pointer;color:var(--vmuted)}
 .drawer .tabs2 button[aria-selected=true]{border-color:var(--vink);color:var(--vink);background:rgba(255,255,255,.5)}
 .work[hidden],.runw[hidden]{display:none}
-.runw{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 252px);min-height:480px}
+.runw{display:grid;grid-template-columns:1fr 300px;gap:12px;height:calc(100vh - 300px);min-height:480px}
 .run{flex:1;min-height:0;overflow:auto;border:1px solid var(--vrule);border-radius:0 8px 8px 8px;background:#f6eed8;padding:14px clamp(10px,2vw,22px) 40px}
 .runh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 14px;margin:0 0 10px;font-size:14.5px;color:var(--vmuted)}
 .runh b{font:600 12px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:#3f5a3c}
@@ -440,7 +455,7 @@ CSS = r"""
 .loose .li:hover{border-color:var(--vred)}
 @media (max-width:900px){.runw{grid-template-columns:1fr;grid-template-rows:1fr 30vh;height:calc(100vh - 170px)}}
 @media (max-width:900px){.work{grid-template-columns:1fr;grid-template-rows:1fr 34vh;height:calc(100vh - 170px)}}
-@media print{.bar,.tray,.drawer,.float,.rg,.rx{display:none}.runw{display:block;height:auto}.run{overflow:visible}.work{display:block;height:auto}}
+@media print{.pal,.bar,.tray,.drawer,.float,.rg,.rx{display:none}.runw{display:block;height:auto}.run{overflow:visible}.work{display:block;height:auto}}
 """
 
 JS = r"""(() => {
@@ -452,6 +467,7 @@ const store = {get: k => { try { return localStorage.getItem(k); } catch (e) { r
 const RELAY = (location.hostname === "localhost" && new URLSearchParams(location.search).get("relay"))
   || "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws";
 const KEY = store.get("osse-hub-dm");
+/*LINK*/
 const GRID = 22, CARDW = 250, SX = 44, SY = 44, FIRSTX = 418, TABW = 4000, SCW = 572, SCH = 396;
 const snap = v => Math.round(v / GRID) * GRID;
 const KINDS = {scene: "Scene", beat: "Beat", reveal: "Reveal", complication: "Complication", decision: "Decision", entrance: "Entrance", exit: "Exit", clock: "Clock", pressure: "Pressure", bottleneck: "Bottleneck", note: "Note"};
@@ -469,6 +485,21 @@ const KDESC = {scene: "The situation (where, when, who is there, what is going o
   pressure: "What the world does if no one acts: a portent that fires when they stall.",
   bottleneck: "A beat most paths reach, where branches meet again.",
   note: "A loose idea. Claude turns it into a plan when you ask."};
+const ICON = {list: '<path d="M7 4h10M7 10h10M7 16h10" /><path d="M3 4h.01M3 10h.01M3 16h.01" stroke-width="3" stroke-linecap="round"/>', map: '<rect x="2" y="3" width="6" height="5"/><rect x="12" y="3" width="6" height="5"/><rect x="12" y="12" width="6" height="5"/><path d="M8 5.5h4M15 8v4"/>',
+  globe: '<circle cx="10" cy="10" r="7.5"/><path d="M2.5 10h15M10 2.5c5 5 5 10 0 15M10 2.5c-5 5-5 10 0 15"/>',
+  scene: '<rect x="2.5" y="4" width="15" height="12.5" rx="1"/><path d="M2.5 8.2h15M6 4l-1.6 4.2M10.6 4 9 8.2M15.2 4l-1.6 4.2"/>',
+  beat: '<path d="M1.5 10.5H6l2.2-6 3.6 11 2.2-5h4.5" stroke-linejoin="round"/>',
+  reveal: '<path d="M1.5 10S4.8 4.5 10 4.5 18.5 10 18.5 10 15.2 15.5 10 15.5 1.5 10 1.5 10z"/><circle cx="10" cy="10" r="2.4"/>',
+  complication: '<path d="M11.5 1.8 4 11.4h5L8 18.2l8-10h-5.2z" stroke-linejoin="round"/>',
+  decision: '<path d="M10 18.5V12M10 12 4 6.5V3M10 12l6-5.5V3M1.8 5 4 2.6 6.2 5M13.8 5 16 2.6 18.2 5" stroke-linejoin="round"/>',
+  entrance: '<path d="M10 3h7v14h-7M1.5 10H12M8 6l4 4-4 4" stroke-linejoin="round"/>',
+  exit: '<path d="M10 3H3v14h7M8 10h10.5M14.5 6l4 4-4 4" stroke-linejoin="round"/>',
+  pressure: '<path d="M3 15.5a8 8 0 1 1 14 0M10 11.5l3.6-4.4"/><circle cx="10" cy="12" r="1.3"/>',
+  clock: '<circle cx="10" cy="10" r="7.5"/><path d="M10 5.2V10l3.2 2.2"/>',
+  bottleneck: '<path d="M3 3h14l-5.4 7L17 17H3l5.4-7z" stroke-linejoin="round"/>',
+  note: '<path d="M3 3h14v9l-5 5H3zM12 17v-5h5" stroke-linejoin="round"/>'};
+const icon = (n, sz = 15) => `<svg viewBox="0 0 20 20" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">${ICON[n]}</svg>`;
+const kic = k => ICON[k] ? icon(k, 13).replace("<svg", '<svg class="ki"') : "";   // a card type's symbol
 let doc = {sessions: [], items: {}, cards: {}, edits: {}, edges: [], order: {}, seeded: []};
 let lane = null, view = {x: 0, y: 0, k: 1}, views = {}, hs = {}, hsh = {};
 const tabOf = {};   // board -> open session tab
@@ -715,23 +746,30 @@ function togglePlayer(id, k) {   // in or out of a scene; "The Party" stands for
   const now = lanesOf(id); before.forEach(b => { if (!now.includes(b) && b !== WHOLE && o.at) delete o.at[b]; });
   changed(); drawRun(); if (shown === id) open(id, mode);
 }
-function newScene() {   // a scene for this session, on no board until it has players
+function newScene(before) {   // a scene for this session, on no board until it has players
   const cid = Math.random().toString(36).slice(2, 10), id = "c:" + cid;
   doc.cards[cid] = {kind: "scene", title: "", text: "", where: "", present: []};
   doc.items[id] = {s: runTab, homes: [], born: HOMELESS, at: {}, w: SCW, h: SCH};
-  doc.order[runTab] = [...scenesIn(runTab).filter(x => x !== id), id];
+  const ord = scenesIn(runTab).filter(x => x !== id), i = before ? ord.indexOf(before) : -1;
+  ord.splice(i < 0 ? ord.length : i, 0, id); doc.order[runTab] = ord;
   opened.add(id); casting = id; changed(); drawRun();
   const el = $$("#run .rc").find(x => x.dataset.uid === id); if (el) el.scrollIntoView({block: "nearest"});
   openHere(id);
 }
-function newInScene(sid, kind = "beat") {   // a card of Tom's, at the end of a scene
+function newInScene(sid, kind = "beat", spot) {   // a card of Tom's, at the end of a scene or where it was dropped
   const cid = Math.random().toString(36).slice(2, 10), id = "c:" + cid, ks = lanesOf(sid);
   doc.cards[cid] = {kind, title: "", text: ""};
   doc.items[id] = {s: sessOf(sid), homes: [ks[0]], born: ks[0], at: {}};
-  if (runMode) { dropInto(id, {sid}, [id]); openHere(id); return; }
+  if (runMode) {
+    dropInto(id, spot || {sid}, [id]);
+    openHere(id);
+    const e = spot && spot.parent && kindOf(spot.parent) === "decision" && doc.edges.find(x => x.from === spot.parent && x.to === id && !x.label);
+    if (e) edgeEditor(e.id);   // a new option: ask for the choice
+    return;
+  }
   const f = insideSpot(sid); join(id, sid, f.rx, f.ry); changed(); draw(); open(id);
 }
-const addBtns = sid => `<div class="adds">${INSCENE.map(k => `<button class="k-${k}" data-addto="${esc(sid)}" data-k="${k}" title="${esc(KDESC[k])}">+ ${KINDS[k]}</button>`).join("")}</div>`;
+const addBtns = sid => `<div class="adds">${INSCENE.map(k => `<button class="k-${k}" data-addto="${esc(sid)}" data-k="${k}" title="${esc(KDESC[k])}">${kic(k)}${KINDS[k]}</button>`).join("")}</div>`;
 function runCard(id, i) {
   const o = objOf(id), mine = id.startsWith("c:"), op = opened.has(id), tr = treeOf(id), others = (o.present || []).filter(n => !pcOf(n)), text = (mine ? o.text : o.summary) || "";
   return `<div class="rc${!mine && cut[id.slice(2)] ? " cut" : ""}" data-uid="${esc(id)}">` +
@@ -748,13 +786,15 @@ let runQ = "", runTray = false;
 function drawRun() {
   const ts = runSessions(); if (!ts.includes(runTab)) runTab = ts[0];
   const t = runTab, scenes = scenesIn(t), all = scenes.length && scenes.every(x => opened.has(x)), top = $("#run").scrollTop;
-  $("#rsess").innerHTML = ts.map(x => `<button role="tab" data-rtab="${esc(x)}" aria-selected="${x === t}">${esc(x)}${sessNum(x) === CUR + 1 ? " · next" : ""}<small>${scenesIn(x).length}</small></button>`).join("");
+  $("#rsess").innerHTML = ts.map(x => `<button role="tab" data-rtab="${esc(x)}" aria-selected="${x === t}" title="${esc(sName(x))}">${esc(x)}${sessNum(x) === CUR + 1 ? " · next" : ""}<small>${scenesIn(x).length}</small></button>`).join("") + addTab;
+  $("#rsess [data-addsess]").onclick = addSession;
   $$("#rsess [data-rtab]").forEach(b => b.onclick = () => { runTab = b.dataset.rtab; closeDrawer(); drawRun(); $("#run").scrollTop = 0; });
-  $("#run").innerHTML = `<div class="runh"><span><b>Running order · ${esc(t)}</b> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"}</span>` +
+  $("#run").innerHTML = `<div class="runh"><span><b>Running order</b> &nbsp;<button class="sname" data-sname title="This session’s name, what happens and its arc">${snHtml(t)}</button> &nbsp;${scenes.length} scene${scenes.length === 1 ? "" : "s"}</span>` +
     (scenes.length ? `<button class="mini" data-allx>${all ? "Collapse all" : "Expand all"}</button>` : "") + `</div>` +
     (scenes.length ? scenes.map(runCard).join("") : `<p class="empty">No scenes in ${esc(t)} yet. Add the scenes first and fit beats, entrances and exits into them, or drag cards in later.</p>`) +
     `<button class="addsc" data-newscene>+ Add a scene to ${esc(t)}</button>`;
   $("#run").scrollTop = top;
+  $("#run [data-sname]").onclick = () => sessPanel(t);
   drawLoose(t);
   $$("#run [data-go]").forEach(b => b.onclick = ev => { ev.stopPropagation(); goto(b.dataset.go, t, b.dataset.id); });
   $$("#run [data-edit]").forEach(b => b.onclick = ev => { ev.stopPropagation(); openHere(b.dataset.edit); });
@@ -762,7 +802,7 @@ function drawRun() {
   $$("#run [data-casting]").forEach(b => b.onclick = ev => { ev.stopPropagation(); casting = casting === b.dataset.casting ? null : b.dataset.casting; drawRun(); });
   $$("#run [data-cast]").forEach(b => b.onclick = ev => { ev.stopPropagation(); togglePlayer(b.dataset.id, b.dataset.cast); });
   $$("#run [data-addto]").forEach(b => b.onclick = ev => { ev.stopPropagation(); newInScene(b.dataset.addto, b.dataset.k); });
-  $("#run [data-newscene]").onclick = newScene;
+  $("#run [data-newscene]").onclick = () => newScene();
   const ax = $("#run [data-allx]"); if (ax) ax.onclick = () => { scenes.forEach(x => all ? opened.delete(x) : opened.add(x)); drawRun(); };
   $$("#run .rc").forEach(el => runDrag(el, t));
   $$("#run .tr").forEach(el => cardDrag(el, el.dataset.card));
@@ -825,6 +865,22 @@ function runDrag(el, t) {   // a scene card: in the running order, or onto anoth
     });
   });
 }
+const clearRun = () => { $$(".in-on,.in-before,.in-after,.rc.hot,#loose.over").forEach(x => x.classList.remove("in-on", "in-before", "in-after", "hot", "over")); $$("#rsess button").forEach(x => x.classList.remove("drop")); };
+function runSpot(e, mine, scene, inScene) {   // where in the running order a card would land, and what that means
+  let spot = null, say = "";
+  const tb = rtabUnder(e), hit = document.elementFromPoint(e.clientX, e.clientY), row = hit && hit.closest("#run .tr"), rc = hit && hit.closest("#run .rc");
+  if (tb) { if (tb.dataset.rtab !== runTab) { tb.classList.add("drop"); spot = {tab: tb.dataset.rtab}; say = `move to ${tb.dataset.rtab}`; } }
+  else if (hit && hit.closest("#loose")) { if (inScene) { $("#loose").classList.add("over"); spot = {out: 1}; say = "take it out of its scene"; } }
+  else if (scene) { if (hit && hit.closest("#run")) { spot = {scene: 1, before: rc ? rc.dataset.uid : null}; if (rc) rc.classList.add("in-before"); say = `a scene in ${runTab}`; } }
+  else if (row && !mine.includes(row.dataset.card)) {
+    const to = row.dataset.card, r = row.getBoundingClientRect(), f = (e.clientY - r.top) / r.height, sid = rc.dataset.uid, tr = treeOf(sid), up = tr.par[to];
+    if (f < .28) { spot = {sid, parent: up, before: to}; row.classList.add("in-before"); }
+    else if (f > .72) { spot = {sid, parent: up, after: to}; row.classList.add("in-after"); }
+    else { spot = {sid, parent: to}; row.classList.add("in-on"); }
+    say = spot.parent ? `follows “${titleOf(spot.parent)}”` : "starts in this scene";
+  } else if (rc && !row) { spot = {sid: rc.dataset.uid}; rc.classList.add("hot"); say = `in “${titleOf(rc.dataset.uid)}”`; }
+  return {spot, say, rc};
+}
 function cardDrag(el, id) {   // a card: into a scene, under or beside another card, back out, or onto another session's tab
   el.addEventListener("click", () => { if (Date.now() - dragEnd > 300) openHere(id); });
   el.addEventListener("pointerdown", ev => {
@@ -832,7 +888,7 @@ function cardDrag(el, id) {   // a card: into a scene, under or beside another c
     ev.preventDefault(); ev.stopPropagation();
     const st = {x: ev.clientX, y: ev.clientY}, from = it(id) ? sceneOf(id) : null, mine = from ? treeOf(from).under(id) : [id], scene = isScene(id);
     let ghost = null, spot = null, timer = null, over = null;
-    const clear = () => { $$(".in-on,.in-before,.in-after,.rc.hot,#loose.over").forEach(x => x.classList.remove("in-on", "in-before", "in-after", "hot", "over")); $$("#rsess button").forEach(x => x.classList.remove("drop")); };
+    const clear = clearRun;
     watch(e => {
       if (!ghost) {
         if (Math.hypot(e.clientX - st.x, e.clientY - st.y) < 5) return;
@@ -840,18 +896,7 @@ function cardDrag(el, id) {   // a card: into a scene, under or beside another c
         ghost.innerHTML = `<div class="t">${esc(titleOf(id))}${mine.length > 1 ? ` <small>+ ${mine.length - 1} under it</small>` : ""}</div><div class="s"></div>`; document.body.append(ghost);
       }
       ghost.style.left = e.clientX + 12 + "px"; ghost.style.top = e.clientY + 10 + "px";
-      clear(); spot = null; let say = "";
-      const tb = rtabUnder(e), hit = document.elementFromPoint(e.clientX, e.clientY), row = hit && hit.closest("#run .tr"), rc = hit && hit.closest("#run .rc");
-      if (tb) { if (tb.dataset.rtab !== runTab) { tb.classList.add("drop"); spot = {tab: tb.dataset.rtab}; say = `move to ${tb.dataset.rtab}`; } }
-      else if (hit && hit.closest("#loose")) { if (it(id) && from) { $("#loose").classList.add("over"); spot = {out: 1}; say = "take it out of its scene"; } }
-      else if (scene) { if (hit && hit.closest("#run")) { spot = {scene: 1, before: rc ? rc.dataset.uid : null}; if (rc) rc.classList.add("in-before"); say = `a scene in ${runTab}`; } }
-      else if (row && !mine.includes(row.dataset.card)) {
-        const to = row.dataset.card, r = row.getBoundingClientRect(), f = (e.clientY - r.top) / r.height, sid = rc.dataset.uid, tr = treeOf(sid), up = tr.par[to];
-        if (f < .28) { spot = {sid, parent: up, before: to}; row.classList.add("in-before"); }
-        else if (f > .72) { spot = {sid, parent: up, after: to}; row.classList.add("in-after"); }
-        else { spot = {sid, parent: to}; row.classList.add("in-on"); }
-        say = spot.parent ? `follows “${titleOf(spot.parent)}”` : "starts in this scene";
-      } else if (rc && !row) { spot = {sid: rc.dataset.uid}; rc.classList.add("hot"); say = `in “${titleOf(rc.dataset.uid)}”`; }
+      clear(); const at = runSpot(e, mine, scene, it(id) && from), rc = at.rc; spot = at.spot; const say = at.say;
       ghost.querySelector(".s").textContent = say;
       if (rc !== over) { clearTimeout(timer); over = rc; if (rc && !opened.has(rc.dataset.uid)) timer = setTimeout(() => { opened.add(rc.dataset.uid); expand(rc, true); }, 550); }
       edgeScroll(e);
@@ -997,7 +1042,7 @@ function planCard(id) {
   const p = view_of(id), o = it("p:" + id), at = o && sessOf("p:" + id);
   const mv = p.target && o && at.toUpperCase() !== p.target.toUpperCase() ? `vault says ${p.target}` : "";
   const checks = p.req.filter(r => r.k === "check").length;
-  return `<div class="k"><span>${esc(isCrit(p) ? "Critical decision" : KINDS[p.kind] || "Beat")}</span><span>${p.edited ? "edited · not in vault" : esc(p.status)}</span></div><div class="t">${esc(p.id)}</div>` +
+  return `<div class="k"><span>${kic(p.kind)}${esc(isCrit(p) ? "Critical decision" : KINDS[p.kind] || "Beat")}</span><span>${p.edited ? "edited · not in vault" : esc(p.status)}</span></div><div class="t">${esc(p.id)}</div>` +
     extras(p, "p:" + id) + `<div class="s">${esc(p.summary)}</div>` +
     (p.kind === "decision" || p.kind === "exit" ? optsHtml("p:" + p.id) : "") +
     `<div class="chips">${p.status === "ready" ? '<span class="ch ready">ready</span>' : ""}${mv ? `<span class="ch move">${esc(mv)}</span>` : ""}` +
@@ -1026,13 +1071,18 @@ function nowCard(n, kind) {
 }
 const whose = c => c.draft === "new" ? "Claude’s draft" : c.draft === "edit" ? "tidied by Claude" : "yours · not in vault";
 function titleOf(id) { if (id.startsWith("p:")) return id.slice(2); const c = doc.cards[id.slice(2)]; return c ? (c.title || "untitled card") : id; }
+function between(a, b) {   // sessions only in the Arc planner, before this one
+  if (!Link.has(doc)) return "";
+  const at = Link.numbers(doc, CUR), list = Link.seq(doc.arcs).filter(c => !doc.arcs.cards[c].link && at[c] > sessNum(a) && at[c] < sessNum(b));
+  return list.length ? `<div class="k"><span>In between, in the Arc planner</span></div><ul>${list.map(c => `<li>S${at[c]} ${esc(doc.arcs.cards[c].title || "Untitled session")}</li>`).join("")}</ul>` : "";
+}
 function startCard(tab, idx) {
   const ln = D.lanes.find(x => x.key === lane);
   if (idx === 0) return nowCard(ln.now, ln.kind);
   const prev = doc.sessions[idx - 1], items = inTab(prev);
   const later = tab === "Later";
   return `<div class="k"><span>${later ? "Later · no session yet" : `End of ${esc(prev)} · as planned`}</span></div>` +
-    `<div class="t">${later ? "Whenever it fits" : `After ${esc(prev)}`}</div>` +
+    `<div class="t">${later ? "Whenever it fits" : `After ${esc(prev)}${sName(prev) ? " · " + esc(sName(prev)) : ""}`}</div>` + (later ? "" : between(prev, tab)) +
     (later ? `<div class="s">Ideas without a session. Place a card here, then move it to a session when it is time.</div>` :
       items.length ? `<div class="k"><span>Planned for ${esc(prev)}</span></div><ul>${items.map(i => `<li>${isScene(i) ? "Scene: " : ""}${esc(titleOf(i))}</li>`).join("")}</ul>`
         : `<div class="s">Nothing planned for ${esc(prev)} yet.</div>`);
@@ -1051,7 +1101,7 @@ function cardHtml(id) {
   let inner, cls;
   if (mine) {
     const c = doc.cards[id.slice(2)];
-    inner = `<div class="k"><span>${esc(kl(id))}</span><span>${whose(c)}</span></div><div class="t">${esc(c.title || "Untitled")}</div>` + extras(c, id) +
+    inner = `<div class="k"><span>${kic(c.kind)}${esc(kl(id))}</span><span>${whose(c)}</span></div><div class="t">${esc(c.title || "Untitled")}</div>` + extras(c, id) +
       (c.text ? `<div class="s">${esc(c.text.length > 220 ? c.text.slice(0, 220) + "…" : c.text)}</div>` : "") + (c.kind === "decision" || c.kind === "exit" ? optsHtml(id) : "");
     cls = `mine k-${c.kind}`;
   } else {
@@ -1069,34 +1119,98 @@ function cardHtml(id) {
     (sc ? `<div class="sh">${inner}</div><span class="rz" title="Drag to resize the scene"></span>` : inner) +
     `<button class="xx" title="${xt}" aria-label="${xt}">×</button><span class="hd" title="Drag to another card to link them"></span></div>`;
 }
+/* sessions and the Arc planner: the card linked to a session is its name and what happens in it, the same record on both pages */
+const sCard = t => { const c = Link.cardOf(doc, t); return c ? {id: c, ...doc.arcs.cards[c]} : null; };
+const sName = t => (sCard(t) || {}).title || "";
+const arcNo = a => doc.arcs.order.indexOf(a) + 1, arcName = a => `Arc ${arcNo(a)}: ${doc.arcs.list[a].title || "Untitled arc"}`;
+const arcHref = c => "arcs.html?" + new URLSearchParams({...Object.fromEntries(new URLSearchParams(location.search)), ...(c ? {card: c} : {})});
+function took(map) {   // sessions took new numbers: what this page has open follows
+  const to = x => map[x] || x;
+  if (!Object.keys(map).length) return;
+  runTab = to(runTab); for (const k in tabOf) tabOf[k] = to(tabOf[k]);
+  views = {}; toast(`Renumbered: ${Object.keys(map).sort((a, b) => sessNum(a) - sessNum(b)).map(k => `${k} is now ${map[k]}`).join(", ")}. Their scenes and cards went along.`);
+}
+function whole(fn) {   // change the sessions and take the new numbers everywhere
+  const before = {}; if (Link.has(doc)) Link.seq(doc.arcs).forEach(c => { before[c] = doc.arcs.cards[c].link; });
+  const out = fn(); Link.settle(doc, CUR);
+  const map = {}; Object.entries(before).forEach(([c, l]) => { const k = doc.arcs.cards[c], n = k && k.link; if (l && n && n !== l) map[l] = n; });
+  took(map); return out;
+}
+function showTab(t) { if (runMode) { runTab = t; changed(); closeDrawer(); drawRun(); $("#run").scrollTop = 0; } else { changed(); openTab(t); } }
+function addSession() {   // + Session: pick one built in the Arc planner, or a blank one
+  shown = null;
+  const A = Link.has(doc) ? doc.arcs : null, at = A ? Link.numbers(doc, CUR) : {}, next = "S" + (Math.max(CUR, ...doc.sessions.map(sessNum)) + 1);
+  const rows = A ? A.order.map(a => { const list = A.list[a].cards.filter(c => A.cards[c] && !A.cards[c].link);
+    return `<h4 class="gr">${esc(arcName(a))}</h4>` + (list.map(c => `<button class="pick" data-bring="${esc(c)}"><b>S${at[c]}</b><span>${esc(A.cards[c].title || "Untitled session")}${A.cards[c].text ? `<small>${esc(A.cards[c].text)}</small>` : ""}</span></button>`).join("") || `<p class="muted" style="margin:4px 0;font-size:14.5px">Every session card in this arc is already here.</p>`) +
+      `<button class="pick new" data-inarc="${esc(a)}"><b>+</b><span>A new session in this arc</span></button>`; }).join("") : "";
+  const d = frame(`<div class="ey">Add a session, on every board</div><h3>+ Session</h3>` + (A ? `<p class="muted" style="font-size:14.5px;margin:4px 0 0">From the Arc planner. The session takes its place there, and the two stay linked: a change on one is a change on the other.</p>` + rows : "") +
+    `<h4 class="gr">Outside the arcs</h4><button class="pick new" data-blank><b>+</b><span>A blank ${esc(next)}</span></button>`);
+  const go = c => { const t = whole(() => Link.join(doc, c, "new", CUR)); showTab(doc.arcs.cards[c].link || t); return doc.arcs.cards[c].link; };
+  d.querySelectorAll("[data-bring]").forEach(b => b.onclick = () => { go(b.dataset.bring); });
+  d.querySelectorAll("[data-inarc]").forEach(b => b.onclick = () => sessPanel(go(Link.add(doc, b.dataset.inarc, "", CUR)), true));
+  d.querySelector("[data-blank]").onclick = () => { doc.sessions.push(next); sortSessions(); whole(() => {}); showTab(next); };
+}
+function sessPanel(t, focus) {   // a session's name, what happens in it and its arc: the Arc planner's card
+  if (!t || t === "Later") return;
+  shown = null;
+  const c = sCard(t), k = c && doc.arcs.cards[c.id], A = Link.has(doc) ? doc.arcs : null, aid = c && Link.arcOf(doc, c.id), n = scenesIn(t).length;
+  const acts = `<div class="acts"><button data-done>Done</button>${c ? `<a href="${esc(arcHref(c.id))}">Open in the Arc planner</a>` : ""}${doc.sessions.length > 2 ? `<button class="del" data-del>Delete session</button>` : ""}</div>`;
+  const d = frame(`<div class="ey">${c ? esc(arcName(aid)) : "Session, not in the Arc planner"}</div><h3>${esc(t)}${c && c.title ? " · " + esc(c.title) : ""}</h3><p class="muted" style="margin:2px 0 0;font-size:14.5px">${n} scene${n === 1 ? "" : "s"} here.${c ? " Its name, what happens and its arc are the same card in the Arc planner." : ""}</p>` +
+    (c ? `<label for="se-n">Name</label><input type="text" id="se-n" value="${esc(k.title)}" placeholder="Session ${sessNum(t)}"><label for="se-t">What happens</label><textarea id="se-t" style="min-height:150px" placeholder="A line or two: where it goes, what it is for">${esc(k.text)}</textarea>` +
+      `<label for="se-a">Arc</label><select id="se-a">${A.order.map(a => `<option value="${esc(a)}" ${a === aid ? "selected" : ""}>${esc(arcName(a))}</option>`).join("")}</select>`
+      : A ? `<label for="se-p">Where it sits in the campaign</label><select id="se-p"><option value="">Not in the Arc planner</option><optgroup label="A new card in">${A.order.map(a => `<option value="a:${esc(a)}">${esc(arcName(a))}</option>`).join("")}</optgroup>` +
+        `<optgroup label="It is this idea, already there">${A.order.flatMap(a => A.list[a].cards.filter(x => A.cards[x] && !A.cards[x].link).map(x => `<option value="c:${esc(x)}">${esc(`${A.cards[x].title || "Untitled session"} (arc ${arcNo(a)})`)}</option>`)).join("")}</optgroup></select>` : "") + acts);
+  const mine = () => { if (k.by === "claude") k.by = "tom"; };
+  d.querySelector("[data-done]").onclick = () => { closeDrawer(); draw(); };
+  const del = d.querySelector("[data-del]"); if (del) del.onclick = () => delSession(t);
+  if (c) {
+    const nm = d.querySelector("#se-n"), tx = d.querySelector("#se-t");
+    const live = fn => { fn(); mine(); changed(); d.querySelector("h3").textContent = t + (k.title ? " · " + k.title : ""); draw(); };
+    nm.oninput = () => live(() => { k.title = nm.value; }); tx.oninput = () => live(() => { k.text = tx.value; });
+    d.querySelector("#se-a").onchange = e => { const to = e.target.value;
+      whole(() => { doc.arcs.list[aid].cards = doc.arcs.list[aid].cards.filter(x => x !== c.id); const arr = doc.arcs.list[to].cards; let i = 0; if (arcNo(to) < arcNo(aid)) i = arr.length; else arr.forEach((x, j) => { const l = sessNum((doc.arcs.cards[x] || {}).link); if (l && l <= CUR) i = j + 1; }); arr.splice(i, 0, c.id); mine(); });
+      changed(); draw(); sessPanel(k.link); };
+    if (focus) setTimeout(() => nm.focus(), 50);
+  } else if (A) d.querySelector("#se-p").onchange = e => { const v = e.target.value; if (!v) return;
+    const cid = whole(() => { const id = v.startsWith("c:") ? v.slice(2) : Link.add(doc, v.slice(2), t, CUR); doc.arcs.cards[id].link = t; return id; });
+    const now = doc.arcs.cards[cid].link; if (now !== t) took({[t]: now}); changed(); draw(); sessPanel(now, true); };
+}
+const addTab = `<button class="add" data-addsess title="Add a session: one built in the Arc planner, or a blank one">+ Session</button>`;
 function sessTabs() {
   const tab = T();
-  $("#sess").innerHTML = doc.sessions.map((t, i) => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t === tab}">${esc(t)}${i === 0 && t !== "Later" ? " · next" : ""}<small>${inTab(t).length}</small>` +
+  $("#sess").innerHTML = doc.sessions.map((t, i) => `<button role="tab" data-tab="${esc(t)}" aria-selected="${t === tab}" title="${esc(sName(t))}">${esc(t)}${i === 0 && t !== "Later" ? " · next" : ""}<small>${inTab(t).length}</small>` +
     (t === tab && t !== "Later" && doc.sessions.length > 2 ? `<span class="dx" data-delsess title="Delete this session" aria-label="Delete ${esc(t)}">×</span>` : "") + `</button>`).join("") +
-    `<button class="add" data-addsess title="Add the session after the last one, on every board">+ Session</button>`;
+    addTab;
   $$("#sess [data-tab]").forEach(b => b.onclick = ev => { if (ev.target.closest("[data-delsess]")) delSession(b.dataset.tab); else openTab(b.dataset.tab); });
-  $("#sess [data-addsess]").onclick = () => {
-    const n = "S" + (Math.max(CUR, ...doc.sessions.map(sessNum)) + 1);
-    doc.sessions.push(n); sortSessions(); changed(); openTab(n);
-  };
+  $("#sess [data-addsess]").onclick = addSession;
+  const sn = $("#sname"); sn.hidden = tab === "Later"; sn.innerHTML = snHtml(tab); sn.onclick = () => sessPanel(tab);
 }
+const snHtml = t => { const c = sCard(t); return `<b>${esc(t)}</b>${c ? esc(c.title || "No name yet") : "<i>Not in the Arc planner</i>"}${c ? `<small>Arc ${arcNo(Link.arcOf(doc, c.id))}</small>` : ""}<span class="pen">✎</span>`; };
 function delSession(t) {   // on every board
   const n = sessNum(t), ids = Object.keys(doc.items).filter(i => sessOf(i) === t);
   const plans = ids.filter(i => i.startsWith("p:") && live(i)), cards = ids.filter(i => i.startsWith("c:"));
   const what = [plans.length ? `its ${plans.length} plan${plans.length > 1 ? "s go" : " goes"} back to the tray` : "", cards.length ? `your ${cards.length} card${cards.length > 1 ? "s move" : " moves"} to Later` : ""].filter(Boolean).join(" and ");
-  const later = doc.sessions.filter(x => sessNum(x) > n);
-  if (!confirm(`Delete ${t} on every board?` + (what ? ` ${what[0].toUpperCase() + what.slice(1)}.` : "") + (later.length ? ` ${later.join(", ")} move up one.` : ""))) return;
+  const c = sCard(t), later = c ? [] : doc.sessions.filter(x => sessNum(x) > n && !sCard(x));   // sessions on no card count down themselves; the rest follow their cards
+  if (!confirm(`Delete ${t} on every board?` + (what ? ` ${what[0].toUpperCase() + what.slice(1)}.` : "") + (c ? ` “${c.title || "Its card"}” stays in the Arc planner as an idea.` : "") + (!c && doc.sessions.some(x => sessNum(x) > n) ? " The sessions after it move up one." : ""))) return;
   plans.forEach(erase);
   Object.values(doc.items).forEach(o => { if (o.s === t) { o.s = "Later"; o.at = {}; } });
   Object.values(doc.items).forEach(o => { const so = o.scene && it(o.scene); if (so) o.s = so.s; });
   doc.edges = doc.edges.filter(e => e.from !== "start:" + t);
-  const down = x => sessNum(x) > n ? "S" + (sessNum(x) - 1) : x;
-  doc.sessions = doc.sessions.filter(x => x !== t).map(down);
-  Object.values(doc.items).forEach(o => { o.s = down(o.s); });
-  doc.edges.forEach(e => { if (e.from.startsWith("start:")) e.from = "start:" + down(e.from.slice(6)); });
-  const ord = {}; for (const k in doc.order) if (k !== t) ord[down(k)] = doc.order[k]; doc.order = ord;
-  views = {}; tabOf[lane] = later.length ? t : doc.sessions[Math.max(0, doc.sessions.length - 2)];
-  changed(); closeDrawer(); draw(); fit();
+  const all = doc.sessions, at = all.indexOf(t);
+  doc.sessions = doc.sessions.filter(x => x !== t); delete doc.order[t];
+  if (c) doc.arcs.cards[c.id].link = "";
+  else if (later.length || Link.has(doc)) {
+    const solo = new Set(later), linked = {}; doc.sessions.forEach(x => { const k = sCard(x); if (k && sessNum(x) > n) linked[x] = k.id; });
+    const down = x => solo.has(x) || linked[x] ? "S" + (sessNum(x) - 1) : x;
+    Object.values(linked).forEach(id => { doc.arcs.cards[id].link = down(doc.arcs.cards[id].link); });
+    doc.sessions = doc.sessions.map(down);
+    Object.values(doc.items).forEach(o => { o.s = down(o.s); });
+    doc.edges.forEach(e => { if (e.from.startsWith("start:")) e.from = "start:" + down(e.from.slice(6)); });
+    const ord = {}; for (const k in doc.order) ord[down(k)] = doc.order[k]; doc.order = ord;
+  }
+  whole(() => {});
+  views = {}; const there = doc.sessions[Math.min(at, Math.max(0, doc.sessions.length - 2))]; tabOf[lane] = there; runTab = there === "Later" ? runTab : there;
+  changed(); closeDrawer(); draw(); if (!runMode) fit();
 }
 function erase(id) {   // off every board; what it held stays, on its home boards
   if (isScene(id)) membersOf(id).forEach(m => release(m));
@@ -1262,7 +1376,7 @@ function fit() {
 }
 let pan = null;
 board.addEventListener("pointerdown", e => {
-  if (e.target.closest(".bn,.wl,.float,.keyp")) return;
+  if (e.target.closest(".bn,.wl,.float,.sname,.keyp")) return;
   cap(board, e.pointerId); pts.set(e.pointerId, {x: e.clientX, y: e.clientY});
   if (pts.size === 1) pan = {x: e.clientX, y: e.clientY, vx: view.x, vy: view.y};
   if (pts.size === 2) { const [a, b] = [...pts.values()]; pan = {pinch: Math.hypot(a.x - b.x, a.y - b.y), k: view.k}; }
@@ -1282,7 +1396,7 @@ board.addEventListener("wheel", e => {
   if (e.ctrlKey || e.metaKey) zoomAt(view.k * Math.exp(-e.deltaY / 300), e.clientX, e.clientY);
   else { view.x -= e.deltaX; view.y -= e.deltaY; applyView(); }
 }, {passive: false});
-board.addEventListener("dblclick", e => { if (!e.target.closest(".bn,.wl,.float,.keyp")) { const w = toWorld(e.clientX, e.clientY); newCard(w.x - CARDW / 2, w.y - 30); } });
+board.addEventListener("dblclick", e => { if (!e.target.closest(".bn,.wl,.float,.sname,.keyp")) { const w = toWorld(e.clientX, e.clientY); newCard(w.x - CARDW / 2, w.y - 30); } });
 
 /* ---------- cards: drag, link, open ---------- */
 const inRect = (e, el) => { const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom; };
@@ -1414,6 +1528,51 @@ function trayDrag(el) {
     const cancel = () => { done(); if (ghost) ghost.remove(); };
     const done = () => { el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up); el.removeEventListener("pointercancel", cancel); };
     el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up); el.addEventListener("pointercancel", cancel);
+  });
+}
+/* the palette: a button per kind of card. Click adds one (in the scene that is open, or in the middle of the canvas); drag places one */
+const sceneHere = () => shown && it(shown) && live(shown) ? (isScene(shown) ? shown : sceneOf(shown)) : null;
+function palAdd(kind) {
+  const sid = kind === "scene" ? null : sceneHere();
+  if (sid && sessOf(sid) === T() && (runMode || onBoard(sid))) { newInScene(sid, kind); return; }
+  if (runMode) { if (kind === "scene") newScene(); else toast(`Open a scene first, or drag ${KINDS[kind]} into the scene it belongs to.`); return; }
+  const r = board.getBoundingClientRect(), p = toWorld(r.left, r.top + 50), q = toWorld(r.right, r.bottom), w = kind === "scene" ? SCW : CARDW, h = kind === "scene" ? SCH : 150;
+  const taken = [...inTab(T()), "start"].map(i => box(i)).filter(Boolean), free = (x, y) => !taken.some(b => x < b.x + b.w + GRID && x + w + GRID > b.x && y < b.y + b.h + GRID && y + h + GRID > b.y);
+  const mx = (p.x + q.x - w) / 2, my = (p.y + q.y - h) / 2; let best = null;   // the free spot in view nearest its middle
+  for (let x = snap(p.x) + GRID; x + w <= q.x; x += GRID) for (let y = snap(p.y) + GRID; y + h <= q.y; y += GRID) { const d = Math.hypot(x - mx, y - my); if ((!best || d < best.d) && free(x, y)) best = {x, y, d}; }
+  const bs = taken.filter(b => b.x < Math.max(FIRSTX, mx) + w && b.x + b.w > Math.max(FIRSTX, mx));   // none: under everything there
+  const at = best || {x: snap(Math.max(FIRSTX, mx)), y: bs.length ? snap(Math.max(...bs.map(b => b.y + b.h))) + 44 : SY}, {x, y} = at;
+  if (!best) { view.y -= (y + h - q.y + 40) * view.k; applyView(); }
+  newCard(x, y, kind);
+}
+function palDrag(el, kind) {
+  el.addEventListener("click", () => { if (Date.now() - dragEnd > 300) palAdd(kind); });
+  el.addEventListener("pointerdown", ev => {
+    if (ev.button > 0) return;
+    const st = {x: ev.clientX, y: ev.clientY}; let ghost = null, at = null, over = null, wait = null;
+    const hotScene = e => { const w = toWorld(e.clientX, e.clientY); return kind === "scene" ? null : inTab(T()).filter(isScene).map(i => [i, box(i)]).filter(([, b]) => b && w.x > b.x && w.x < b.x + b.w && w.y > b.y + 20 && w.y < b.y + b.h).sort((a, c) => a[1].w * a[1].h - c[1].w * c[1].h).map(x => x[0])[0] || null; };
+    watch(e => {
+      if (!ghost) {
+        if (Math.hypot(e.clientX - st.x, e.clientY - st.y) < 6) return;
+        ghost = document.createElement("div"); ghost.className = `bn ghost k-${kind}`; ghost.innerHTML = `<div class="k"><span>${kic(kind)}${KINDS[kind]}</span></div><div class="s"></div>`;
+        document.body.append(ghost); el.classList.add("drag");
+      }
+      e.preventDefault(); ghost.style.left = e.clientX - 30 + "px"; ghost.style.top = e.clientY - 16 + "px";
+      let say = "";
+      if (runMode) {
+        clearRun(); at = runSpot(e, [], kind === "scene", null); say = at.spot && at.spot.tab ? "" : at.say; $$("#rsess button").forEach(x => x.classList.remove("drop"));
+        ghost.style.left = e.clientX + 12 + "px"; ghost.style.top = e.clientY + 10 + "px";
+        if (at.rc !== over) { clearTimeout(wait); over = at.rc; const rc = at.rc; if (rc && kind !== "scene" && !opened.has(rc.dataset.uid)) wait = setTimeout(() => { opened.add(rc.dataset.uid); expand(rc, true); }, 550); }
+        edgeScroll(e);
+      } else { const hot = inRect(e, board) ? hotScene(e) : null; $$("#nodes .bn").forEach(x => x.classList.toggle("hot", x.dataset.id === hot)); say = hot ? `in “${titleOf(hot)}”` : ""; }
+      ghost.querySelector(".s").textContent = say;
+    }, (e, off) => {
+      clearTimeout(wait); el.classList.remove("drag"); clearRun(); $$("#nodes .bn.hot").forEach(x => x.classList.remove("hot"));
+      if (!ghost) return;
+      ghost.remove(); dragEnd = Date.now(); if (off) return;
+      if (runMode) { const s = at && at.spot; if (!s || s.tab || s.out) return; if (s.scene) newScene(s.before); else newInScene(s.sid, kind, s); return; }
+      if (inRect(e, board)) { const w = toWorld(e.clientX, e.clientY); newCard(w.x - 30, w.y - 16, kind); }
+    });
   });
 }
 function newCard(x, y, kind) {
@@ -1664,21 +1823,23 @@ function legend() {
   const k = $("#keyp"), btn = $('[data-act="legend"]');
   if (!k.hidden) { k.hidden = true; btn.classList.remove("on"); return; }
   k.innerHTML = `<button class="x" aria-label="Close">×</button><h3>Key</h3><dl>` +
-    Object.keys(KINDS).map(x => `<dt>${KINDS[x]}</dt><dd>${esc(KDESC[x])}</dd>`).join("") +
+    Object.keys(KINDS).map(x => `<dt class="k-${x}" style="border:0">${kic(x)}${KINDS[x]}</dt><dd>${esc(KDESC[x])}</dd>`).join("") +
     `<dt>Whole session</dt><dd>Running order and Canvas show everything in a session, whoever it is for: one as a list, one as a canvas with the scenes numbered in that order. Line up lays the canvas out to match.</dd>` +
     `<dt>Boards</dt><dd>One per player character, and the World for what moves without the party knowing. The same scenes and cards, only the ones that belong there.</dd>` +
     `<dt>Session tabs</dt><dd>One canvas per session. The first starts from the end of S${CUR} as played; each later one starts from the end of the one before, as planned. Later holds ideas with no session yet.</dd>` +
+    `<dt>Arc planner</dt><dd>A session’s name, what happens in it and its arc are one card, the same here and in the Arc planner. + Session brings in a session built there. Session numbers follow the order of the cards there; what is in a session goes along when its number changes. A session can also stay outside the arcs, and an idea can stay only there.</dd>` +
     `<dt>Scenes</dt><dd>Drag a scene by its header: the cards inside move with it. Drag its bottom-right corner to resize it. Drop a card inside a scene to set it there. A scene shows on the board of every player character listed as present, with its cards. There is one copy: change it on one board and it changes on all of them; only its place on each canvas is its own.</dd>` +
     `<dt>Situation and purpose</dt><dd>On the scene itself: where, when, who is there and what is going on when it opens; and what the scene is for.</dd>` +
     `<dt>Cue</dt><dd>On every card in a scene: what triggers it at the table. With a cue, a card needs no arrow into it; draw arrows only where one thing has to follow another.</dd>` +
     `<dt>Critical</dt><dd>A decision that can end or remake a character. Ticked in its panel.</dd>` +
+    `<dt>Card types</dt><dd>The row of symbols above the canvas. Click one to add it: in the scene whose panel (or whose card's panel) is open, or on free canvas in view. Or drag it where it belongs: onto the canvas, into a scene, or into place in the Running order.</dd>` +
     `<dt>Moving a card</dt><dd>Drag it onto another session's tab, or pick the session in its panel.</dd>` +
     `<dt>Deleting</dt><dd>The × on a card: a plan goes back to the tray, your own card is deleted; a scene on several boards comes off this one only. Select a card and press Delete to do the same. To drop a plan for good, open it and choose Drop this plan. The × on the open session's tab deletes that session.</dd>` +
     `<dt>Tray</dt><dd>This board's plans that are not placed. Drag one onto the canvas or onto a session tab (on a touch screen, by its ⠿ grip). Drag a card back onto the tray to take it off.</dd>` +
     `<dt>Links</dt><dd>Solid: the vault already joins them, or it is a decision's option. Dashed red: yours, not in the vault yet; drag from a card's + to add one, tap its label to edit it. Dotted grey: it follows something in an earlier session.</dd>` +
     `<dt>Secret chips</dt><dd>A secret the card needs. Tap one to try a what-if: cards it closes fade and say why.</dd>` +
     `<dt>Edited</dt><dd>You changed a plan's text here. It goes into the vault when you ask Claude to bring the board in.</dd></dl>` +
-    `<p class="muted" style="font-size:13.5px">Drag the canvas to pan; pinch, Command-scroll or the + and − buttons to zoom; double-click empty canvas to add a card. Cards snap to the grid.</p>`;
+    `<p class="muted" style="font-size:13.5px">Drag the canvas to pan; pinch, Command-scroll or the + and − buttons to zoom; double-click empty canvas to add a note. Cards snap to the grid.</p>`;
   k.hidden = false; btn.classList.add("on");
   k.querySelector(".x").onclick = () => { k.hidden = true; btn.classList.remove("on"); };
 }
@@ -1754,7 +1915,7 @@ function pack() {
 }
 /* Saving. The relay holds one copy, and another device or a session with Claude may have saved since this page read it:
    every save first looks, and merges record by record what changed there with what changed here (here wins on the same thing). */
-const PARTS = ["sessions", "items", "cards", "edits", "edges", "order", "seeded", "arcs"];   // arcs: the Arc planner's part (vault/arcs.html), carried untouched
+const PARTS = ["sessions", "items", "cards", "edits", "edges", "order", "seeded", "arcs"];   // arcs: the Arc planner's part (vault/arcs.html); its linked cards are the sessions' names
 let timer = null, dirty = false, unread = false, rev = null, base = null, ticks = 0, busy = null, held = false;
 const copyOf = x => JSON.parse(JSON.stringify(x)), same = (a, b) => canon(a) === canon(b), isMap = x => !!x && typeof x === "object" && !Array.isArray(x);
 const canon = x => JSON.stringify(x, (k, v) => isMap(v) ? Object.fromEntries(Object.keys(v).sort().map(q => [q, v[q]])) : v) ?? "";
@@ -1772,11 +1933,11 @@ function into(old, now) {   // update in place, so an open panel keeps working o
 function absorb(got) {   // take in what was saved elsewhere; true when it changes what this page holds
   if (!got || !got.items) return false;
   const theirs = partsOf(got), mine = partsOf(doc), out = merge3(base || theirs, mine, theirs);
-  base = theirs; rev = got.saved_at;
+  base = copyOf(theirs); rev = got.saved_at;
   if (same(out, mine)) return false;
   const had = new Map(doc.edges.map(e => [e.id, e]));
   PARTS.forEach(f => { if (f === "edges") doc.edges = Object.values(out.edges).map(e => { const o = had.get(e.id); if (!o) return e; into(o, e); return o; }); else if (isMap(doc[f])) into(doc[f], out[f]); else doc[f] = out[f]; });
-  sortSessions();
+  sortSessions(); Link.tidy(doc.arcs);
   if (layNew()) changed();
   recut();
   return true;
@@ -1801,7 +1962,7 @@ async function save(leaving) {
       let fresh = null;
       if (leaving !== true) { const got = fresh = await peek(); if (held) { later(); return; } if (got.items && got.saved_at !== rev && absorb(got)) showNew(); }
       const at = ticks, sent = pack();
-      if (fresh && fresh.arcs) sent.arcs = doc.arcs = fresh.arcs;   // this page never changes the Arc planner's part: send back the relay's own
+      if (fresh && fresh.arcs && !sent.arcs) sent.arcs = doc.arcs = fresh.arcs;
       const body = JSON.stringify(sent);   // keepalive only when leaving: browsers allow 64 KB of it in all, then refuse
       const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body, keepalive: leaving === true && new Blob([body]).size < 60000});
       if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status);
@@ -1834,9 +1995,9 @@ async function load() {
   if (!some(got)) { try { const loc = JSON.parse(store.get("osse-paths-local") || "null"); if (some(loc)) { got = loc; if (KEY && !unread) dirty = true; } } catch (e) {} }
   if (got && got.items) { if (!dirty) { base = partsOf(got); rev = got.saved_at; } for (const f of PARTS) { if (got[f]) doc[f] = got[f]; } }
   else if (some(got)) { migrate(got); dirty = true; }
-  if (got && got.arcs) doc.arcs = got.arcs;
   doc.sessions = (doc.sessions.length ? doc.sessions : defaults()).filter(t => t === "Later" || sessNum(t) > CUR || Object.values(doc.items).some(o => o.s === t));
   sortSessions();
+  if (Object.keys(Link.settle(doc, CUR)).length) dirty = true;
   recut();
   if (!doc.seeded.includes("@canvas")) { Object.values(doc.items).forEach(o => { if (o.at) delete o.at[WHOLE]; }); doc.seeded.push("@canvas"); }   // once: The Party's board became the session canvas
   D.lanes.forEach(l => { if (!doc.seeded.includes(l.key)) seed(l.key); });
@@ -1852,7 +2013,7 @@ function pick(key) {
   runMode = key === RUN;
   if (from && key === WHOLE) tabOf[WHOLE] = from; if (from && runMode) runTab = from;
   $(".paths").classList.toggle("whole", runMode || key === WHOLE); $("#lineup").hidden = key !== WHOLE;
-  $("#runw").hidden = !runMode; $("#work").hidden = runMode; $$('.tools [data-act="card"]').forEach(b => { b.hidden = runMode; });
+  $("#runw").hidden = !runMode; $("#work").hidden = runMode;
   store.set("osse-paths-lane", key); history.replaceState(null, "", "#" + encodeURIComponent(key));
   $$("[data-lane]").forEach(b => b.setAttribute("aria-selected", b.dataset.lane === key));
   closeDrawer();
@@ -1861,23 +2022,19 @@ function pick(key) {
   const v = views[key + "|" + T()]; if (v) { view = {...v}; applyView(); } else fit();
 }
 function refresh() { recut(); draw(); if (shown) open(shown, mode); }
-const ICON = {list: '<path d="M7 4h10M7 10h10M7 16h10" /><path d="M3 4h.01M3 10h.01M3 16h.01" stroke-width="3" stroke-linecap="round"/>', map: '<rect x="2" y="3" width="6" height="5"/><rect x="12" y="3" width="6" height="5"/><rect x="12" y="12" width="6" height="5"/><path d="M8 5.5h4M15 8v4"/>',
-  globe: '<circle cx="10" cy="10" r="7.5"/><path d="M2.5 10h15M10 2.5c5 5 5 10 0 15M10 2.5c-5 5-5 10 0 15"/>'};
-const icon = n => `<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">${ICON[n]}</svg>`;
 $("#views").innerHTML = `<button role="tab" data-lane="${RUN}" title="The session's scenes, in the order you plan to run them">${icon("list")}Running order</button>` +
   `<button role="tab" data-lane="${WHOLE}" title="The same session as a canvas: every scene and card, whoever it is for">${icon("map")}Canvas</button>`;
 $("#lanes").innerHTML = `<span class="lb">Boards</span>` + PCS.map(l => `<button role="tab" data-lane="${esc(l.key)}"><i style="--c:${esc(l.colour)}"></i>${esc(l.short)}<small>${l.count}</small></button>`).join("") + `<span class="sep"></span>` +
   D.lanes.filter(l => l.kind === "world").map(l => `<button role="tab" class="wb" data-lane="${esc(l.key)}" title="What moves without the party knowing, and could still reach them">${icon("globe")}${esc(l.short)}<small>${l.count}</small></button>`).join("");
 $$("[data-lane]").forEach(b => b.onclick = () => pick(b.dataset.lane));
+$("#pal").innerHTML = ["scene", ...INSCENE, "|", "pressure", "clock", "bottleneck", "note"].map(k => k === "|" ? `<span class="sep"></span>` : `<button class="k-${k}" data-pal="${k}" title="${esc(KINDS[k])}: ${esc(KDESC[k])}">${icon(k, 17)}<span>${KINDS[k]}</span></button>${k === "scene" ? `<span class="sep"></span>` : ""}`).join("");
+$$("#pal [data-pal]").forEach(b => palDrag(b, b.dataset.pal));
 $("#wi-reset").onclick = () => { ov.out = {}; ov.dead = {}; ov.drop = {}; refresh(); };
 $("#tray-all").onchange = tray; $("#tray-q").oninput = tray;
 $$("[data-act]").forEach(b => b.onclick = ev => {
   ev.stopPropagation();
   const a = b.dataset.act;
   const r = board.getBoundingClientRect();
-  if (a === "scene" && runMode) { newScene(); return; }
-  if (a === "card" || a === "scene") { const w = toWorld(r.left + r.width / 2, r.top + r.height / 3), cw = a === "scene" ? SCW : CARDW;
-    newCard(Math.max(SX + 344, w.x - cw / 2), w.y, a === "scene" ? "scene" : ""); }   // clear of the start card
   if (a === "zin" || a === "zout") zoomAt(view.k * (a === "zin" ? 1.25 : .8), r.left + r.width / 2, r.top + r.height / 2);
   if (a === "fit") fit();
   if (a === "line" && confirm("Lay every scene out left to right in running order, with the other cards underneath? It replaces how you have arranged this canvas.")) {
@@ -1900,8 +2057,9 @@ addEventListener("pointerup", e => {
 }, true);
 document.body.insertAdjacentHTML("beforeend", `<div id="meas" aria-hidden="true"></div><datalist id="dl-places">${D.places.map(x => `<option value="${esc(x)}">`).join("")}</datalist>` +
   `<datalist id="dl-secrets">${D.secrets.filter(x => !x.out).map(x => `<option value="${esc(x.n)}">`).join("")}</datalist><datalist id="dl-people">${D.people.map(x => `<option value="${esc(x.n)}" label="${esc(x.t)}">`).join("")}</datalist>`);
-$("#hint").textContent = "Drag plans in from the tray · drag a card's + to link · double-click to add a card";
+$("#hint").textContent = "Click a card type to add one, or drag it into place · drag plans in from the tray · drag a card's + to link";
 load().then(() => {
+  const s0 = new URLSearchParams(location.search).get("s"); if (s0 && doc.sessions.includes(s0)) { runTab = s0; [...D.lanes.map(l => l.key), WHOLE].forEach(k => { tabOf[k] = s0; }); }   // from the Arc planner
   const want = decodeURIComponent(location.hash.slice(1)) || store.get("osse-paths-lane");
   pick(want === RUN || D.lanes.some(l => l.key === want) ? want : D.lanes[0].key);
 });

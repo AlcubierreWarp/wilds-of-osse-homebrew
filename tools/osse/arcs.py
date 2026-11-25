@@ -2,13 +2,15 @@
 """Arc planner (vault/arcs.html): the campaign as a row per arc. Built by pages.py on every build; never edit the page by hand.
 
 Each arc has a name, what it starts on, what it ends on, and what it is about. Its row holds session cards in running order:
-a card is either linked to a session (a played one, or one with a tab in the Session planner) or a general idea for a session
-not planned yet. Tom drags cards within a row and between rows, edits everything, and adds or deletes arcs and cards.
-Unlinked cards are counted on from the last linked one, so each shows about which session it would be.
+a card is a played session, a session planned in the Session planner, or a general idea for one. Tom drags cards within a row
+and between rows, edits everything, and adds or deletes arcs and cards.
 
-The arcs are stored as the `arcs` part of the Session planner's store on the Gus relay (paths.json), behind the hub's
-game master passcode; the Session planner carries the part without touching it. `python3 tools/osse/paths_sync.py arcs`
-prints them. Nothing here is canon or a vault plan: the arcs only frame the sessions.
+The arcs are the `arcs` part of the Session planner's store on the Gus relay (paths.json), behind the hub's game master
+passcode, and both pages read and change the same records. A card whose `link` is a session (S15) IS that session's name and
+description in the Session planner. Numbers follow the order of the cards: move a planned session here and its tab, scenes,
+cards and links in the Session planner take the new number with it (LINK, below, shared by both pages). A session in the
+Session planner that no card is linked to keeps its number, and the cards count around it.
+`python3 tools/osse/paths_sync.py arcs` prints them. Nothing here is canon or a vault plan: the arcs only frame the sessions.
 
 Run this file on its own to rebuild vault/arcs.html from vault/status.json and the session pages, without the vault."""
 import html, json, os, re, sys, types
@@ -86,6 +88,67 @@ SEED_ARCS = [
 ]
 
 
+# How sessions and session cards hold together, the same on both pages. `st` is the store: {sessions, items, edges, order, arcs}.
+LINK = r"""const Link = (() => {
+  const num = l => { const m = /^S(\d+)$/i.exec(l || ""); return m ? +m[1] : 0; };
+  const has = st => !!(st.arcs && st.arcs.order && st.arcs.order.length);
+  function tidy(A) {   // every card in exactly one arc, no arc without its record, no session on two cards
+    if (!A || !A.order) return;
+    A.list ||= {}; A.cards ||= {};
+    A.order = [...new Set(A.order.filter(a => A.list[a]))];
+    Object.keys(A.list).forEach(a => { if (!A.order.includes(a)) A.order.push(a); });
+    const seen = new Set(), links = new Set();
+    A.order.forEach(a => { A.list[a].cards = (A.list[a].cards || []).filter(c => A.cards[c] && !seen.has(c) && seen.add(c)); });
+    Object.keys(A.cards).forEach(c => { if (!seen.has(c)) delete A.cards[c]; });
+    A.order.forEach(a => A.list[a].cards.forEach(c => { const l = A.cards[c].link; if (l) { if (links.has(l)) A.cards[c].link = ""; else links.add(l); } }));
+  }
+  const seq = A => A.order.flatMap(a => A.list[a].cards).filter(c => A.cards[c]);
+  const cardOf = (st, s) => has(st) ? seq(st.arcs).find(c => A_(st, c).link === s) || null : null;
+  const A_ = (st, c) => st.arcs.cards[c];
+  const arcOf = (st, c) => st.arcs.order.find(a => st.arcs.list[a].cards.includes(c));
+  const unplaced = (st, cur) => (st.sessions || []).filter(s => num(s) > cur && !cardOf(st, s));   // in the Session planner, on no card
+  function numbers(st, cur) {   // each card's session number: a played one its own; the rest count on, around the sessions no card has
+    const keep = new Set(unplaced(st, cur).map(num)), out = {}; let n = cur;
+    seq(st.arcs).forEach(c => { const l = num(A_(st, c).link); if (l && l <= cur) { out[c] = l; return; } do n++; while (keep.has(n)); out[c] = n; });
+    return out;
+  }
+  const sort = list => { const o = [...new Set(list)].filter(x => x !== "Later").sort((x, y) => (num(x) || 1e9) - (num(y) || 1e9)); return o.concat("Later"); };
+  function settle(st, cur) {   // give every planned session the number its card's place gives it; what is in it goes along. Returns {old: new}
+    if (!has(st)) return {};
+    tidy(st.arcs);
+    const at = numbers(st, cur), map = {};
+    seq(st.arcs).forEach(c => { const k = A_(st, c), l = num(k.link); if (l > cur && l !== at[c]) { map[k.link] = "S" + at[c]; k.link = "S" + at[c]; } });
+    if (!Object.keys(map).length) return map;
+    const to = x => map[x] || x;
+    st.sessions = sort(st.sessions.map(to));
+    Object.values(st.items || {}).forEach(o => { o.s = to(o.s); });
+    (st.edges || []).forEach(e => { if (String(e.from).startsWith("start:")) e.from = "start:" + to(e.from.slice(6)); });
+    const ord = {}; for (const k in st.order || {}) ord[to(k)] = st.order[k]; st.order = ord;
+    return map;
+  }
+  function join(st, c, s, cur) {   // card c is session s; "new": the one its place gives, with a new tab. Returns the session's name in the end
+    A_(st, c).link = s === "new" ? "S" + numbers(st, cur)[c] : s;
+    if (num(A_(st, c).link) > cur) st.sessions = sort(st.sessions.concat(A_(st, c).link));
+    settle(st, cur);
+    return A_(st, c).link;
+  }
+  function part(st, c) {   // card c is an idea again; an empty tab goes with it, one with something in it stays as a session on no card
+    const s = A_(st, c).link; A_(st, c).link = "";
+    if (s && !Object.values(st.items || {}).some(o => o.s === s)) { st.sessions = st.sessions.filter(x => x !== s); if (st.order) delete st.order[s]; }
+    return s;
+  }
+  function add(st, aid, link, cur) {   // a new card: after the last played or planned one in its arc (a played session: after the last earlier one)
+    const A = st.arcs, c = "k" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), arr = A.list[aid].cards, n = num(link);
+    A.cards[c] = {title: "", text: "", link: ""};
+    let at = 0; arr.forEach((x, i) => { const l = num((A.cards[x] || {}).link); if (l && (!n || l < n)) at = i + 1; });
+    arr.splice(at, 0, c);
+    return c;
+  }
+  return {num, has, tidy, seq, cardOf, arcOf, unplaced, numbers, sort, settle, join, part, add};
+})();
+"""
+
+
 def seed():
     order, lst, cards = [], {}, {}
     for i, a in enumerate(SEED_ARCS, 1):
@@ -115,7 +178,7 @@ def page(site, played=None):
     return (head + f"<style>{CSS}</style>" + pages.topbar(site, here="arcs") +
             '<main class="sheet arcs">'
             '<div class="atop"><div><h1>Arc planner</h1><p class="lede">The campaign, an arc to a row. Drag session cards to reorder them or move them '
-            'between arcs. Tap anything to edit it.</p></div>'
+            'between arcs. Tap anything to edit it. Planned sessions are the ones in the Session planner: what you change here changes there.</p></div>'
             '<div class="tools"><span id="save" class="save"></span><button class="mini" data-act="addarc">+ Arc</button></div></div>'
             '<div class="strip" id="strip" aria-label="The campaign at a glance"></div>'
             '<div class="loose" id="loose" hidden></div>'
@@ -123,7 +186,7 @@ def page(site, played=None):
             '<aside id="drawer" class="drawer" hidden></aside>'
             f'<footer>After S{site.cur}. Nothing here is canon or a vault plan: the arcs frame the sessions, and the Session planner holds what happens in each. '
             'Saved with the Session planner on the relay, behind the hub passcode.</footer>'
-            f'<script>const ARCS={js_data};</script><script>{JS}</script></main></div></body></html>')
+            f'<script>const ARCS={js_data};</script><script>' + JS.replace('/*LINK*/', LINK) + '</script></main></div></body></html>')
 
 
 CSS = r"""
@@ -193,24 +256,29 @@ CSS = r"""
 .add:hover{background:rgba(255,255,255,.5)}
 .empty{align-self:center;font-style:italic;color:var(--vmuted);font-size:14px;padding:0 6px}
 
-/* editor */
-.drawer{position:fixed;right:0;top:0;bottom:0;width:min(440px,100%);z-index:40;overflow:auto;background:#fbf5e6;color:var(--vink);border-left:1px solid var(--vrule);
-  box-shadow:-12px 0 30px rgba(0,0,0,.35);padding:18px 20px 30px;font-size:15.5px}
-.drawer h3{margin:0 30px 4px 0;font:600 19px/1.25 var(--f-display)}
-.drawer .x{position:absolute;right:10px;top:6px;border:0;background:none;font-size:28px;cursor:pointer;color:var(--vmuted);width:44px;height:44px}
-.drawer label{display:block;font:500 10.5px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--vmuted);margin:14px 0 4px}
-.drawer input,.drawer textarea,.drawer select{width:100%;font:16px/1.4 var(--f-body);color:var(--vink);background:#fff;border:1px solid var(--vrule);border-radius:5px;padding:9px 10px}
+/* editor: the same panel as the Session planner's */
+.drawer{position:fixed;right:16px;top:16px;bottom:16px;width:min(440px,calc(100vw - 32px));overflow:auto;z-index:40;
+  background:linear-gradient(180deg,var(--vellum),var(--vellum-2));color:var(--vink);border:1px solid var(--vrule);border-radius:8px;padding:18px 20px 24px;box-shadow:0 20px 50px rgba(0,0,0,.45);font-size:16px}
+.drawer h3{font-size:22px;margin:0 30px 6px 0}.drawer .x{position:absolute;right:12px;top:8px;border:0;background:none;font-size:28px;cursor:pointer;color:var(--vmuted)}
+.drawer .ey{font:500 11px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--vmuted);margin-right:30px}
+.drawer label{display:block;font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--vmuted);margin:12px 0 4px}
+.drawer input,.drawer textarea,.drawer select{width:100%;font:16px var(--f-body);padding:8px 10px;border:1px solid var(--vline);border-radius:4px;background:rgba(255,255,255,.65);color:var(--vink)}
 .drawer textarea{min-height:110px;resize:vertical}
-.drawer .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.drawer .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.drawer .row button,.drawer .row a,.drawer .info a.go,.drawer .info button{font:500 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--vink);border-radius:4px;padding:9px 11px;color:var(--vink);background:none;cursor:pointer;text-decoration:none;min-height:0}
+.drawer .row button:disabled{opacity:.4;cursor:default}.drawer .row .warn{border-color:var(--vred);color:var(--vred)}
+.drawer .info a.go,.drawer .info button{display:inline-block;margin-top:9px}
+.card.on{box-shadow:0 0 0 3px rgba(124,22,34,.45)}.ahead.on{background:rgba(255,255,255,.45)}
 .drawer .note{font-size:14px;color:var(--vmuted);margin:8px 0 0}
 .drawer .info{margin-top:10px;padding:9px 11px;border-radius:6px;background:rgba(61,90,128,.08);border:1px solid rgba(61,90,128,.25);font-size:14px}
 .drawer .info ol{margin:6px 0 0;padding-left:20px}
 footer{margin-top:22px;font-size:13.5px;color:var(--vmuted)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60;max-width:min(560px,calc(100vw - 32px));background:var(--vink);color:var(--vellum);border-radius:8px;padding:12px 16px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 @media (max-width:760px){
   .seg .nm span,.seg .rg{display:none}.seg{min-width:0}
   .arc{grid-template-columns:1fr}.ahead{border-right:0;border-bottom:1px solid var(--vline)}.ahead .ab{-webkit-line-clamp:3}
   .lane{padding:12px;scroll-padding:12px}.gate{width:150px;position:static;box-shadow:none!important}.card{width:190px}
-  .drawer{top:auto;max-height:88vh;border-left:0;border-top:1px solid var(--vrule);border-radius:12px 12px 0 0;box-shadow:0 -12px 30px rgba(0,0,0,.35)}
+  .drawer{top:auto;max-height:80vh}
 }
 @media print{.tools,.drawer,.add{display:none}.lane{flex-wrap:wrap;overflow:visible}}
 """
@@ -225,28 +293,24 @@ const RELAY = (location.hostname === "localhost" && new URLSearchParams(location
   || "https://2srnsytz3rqi3jke23bz643jhq0irvei.lambda-url.ca-central-1.on.aws";
 const KEY = store.get("osse-hub-dm");
 const COLOURS = ["#7c1622", "#3f5a3c", "#3d5a80", "#8a5a12", "#5b3f6b", "#2f6b6b"];
+/*LINK*/
 const copyOf = x => JSON.parse(JSON.stringify(x));
-let A = copyOf(D.seed), planner = {sessions: [], order: {}, cards: {}}, open = null;
+let st = {sessions: [], items: {}, cards: {}, edits: {}, edges: [], order: {}, seeded: [], arcs: copyOf(D.seed)}, A = st.arcs, open = null;   // the whole store; the arcs are its part here
 const folded = (() => { try { return JSON.parse(store.get("osse-arcs-open") || "{}"); } catch (e) { return {}; } })();
-const num = l => { const m = /^S(\d+)$/.exec(l || ""); return m ? +m[1] : 0; };
+const num = Link.num;
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 /* ---------- what each card is ---------- */
-function walk() {   // each card's session number: its link, or one on from the card before it
-  let prev = 0; const out = {};
-  for (const aid of A.order) for (const cid of A.list[aid].cards) {
-    const c = A.cards[cid]; if (!c) continue;
-    const n = num(c.link), est = n || prev + 1;
-    out[cid] = {n: est, linked: !!n, back: !!n && n <= prev};
-    prev = Math.max(prev, est);
-  }
+function walk() {   // each card's session number, and whether it comes before a session to its left
+  const at = Link.numbers(st, CUR), out = {}, all = Link.seq(A), last = all.reduce((b, c, i) => at[c] <= CUR ? i : b, -1); let prev = 0;
+  all.forEach((c, i) => { const n = at[c]; out[c] = {n, linked: !!num(A.cards[c].link), back: n <= CUR ? n <= prev : i < last}; if (n <= CUR) prev = Math.max(prev, n); });
   return out;
 }
 const state = c => { const n = num(c.link); return n && n <= CUR && PLAYED.has(n) ? "played" : n ? "planned" : "idea"; };
 const titleOf = c => c.title || (PLAYED.get(num(c.link)) || {}).title || (c.link ? "Session " + c.link.slice(1) : "Untitled session");
 const textOf = c => c.text || (state(c) === "played" ? (PLAYED.get(num(c.link)) || {}).summary || "" : "");
 function scenes(link) {   // the running order the Session planner holds for a session
-  return (planner.order[link] || []).map(id => id.startsWith("p:") ? id.slice(2) : ((planner.cards[id.slice(2)] || {}).title || "Untitled scene"));
+  return (st.order[link] || []).filter(id => id.startsWith("p:") || st.cards[id.slice(2)]).map(id => id.startsWith("p:") ? id.slice(2) : (st.cards[id.slice(2)].title || "Untitled scene"));
 }
 function range(aid, w) {
   const ns = A.list[aid].cards.map(c => w[c] && w[c].n).filter(Boolean);
@@ -274,7 +338,7 @@ function draw() {
       `<div class="rg">${esc(range(aid, w))}${cards.length ? ` · ${cards.length} session${cards.length === 1 ? "" : "s"}` : ""}</div></div>` +
       `<div class="lane" data-lane="${aid}">${lane}</div></section>`;
   }).join("") || `<p class="empty">No arcs yet. Add one with + Arc.</p>`;
-  strip(w); loose(); wire();
+  strip(w); loose(); wire(); mark();
   if (open) editor(open, true);
 }
 function cardHtml(cid, w) {
@@ -284,7 +348,7 @@ function cardHtml(cid, w) {
   return `<div class="card ${st}" data-card="${cid}" tabindex="0" role="button" aria-label="${esc(titleOf(c))}"><div class="k"><span>${label}</span></div>` +
     `<div class="t">${esc(titleOf(c))}</div><div class="s">${esc(textOf(c))}</div>` +
     `<div class="chips">${sc.length ? `<span class="ch">${sc.length} scene${sc.length === 1 ? "" : "s"} planned</span>` : ""}` +
-    `${w.back ? `<span class="ch bad" title="This session comes before a card to its left">out of order</span>` : ""}` +
+    `${w.back ? `<span class="ch bad" title="It sits among the sessions already played, or before one of them">out of order</span>` : ""}` +
     `${c.by === "claude" && st !== "played" ? `<span class="ch dr">Claude's draft</span>` : ""}</div></div>`;
 }
 function strip(w) {
@@ -301,61 +365,65 @@ function strip(w) {
     for (const s of segs) { const el = s.p && $(`.seg[data-go="${s.aid}"] .bar`); if (el) { const r = el.getBoundingClientRect(); now.style.left = (r.left - box.left + r.width * s.p / s.n) + "px"; } }
   });
 }
-function loose() {   // played sessions no card is linked to
-  const used = new Set(Object.values(A.cards).map(c => c.link)), miss = D.played.filter(s => !used.has("S" + s.n));
-  const el = $("#loose"); el.hidden = !miss.length || !A.order.length;
-  el.innerHTML = miss.length ? `<b>Played, not in an arc:</b> ` + miss.map(s => `<button class="mini" data-place="${s.n}">+ S${s.n} ${esc(s.title)}</button>`).join("") : "";
+function loose() {   // sessions no card is linked to: played ones, and ones in the Session planner
+  const used = new Set(Object.values(A.cards).map(c => c.link)), miss = D.played.filter(s => !used.has("S" + s.n)), un = Link.unplaced(st, CUR);
+  const el = $("#loose"); el.hidden = !(miss.length || un.length) || !A.order.length;
+  el.innerHTML = (miss.length ? `<span><b>Played, not in an arc:</b></span>` + miss.map(s => `<button class="mini" data-place="${s.n}">+ S${s.n} ${esc(s.title)}</button>`).join("") : "") +
+    (un.length ? `<span><b>In the Session planner, not in an arc:</b></span>` + un.map(s => { const k = scenes(s).length; return `<button class="mini" data-place="${num(s)}" title="${esc(scenes(s).join(" · "))}">+ ${s}${k ? ` · ${k} scene${k === 1 ? "" : "s"}` : ""}</button>`; }).join("") +
+      `<span class="muted">Click to give it a card, or open an idea's card and choose the session there.</span>` : "");
 }
+function mark() { $$(".card.on,.ahead.on").forEach(x => x.classList.remove("on")); const el = open && (open.card ? $(`[data-card="${open.card}"]`) : $(`[data-edit-arc="${open.arc}"]`)); if (el) el.classList.add("on"); }
+const plannerHref = s => "paths.html?" + new URLSearchParams({...Object.fromEntries(new URLSearchParams(location.search)), s}) + "#%40session";
 
 /* ---------- editing ---------- */
 function touch(o) { if (o.by === "claude") o.by = "tom"; }
 function editor(which, keep) {
-  open = which; const d = $("#drawer"); d.hidden = false;
+  open = which; const d = $("#drawer"); d.hidden = false; mark();
   if (which.arc) {
     const a = A.list[which.arc]; if (!a) return closeEd();
     const i = A.order.indexOf(which.arc);
     if (keep && d.dataset.for === "arc:" + which.arc) return;
     d.dataset.for = "arc:" + which.arc;
-    d.innerHTML = `<button class="x" data-close aria-label="Close">×</button><h3>Arc ${i + 1}</h3>` +
+    d.innerHTML = `<button class="x" data-close aria-label="Close">×</button><div class="ey">Arc ${i + 1}${a.by === "claude" ? " · Claude’s draft" : ""}</div><h3>${esc(a.title || "Untitled arc")}</h3>` +
       `<label for="f-title">Name</label><input id="f-title" data-f="title" value="${esc(a.title)}">` +
       `<label for="f-starts">Starts on</label><textarea id="f-starts" data-f="starts" style="min-height:70px" placeholder="e.g. departure from Althon's Gate">${esc(a.starts)}</textarea>` +
       `<label for="f-ends">Ends on</label><textarea id="f-ends" data-f="ends" style="min-height:70px" placeholder="e.g. confronting Dreeshen">${esc(a.ends)}</textarea>` +
       `<label for="f-about">What the arc is about</label><textarea id="f-about" data-f="about" style="min-height:160px">${esc(a.about)}</textarea>` +
-      `<div class="row"><button class="mini" data-arcmove="-1" ${i ? "" : "disabled"}>↑ Move up</button><button class="mini" data-arcmove="1" ${i < A.order.length - 1 ? "" : "disabled"}>↓ Move down</button>` +
-      `<button class="mini warn" data-delarc>Delete arc</button><button class="mini solid" data-close>Done</button></div>` +
+      `<div class="row"><button data-close>Done</button><button data-arcmove="-1" ${i ? "" : "disabled"}>↑ Move up</button><button data-arcmove="1" ${i < A.order.length - 1 ? "" : "disabled"}>↓ Move down</button>` +
+      `<button class="warn" data-delarc>Delete arc</button></div>` +
       (a.by === "claude" ? `<p class="note">Claude's draft until you change it.</p>` : "");
     if (which.focus) setTimeout(() => { const f = d.querySelector(`[data-f="${which.focus}"]`); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } }, 30);
     return;
   }
   const cid = which.card, c = A.cards[cid]; if (!c) return closeEd();
-  const aid = A.order.find(x => A.list[x].cards.includes(cid)), arr = A.list[aid].cards, pos = arr.indexOf(cid), st = state(c), w = walk()[cid] || {};
+  const aid = A.order.find(x => A.list[x].cards.includes(cid)), arr = A.list[aid].cards, pos = arr.indexOf(cid), w = walk()[cid] || {};
   if (keep && d.dataset.for === "card:" + cid) { info(c); return; }
   d.dataset.for = "card:" + cid;
-  const taken = new Map(Object.entries(A.cards).filter(([k, x]) => k !== cid && x.link).map(([k, x]) => [x.link, k]));
-  const future = [...new Set(planner.sessions.filter(t => num(t) > CUR).concat(Array.from({length: 16}, (_, k) => "S" + (CUR + 1 + k))))].sort((x, y) => num(x) - num(y));
-  const opt = (v, t) => `<option value="${v}" ${c.link === v ? "selected" : ""} ${taken.has(v) ? "disabled" : ""}>${esc(t)}${taken.has(v) ? " (on another card)" : ""}</option>`;
-  d.innerHTML = `<button class="x" data-close aria-label="Close">×</button><h3>${st === "played" ? "Played session" : st === "planned" ? "Planned session" : "Session idea"}</h3>` +
-    `<label for="f-link">Session</label><select id="f-link" data-f="link"><option value="" ${c.link ? "" : "selected"}>Not linked yet (about S${w.n || CUR + 1})</option>` +
-    `<optgroup label="Coming up">${future.map(t => opt(t, t + (planner.sessions.includes(t) ? " · in the Session planner" : ""))).join("")}</optgroup>` +
-    `<optgroup label="Played">${D.played.slice().reverse().map(s => opt("S" + s.n, `S${s.n} · ${s.title}`)).join("")}</optgroup></select>` +
+  const used = new Set(Object.values(A.cards).map(x => x.link)), un = Link.unplaced(st, CUR), free = D.played.filter(x => !used.has("S" + x.n) || c.link === "S" + x.n), opt = (v, t) => `<option value="${v}" ${c.link === v ? "selected" : ""}>${esc(t)}</option>`;
+  const many = x => { const k = scenes(x).length; return k ? `, ${k} scene${k === 1 ? "" : "s"}` : ""; };
+  d.innerHTML = `<button class="x" data-close aria-label="Close">×</button><div class="ey">${state(c) === "played" ? "Played session" : state(c) === "planned" ? "In the Session planner" : "Session idea"}${c.by === "claude" && state(c) !== "played" ? " · Claude’s draft" : ""}</div><h3>${esc((w.linked ? "S" + w.n + " · " : "") + titleOf(c))}</h3>` +
+    `<label for="f-link">Session</label><select id="f-link" data-link>${opt("", `An idea, about S${w.linked ? w.n : w.n || CUR + 1}`)}` +
+    (c.link && state(c) === "planned" ? opt(c.link, `${c.link}, in the Session planner`) : `<option value="new">Bring it into the Session planner</option>`) +
+    (un.length ? `<optgroup label="It is a session already in the Session planner">${un.map(x => opt(x, x + many(x))).join("")}</optgroup>` : "") +
+    (free.length ? `<optgroup label="It was played as">${free.slice().reverse().map(x => opt("S" + x.n, `S${x.n} · ${x.title}`)).join("")}</optgroup>` : "") + `</select>` +
     `<label for="f-title">Name</label><input id="f-title" data-f="title" value="${esc(c.title)}" placeholder="${esc(titleOf({link: c.link}))}">` +
-    `<label for="f-text">What happens</label><textarea id="f-text" data-f="text" placeholder="${esc(st === "played" ? textOf({link: c.link}) : "A line or two: where it goes, what it is for")}">${esc(c.text)}</textarea>` +
+    `<label for="f-text">What happens</label><textarea id="f-text" data-f="text" placeholder="${esc(state(c) === "played" ? textOf({link: c.link}) : "A line or two: where it goes, what it is for")}">${esc(c.text)}</textarea>` +
     `<div id="info"></div>` +
     `<label for="f-arc">Arc</label><select id="f-arc" data-movearc>${A.order.map((x, i) => `<option value="${x}" ${x === aid ? "selected" : ""}>Arc ${i + 1}: ${esc(A.list[x].title || "Untitled arc")}</option>`).join("")}</select>` +
-    `<div class="row"><button class="mini" data-cardmove="-1" ${pos ? "" : "disabled"}>← Earlier</button><button class="mini" data-cardmove="1" ${pos < arr.length - 1 ? "" : "disabled"}>Later →</button>` +
-    `<button class="mini warn" data-delcard>Delete</button><button class="mini solid" data-close>Done</button></div>` +
+    `<div class="row"><button data-close>Done</button><button data-cardmove="-1" ${pos ? "" : "disabled"}>← Earlier</button><button data-cardmove="1" ${pos < arr.length - 1 ? "" : "disabled"}>Later →</button>` +
+    `<button class="warn" data-delcard>Delete</button></div>` +
     (c.by === "claude" ? `<p class="note">Claude's draft until you change it.</p>` : "");
   info(c);
   if (which.focus) setTimeout(() => { const f = d.querySelector(`[data-f="${which.focus}"]`); if (f) f.focus(); }, 30);
 }
 function info(c) {
   const el = $("#info"); if (!el) return;
-  const n = num(c.link), s = PLAYED.get(n), st = state(c);
-  if (st === "played") el.innerHTML = `<div class="info"><b>S${n} · ${esc(s.title)}</b><br>${esc(s.summary)}${s.href ? `<br><a href="${esc(s.href)}">Open the session page</a>` : ""}</div>`;
-  else if (st === "planned") { const sc = scenes(c.link); el.innerHTML = `<div class="info">${sc.length ? `<b>In the Session planner for ${c.link}:</b><ol>${sc.map(x => `<li>${esc(x)}</li>`).join("")}</ol>` : `Nothing in the Session planner's running order for ${c.link} yet.`}<br><a href="paths.html#%40session">Open the Session planner</a></div>`; }
-  else el.innerHTML = "";
+  const n = num(c.link), s = PLAYED.get(n), what = state(c);
+  if (what === "played") el.innerHTML = `<div class="info"><b>S${n} · ${esc(s.title)}</b><br>${esc(s.summary)}${s.href ? `<br><a href="${esc(s.href)}">Open the session page</a>` : ""}</div>`;
+  else if (what === "planned") { const sc = scenes(c.link); el.innerHTML = `<div class="info">${sc.length ? `<b>In the Session planner for ${c.link}:</b><ol>${sc.map(x => `<li>${esc(x)}</li>`).join("")}</ol>` : `No scenes in the Session planner for ${c.link} yet.`}<a class="go" href="${esc(plannerHref(c.link))}">Open ${c.link} in the Session planner</a></div>`; }
+  else el.innerHTML = `<div class="info">Not in the Session planner. It can stay an idea until you want to build it.<br><button data-bring>Bring it into the Session planner</button></div>`;
 }
-function closeEd() { open = null; const d = $("#drawer"); d.hidden = true; d.dataset.for = ""; }
+function closeEd() { open = null; const d = $("#drawer"); d.hidden = true; d.dataset.for = ""; mark(); }
 const arcOf = cid => A.order.find(x => A.list[x].cards.includes(cid));
 function moveCard(cid, toArc, before) {   // before: a card id, or null for the end
   const from = arcOf(cid); if (!from) return;
@@ -363,49 +431,71 @@ function moveCard(cid, toArc, before) {   // before: a card id, or null for the 
   const arr = A.list[toArc].cards, at = before ? arr.indexOf(before) : -1;
   if (at < 0) arr.push(cid); else arr.splice(at, 0, cid);
 }
+function settled() {   // the cards moved: planned sessions take their new numbers, here and in the Session planner
+  const map = Link.settle(st, CUR), ks = Object.keys(map).sort((x, y) => num(x) - num(y));
+  if (ks.length) toast(`Renumbered in the Session planner too: ${ks.map(k => `${k} is now ${map[k]}`).join(", ")}.`);
+}
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 6500); }
 function addCard(aid, link) {
-  const cid = uid("k"); A.cards[cid] = {title: "", text: "", link: link || ""};
-  const arr = A.list[aid].cards, n = num(link);
-  let at = arr.length;   // a played session goes in after the last card linked to an earlier session
-  if (n) { const i = arr.map(x => num((A.cards[x] || {}).link)).reduce((b, m, k) => m && m < n ? k : b, -1); at = i + 1; }
-  arr.splice(at, 0, cid);
+  const cid = link ? Link.add(st, aid, link, CUR) : uid("k");
+  if (link) Link.join(st, cid, link, CUR); else { A.cards[cid] = {title: "", text: "", link: ""}; A.list[aid].cards.push(cid); settled(); }
   return cid;
+}
+function relink(cid, v) {   // what the Session menu on a card does
+  const c = A.cards[cid], was = c.link;
+  if (v === was) return;
+  if (was) { const s = Link.part(st, cid); if (num(s) > CUR && st.sessions.includes(s)) toast(`${s} stays in the Session planner with what is in it, on no card here.`); }
+  if (v) Link.join(st, cid, v, CUR); else settled();
+  touch(c); $("#drawer").dataset.for = ""; changed(); draw();
 }
 document.addEventListener("input", e => {
   const f = e.target.dataset.f; if (!f || !open) return;
   const o = open.arc ? A.list[open.arc] : A.cards[open.card]; if (!o) return;
   o[f] = e.target.value; touch(o);
-  if (f === "link") { $("#drawer").dataset.for = ""; editor(open); }
+  const h = $("#drawer h3"), n = open.card ? num(o.link) : 0; if (h) h.textContent = open.arc ? o.title || "Untitled arc" : (n ? `S${n} · ` : "") + titleOf(o);
   changed(); redraw();
 });
 let rtimer = null; const redraw = () => { clearTimeout(rtimer); rtimer = setTimeout(() => { const y = scrollY, xs = $$(".lane").map(l => l.scrollLeft); draw(); $$(".lane").forEach((l, i) => l.scrollLeft = xs[i] || 0); scrollTo(0, y); }, 150); };
 document.addEventListener("change", e => {
-  if (e.target.matches("[data-movearc]") && open && open.card) { moveCard(open.card, e.target.value, null); touch(A.cards[open.card]); $("#drawer").dataset.for = ""; changed(); draw(); }
+  if (e.target.matches("[data-link]") && open && open.card) relink(open.card, e.target.value);
+  if (e.target.matches("[data-movearc]") && open && open.card) { moveCard(open.card, e.target.value, null); settled(); touch(A.cards[open.card]); $("#drawer").dataset.for = ""; changed(); draw(); }
 });
 document.addEventListener("click", e => {
   const t = e.target.closest("button,[data-edit-arc],[data-card]"); if (!t) return;
   if (t.matches("[data-close]")) return closeEd();
+  if (t.matches("[data-bring]") && open && open.card) return relink(open.card, "new");
   if (t.dataset.act === "addarc") { const aid = uid("a"); A.order.push(aid); A.list[aid] = {title: "", starts: "", ends: "", about: "", cards: []}; changed(); draw(); editor({arc: aid, focus: "title"}); document.getElementById("arc-" + aid).scrollIntoView({behavior: "smooth", block: "center"}); return; }
   if (t.dataset.go) { document.getElementById("arc-" + t.dataset.go).scrollIntoView({behavior: "smooth", block: "start"}); return; }
   if (t.dataset.fold) { folded[t.dataset.fold] = !folded[t.dataset.fold]; store.set("osse-arcs-open", JSON.stringify(folded)); draw(); return; }
   if (t.dataset.add) { const cid = addCard(t.dataset.add); changed(); draw(); editor({card: cid, focus: "title"}); const el = $(`[data-card="${cid}"]`); if (el) el.scrollIntoView({behavior: "smooth", inline: "nearest", block: "nearest"}); return; }
-  if (t.dataset.place) { const n = +t.dataset.place, prevArc = A.order.slice().reverse().find(x => A.list[x].cards.some(c => A.cards[c] && num(A.cards[c].link) && num(A.cards[c].link) < n)) || A.order[0]; addCard(prevArc, "S" + n); changed(); draw(); return; }
+  if (t.dataset.place) { const n = +t.dataset.place, prevArc = A.order.slice().reverse().find(x => A.list[x].cards.some(c => A.cards[c] && num(A.cards[c].link) && num(A.cards[c].link) < n)) || A.order[0], cid = addCard(prevArc, "S" + n); changed(); draw(); editor({card: cid, focus: n > CUR ? "title" : ""}); return; }
   if (t.dataset.gate) return editor({arc: t.dataset.arc, focus: t.dataset.gate});
   if (t.dataset.editArc) return editor({arc: t.dataset.editArc});
   if (t.dataset.card) { if (dragged) return; return editor({card: t.dataset.card}); }
-  if (t.dataset.arcmove && open && open.arc) { const i = A.order.indexOf(open.arc), j = i + +t.dataset.arcmove; [A.order[i], A.order[j]] = [A.order[j], A.order[i]]; $("#drawer").dataset.for = ""; changed(); draw(); return; }
-  if (t.dataset.cardmove && open && open.card) { const aid = arcOf(open.card), arr = A.list[aid].cards, i = arr.indexOf(open.card), j = i + +t.dataset.cardmove; [arr[i], arr[j]] = [arr[j], arr[i]]; touch(A.cards[open.card]); $("#drawer").dataset.for = ""; changed(); draw(); return; }
-  if (t.matches("[data-delcard]") && open && open.card) { const cid = open.card, aid = arcOf(cid); if (!confirm(`Delete “${titleOf(A.cards[cid])}”?`)) return; A.list[aid].cards = A.list[aid].cards.filter(x => x !== cid); delete A.cards[cid]; closeEd(); changed(); draw(); return; }
+  if (t.dataset.arcmove && open && open.arc) { const i = A.order.indexOf(open.arc), j = i + +t.dataset.arcmove; [A.order[i], A.order[j]] = [A.order[j], A.order[i]]; settled(); $("#drawer").dataset.for = ""; changed(); draw(); return; }
+  if (t.dataset.cardmove && open && open.card) { const aid = arcOf(open.card), arr = A.list[aid].cards, i = arr.indexOf(open.card), j = i + +t.dataset.cardmove; [arr[i], arr[j]] = [arr[j], arr[i]]; settled(); touch(A.cards[open.card]); $("#drawer").dataset.for = ""; changed(); draw(); return; }
+  if (t.matches("[data-delcard]") && open && open.card) { const cid = open.card, aid = arcOf(cid); const l = A.cards[cid].link, full = num(l) > CUR && Object.values(st.items).some(o => o.s === l); if (!confirm(`Delete “${titleOf(A.cards[cid])}”?${full ? ` ${l} stays in the Session planner with what is in it, without a name.` : num(l) > CUR ? ` Its empty tab goes from the Session planner.` : ""}`)) return; Link.part(st, cid); A.list[aid].cards = A.list[aid].cards.filter(x => x !== cid); delete A.cards[cid]; settled(); closeEd(); changed(); draw(); return; }
   if (t.matches("[data-delarc]") && open && open.arc) {
     const aid = open.arc, a = A.list[aid], n = a.cards.length;
-    if (!confirm(n ? `Delete “${a.title || "this arc"}” and its ${n} session card${n === 1 ? "" : "s"}?` : `Delete “${a.title || "this arc"}”?`)) return;
-    a.cards.forEach(c => delete A.cards[c]); delete A.list[aid]; A.order = A.order.filter(x => x !== aid); closeEd(); changed(); draw(); return;
+    if (!confirm(n ? `Delete “${a.title || "this arc"}” and its ${n} session card${n === 1 ? "" : "s"}? Sessions with something in them stay in the Session planner.` : `Delete “${a.title || "this arc"}”?`)) return;
+    a.cards.forEach(c => { if (A.cards[c]) { if (A.cards[c].link) Link.part(st, c); delete A.cards[c]; } }); delete A.list[aid]; A.order = A.order.filter(x => x !== aid); settled(); closeEd(); changed(); draw(); return;
   }
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !$("#drawer").hidden) closeEd();
   if ((e.key === "Enter" || e.key === " ") && e.target.matches(".card")) { e.preventDefault(); editor({card: e.target.dataset.card}); }
 });
+
+/* a click on the main area closes the open panel; a drag, or a click that opens something else, does not (as in the Session planner) */
+let press = null;
+addEventListener("pointerdown", e => { press = !$("#drawer").hidden && e.button < 1 && {x: e.clientX, y: e.clientY, at: e.target, was: $("#drawer").dataset.for}; }, true);
+addEventListener("pointercancel", () => { press = null; }, true);
+addEventListener("pointerup", e => {
+  const p = press; press = null;
+  if (!p || Math.hypot(e.clientX - p.x, e.clientY - p.y) >= 5 || !p.at.closest || !p.at.closest(".arcs") || p.at.closest(".drawer")) return;
+  if (p.at.closest("button,a,input,select,textarea,label,.card,[data-edit-arc]")) return;   // these do something of their own
+  setTimeout(() => { if (!$("#drawer").hidden && $("#drawer").dataset.for === p.was) closeEd(); }, 0);
+}, true);
 
 /* ---------- dragging cards: within a row and between rows; works with a finger ---------- */
 let drag = null, dragged = false;
@@ -460,15 +550,15 @@ function end(ok) {
   if (!d.on) return;
   dragged = true; setTimeout(() => { dragged = false; }, 50);
   d.g.remove(); d.el.classList.remove("drag"); $$(".lane.over").forEach(l => l.classList.remove("over"));
-  if (ok && d.lane && d.before !== d.cid) { moveCard(d.cid, d.lane, d.before); touch(A.cards[d.cid]); changed(); }
+  if (ok && d.lane && d.before !== d.cid) { moveCard(d.cid, d.lane, d.before); settled(); touch(A.cards[d.cid]); $("#drawer").dataset.for = ""; changed(); }
   const xs = $$(".lane").map(l => l.scrollLeft); draw(); $$(".lane").forEach((l, i) => l.scrollLeft = xs[i] || 0);
 }
 addEventListener("pointerup", ev => { if (drag && ev.pointerId === drag.id) end(true); });
 addEventListener("pointercancel", ev => { if (drag && ev.pointerId === drag.id) end(false); });
 addEventListener("contextmenu", ev => { if (drag) ev.preventDefault(); });
 
-/* ---------- saving: the `arcs` part of the Session planner's store. Every save reads first and merges what changed
-   elsewhere with what changed here (here wins on the same thing), then sends the whole store back with only `arcs` changed. ---------- */
+/* ---------- saving: the Session planner's store, the same way it does. Every save reads first and merges, record by record,
+   what changed there with what changed here (here wins on the same thing), then sends the whole store back. ---------- */
 const isMap = x => !!x && typeof x === "object" && !Array.isArray(x);
 const canon = x => JSON.stringify(x, (k, v) => isMap(v) ? Object.fromEntries(Object.keys(v).sort().map(q => [q, v[q]])) : v) ?? "";
 const same = (a, b) => canon(a) === canon(b);
@@ -478,19 +568,22 @@ function merge3(b, m, t) {
   if (isMap(m) && isMap(t)) { const o = {}; for (const k of new Set([...Object.keys(m), ...Object.keys(t)])) { const v = merge3(isMap(b) ? b[k] : undefined, m[k], t[k]); if (v !== undefined) o[k] = v; } return o; }
   return Array.isArray(m) && Array.isArray(t) ? m.concat(t.filter(x => !m.some(y => same(x, y)) && !(Array.isArray(b) && b.some(y => same(x, y))))) : m;
 }
-function tidy() {   // after a merge: every card in exactly one arc, no arc without its record
-  A.order = [...new Set(A.order.filter(a => A.list[a]))];
-  Object.keys(A.list).forEach(a => { if (!A.order.includes(a)) A.order.push(a); });
-  const seen = new Set();
-  A.order.forEach(a => { A.list[a].cards = A.list[a].cards.filter(c => A.cards[c] && !seen.has(c) && seen.add(c)); });
-  Object.keys(A.cards).forEach(c => { if (!seen.has(c)) delete A.cards[c]; });
+const PARTS = ["sessions", "items", "cards", "edits", "edges", "order", "seeded", "arcs"], LISTS = ["sessions", "edges", "seeded"];
+const partsOf = d => { const o = {}; PARTS.forEach(f => { o[f] = copyOf(d[f] ?? (LISTS.includes(f) ? [] : {})); }); o.edges = Object.fromEntries(o.edges.map(e => [e.id, e])); return o; };
+function hold(p) { PARTS.forEach(f => { st[f] = f === "edges" ? Object.values(p.edges) : p[f]; }); st.sessions = Link.sort(st.sessions); A = st.arcs; Link.tidy(A); }
+function absorb(got) {   // take in what was saved elsewhere; true when it changes what this page holds
+  const theirs = partsOf(got), mine = partsOf(st);
+  if (!theirs.arcs.order) theirs.arcs = base ? copyOf(base.arcs) : theirs.arcs;   // a store without arcs does not take them away
+  const out = merge3(base || theirs, mine, theirs);
+  base = copyOf(theirs);
+  if (same(out, mine)) return false;
+  hold(out); return true;
 }
-let timer = null, dirty = false, unread = false, base = null, busy = null;
+let timer = null, dirty = false, unread = false, base = null, busy = null, ticks = 0;
 function status(t, bad) { const el = $("#save"); el.textContent = t; el.classList.toggle("bad", !!bad); }
 const get = async () => { const r = await fetch(RELAY + "/paths", {headers: {"x-gus-key": KEY}, cache: "no-store"}); if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status); return r.json(); };
-const take = got => { planner = {sessions: got.sessions || [], order: got.order || {}, cards: got.cards || {}}; };
 function changed() {
-  dirty = true; store.set("osse-arcs-local", JSON.stringify(A));
+  dirty = true; ticks++; store.set("osse-arcs-local", JSON.stringify(A));
   if (unread) { status("Not saving: the relay could not be read when this page opened. Reload before you change more.", true); return; }
   status(KEY ? "Saving…" : "Saved on this device only");
   clearTimeout(timer); if (KEY) timer = setTimeout(save, 800);
@@ -499,19 +592,20 @@ async function save() {
   if (busy) { clearTimeout(timer); timer = setTimeout(save, 300); return; }
   busy = (async () => {
     try {
-      const got = await get(); take(got);
-      if (got.arcs && base && !same(got.arcs, base)) { A = merge3(base, A, got.arcs); tidy(); draw(); }
-      const sent = copyOf(A), body = JSON.stringify({...got, arcs: sent});
+      const got = await get();
+      if (!base) base = partsOf(got);
+      if (absorb(got)) { Link.settle(st, CUR); draw(); }
+      const at = ticks, sent = partsOf(st), body = JSON.stringify({...got, ...copyOf(sent), edges: Object.values(sent.edges)});
       const r = await fetch(RELAY + "/paths", {method: "PUT", headers: {"x-gus-key": KEY, "content-type": "application/json"}, body});
       if (!r.ok) throw new Error(r.status === 401 ? "the hub passcode was refused" : "the relay said " + r.status);
-      base = sent; if (same(A, sent)) { dirty = false; status("Saved"); }
+      base = sent; if (ticks === at) { dirty = false; status("Saved"); }
     } catch (e) { status("Not saved: " + e.message + ". This device keeps a copy.", true); }
   })();
   await busy; busy = null;
 }
 async function look() {   // anything new from another device or a session with Claude?
-  if (!KEY || unread || dirty || busy || document.visibilityState === "hidden" || (document.activeElement && document.activeElement.matches("#drawer input, #drawer textarea, #drawer select"))) return;
-  try { const got = await get(); take(got); if (got.arcs && !same(got.arcs, base)) { A = copyOf(got.arcs); base = copyOf(got.arcs); tidy(); draw(); } } catch (e) {}
+  if (!KEY || unread || dirty || busy || drag || document.visibilityState === "hidden" || (document.activeElement && document.activeElement.matches("#drawer input, #drawer textarea, #drawer select"))) return;
+  try { const got = await get(); if (dirty || drag) return; if (absorb(got)) { $("#drawer").dataset.for = ""; draw(); } } catch (e) {}
 }
 setInterval(look, 20000); addEventListener("focus", look);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") look(); else if (dirty && KEY && !unread) save(); });
@@ -519,13 +613,15 @@ async function load() {
   const local = (() => { try { const x = JSON.parse(store.get("osse-arcs-local") || "null"); return x && x.order ? x : null; } catch (e) { return null; } })();
   let got = null;
   if (KEY) {
-    try { got = await get(); take(got); status("Saved"); }
+    try { got = await get(); status("Saved"); }
     catch (e) { unread = true; status(String(e.message).includes("passcode") ? "Hub passcode refused: unlock the hub again to save." : "Relay unreachable: showing this device's copy. Reload before you change anything.", true); }
   } else status("Unlock the game master section on the hub to save to the relay. Until then this device keeps your changes.");
-  if (got && got.arcs && got.arcs.order) { A = copyOf(got.arcs); base = copyOf(got.arcs); }
-  else if (local) { A = local; if (got) { dirty = true; } }   // the relay lost them (or never had them): this device's copy goes back up
-  else { A = copyOf(D.seed); if (got) dirty = true; }
-  tidy(); draw();
+  if (got) { base = partsOf(got); hold(copyOf(base)); }
+  if (!A.order) { st.arcs = A = local || copyOf(D.seed); if (got) dirty = true; }   // the relay lost them (or never had them): this device's copy goes back up
+  else if (!got && local) st.arcs = A = local;
+  Link.tidy(A); if (got && Object.keys(Link.settle(st, CUR)).length) dirty = true;
+  draw();
+  const want = new URLSearchParams(location.search).get("card"); if (want && A.cards[want]) { editor({card: want}); const el = $(`[data-card="${want}"]`); if (el) el.scrollIntoView({inline: "center", block: "center"}); }
   if (dirty && KEY && !unread) save();
 }
 load();

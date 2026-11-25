@@ -9,7 +9,7 @@ description: Draft onto Tom's Session planner boards (once called Paths ahead) f
 | --- | --- |
 | A brain dump turned into cards, or something built out, tidied, linked or fixed on the page | **Draft on the boards** (below). Nothing goes into the vault |
 | The board brought into the vault | Steps 1 to 4 |
-| Where a session sits in the campaign | `python3 tools/osse/paths_sync.py arcs` prints the Arc planner (`vault/arcs.html`): each arc's start, end and session cards. Read it before drafting a session, so the draft moves its arc toward its end. Change arcs only on the page; nothing there goes into the vault |
+| Where a session sits in the campaign | `python3 tools/osse/paths_sync.py arcs` prints the Arc planner (`vault/arcs.html`): each arc's start, end and session cards. Read it before drafting a session, so the draft moves its arc toward its end. A card linked to a session is that session’s name on the Session planner too. Change arcs only on the pages; nothing there goes into the vault |
 
 ## Draft on the boards
 1. **Read.** `python3 tools/osse/paths_sync.py board S14` (no session for all) prints what is there with its ids. `python3 tools/osse/osse.py brief`, then `card` for each person, place and secret involved. Read the live plans on the same subject (`osse.py plans`): place an existing plan rather than writing a card that repeats it.
