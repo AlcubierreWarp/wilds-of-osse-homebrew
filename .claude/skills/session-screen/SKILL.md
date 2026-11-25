@@ -18,7 +18,7 @@ The hub's game master section finds the screen by itself (see step 6). Tom runs 
 
 ## 1. Get the plan first
 
-The story comes from Tom's plan for the session: the plans marked `ready` for it in the Ossë vault (`python3 tools/osse/osse.py plans`, then `card` on each), and any prep Tom gives in the conversation. Look up who and what is involved with `osse.py brief`, `card` and `find`. Run the scenes in the running order Tom set on the Paths ahead Session plan (`python3 tools/osse/paths_sync.py show`, last section), when he has set one. Never invent scenes, NPCs, clues or lines. If there is no plan marked ready and none in the conversation, ask for it and stop.
+The story comes from Tom's plan for the session: the plans marked `ready` for it in the Ossë vault (`python3 tools/osse/osse.py plans`, then `card` on each), and any prep Tom gives in the conversation. Look up who and what is involved with `osse.py brief`, `card` and `find`. Run the scenes in the running order Tom set in the Session planner (`python3 tools/osse/paths_sync.py show`, last section), when he has set one. Never invent scenes, NPCs, clues or lines. If there is no plan marked ready and none in the conversation, ask for it and stop.
 
 From the plan, pull:
 
@@ -34,7 +34,7 @@ From the plan, pull:
 
 ## 2. Shape the screen around the story
 
-- One movement per scene. A planned scene prints whole with `python3 tools/osse/osse.py scene NAME` (or, before it is in the vault, `paths_sync.py board S<n>`): its situation and purpose open the movement, its cues become the triggers on the flagged beats, and its exits the ways out. Mark a critical decision plainly. Each names its lead PC, a job for every other PC, the flagged beats, and the pen questions.
+- One movement per scene. A planned scene prints whole with `python3 tools/osse/osse.py scene NAME` (or, before it is in the vault, `paths_sync.py board S<n>`): its situation and purpose open the movement, its cues become the triggers on the flagged beats, and its exits the ways out. Its Any time cards stay apart from the beats that run in order: show them as ready at any point in the movement. A decision's options show with where each leads or what happens. A floating scene (`~` in the running order) is a movement Tom can call when it fits: leave it unnumbered, at its place in the order, and print its after and before limits. Mark a critical decision plainly. Each names its lead PC, a job for every other PC, the flagged beats, and the pen questions.
 - Each movement also carries the stakes (`st`): for each PC who faces a decision in that scene, the decision in one line, then the considerations the game master can offer from that character's history. Use only facts from the plan and the campaign record. Keep sealed secrets out of it. A PC with no decision is left out. This feeds the Stakes view.
 - Set `order` on a movement when the plan fixes the order the PCs are taken in.
 - Pick the views each movement offers by what the scene is (`TV`). Next in Spotlight moves to the next movement and its first view:

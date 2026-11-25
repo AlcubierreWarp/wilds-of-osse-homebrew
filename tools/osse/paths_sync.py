@@ -82,7 +82,7 @@ class Board:
         if i.startswith("c:"):
             return self.cards.get(i[2:], {})
         d, e = self.data.get(i[2:], {}), self.edits.get(i[2:], {})
-        return {**d, **{k: e[k] for k in ("kind", "summary", *paths_draft.EXTRA) if k in e}}
+        return {**d, **{k: e[k] for k in ("kind", "summary", "options", *paths_draft.EXTRA) if k in e}}
 
     def is_scene(self, i):
         return self.obj(i).get("kind") == "scene"
@@ -90,6 +90,19 @@ class Board:
     def scene(self, i):
         sc = self.items.get(i, {}).get("scene")
         return sc if sc and self.live(sc) and self.is_scene(sc) and not self.is_scene(i) else None
+
+    def anytime(self, i):
+        """In the scene's Any time section: it can come at any point, on its cue."""
+        return bool(self.scene(i) and self.items[i].get("any"))
+
+    def floating(self, i):
+        """What a floating scene says of its place ('' when its place in the running order is fixed)."""
+        o = self.items[i]
+        if not o.get("float"):
+            return ""
+        t = lambda x: x[2:] if x.startswith("p:") else self.cards[x[2:]].get("title") or "untitled"
+        lim = [f"{k} " + " and ".join(t(x) for x in o.get(k) or [] if self.live(x)) for k in ("after", "before") if any(self.live(x) and self.session(x) == o["s"] for x in o.get(k) or [])]
+        return "floating: " + (", ".join(lim) or "any time in the session")
 
     def session(self, i):
         return self.items[self.scene(i) or i]["s"]
@@ -156,6 +169,8 @@ def show(only=None):
                 say(i, f"- [[{pid}]]: placed in Tom's new scene {b.label(sc)} → set scene: once that card is a plan")
             elif not sc and d["scene"]:
                 say(i, f"- [[{pid}]]: the vault sets it in the scene [[{d['scene']}]], but Tom placed it outside → ask before clearing scene")
+            if sc and b.anytime(i) != d["anytime"]:
+                say(i, f"- [[{pid}]]: " + ("in its scene's Any time section → set anytime: true" if b.anytime(i) else "no longer in the Any time section → remove anytime"))
             if not sc:
                 for k in b.items[i].get("homes", []):
                     if k not in d["lanes"] and k != "world" and not (b.is_scene(i) and k in b.cast(i)):
@@ -169,8 +184,10 @@ def show(only=None):
             for f in paths_draft.EXTRA:
                 if paths_draft.has(o, f):
                     lines.append(f'    {f}: {", ".join(o[f]) if isinstance(o[f], list) else o[f]}')
+            for x in o.get("options") or []:
+                lines.append(f'    option · "{x.get("label") or "(not named)"}"' + (f': {x["text"]}' if x.get("text") else "") + " (only listed, no card)")
             if sc:
-                lines.append(f"    in the scene {b.label(sc)}")
+                lines.append(f"    in the scene {b.label(sc)}" + (", any time" if b.anytime(i) else ""))
             for e in b.edges:
                 choice = " option" if not e["from"].startswith("start") and b.obj(e["from"]).get("kind") == "decision" else ""
                 if e["to"] == i:
@@ -187,6 +204,8 @@ def show(only=None):
             continue
         changes = [f'{k}: "{ed[k]}"' for k in ("kind", "summary", *(f for f in paths_draft.EXTRA if f not in ("present", "who"))) if k in ed]
         changes += [f"{k}: " + (", ".join(ed[k]) or "(nobody)") for k in ("present", "who") if k in ed]
+        if "options" in ed:
+            changes.append("options (rewrite ## Options with the whole list):" + "".join(f'\n      - ' + (f'[[{x["to"]}]] · {x.get("label") or "(not named)"}' if x.get("to") else f'{x.get("label") or "(not named)"} · {x.get("text") or "(outcome not written)"}') for x in ed["options"]))
         if "idea" in ed:
             changes.append("idea (rewrite ## Idea, linking names as [[ ]]):\n      " + ed["idea"].replace("\n", "\n      "))
         if ed.get("note"):
@@ -212,8 +231,10 @@ def show(only=None):
         print("\n## Running order (for the session screen, nothing to write in the vault)")
         for sess in sorted(order, key=lambda t: int(t[1:]) if t[1:].isdigit() else 1e9):
             print(f"{sess}:")
-            for n, i in enumerate([x for x in order[sess] if b.live(x)], 1):
-                print(f"  {n}. {b.label(i)} ({', '.join(b.lanes(i))})")
+            n = 0
+            for i in (x for x in order[sess] if b.live(x)):
+                n += not b.floating(i)
+                print(f"  {'~' if b.floating(i) else f'{n}.'} {b.label(i)} ({', '.join(b.lanes(i))})" + (f" [{b.floating(i)}]" if b.floating(i) else ""))
 
 
 def known(b):
@@ -315,7 +336,7 @@ def notes(which, out=None):
     plan = lambda i: f"[[{safe(title(i))}]]"
     q = lambda v: '"' + str(v).replace('"', "'").replace("\n", " ") + '"'
     members = [m for m in b.items if b.live(m) and b.scene(m) == sid]
-    members.sort(key=lambda m: (b.items[m].get("ry", 0), b.items[m].get("rx", 0)))
+    members.sort(key=lambda m: (not b.anytime(m), b.items[m].get("any", 0) if b.anytime(m) else b.items[m].get("ry", 0), b.items[m].get("rx", 0)))
     today, made = datetime.date.today().isoformat(), []
     for i in [sid, *members]:
         if i.startswith("p:"):
@@ -334,13 +355,15 @@ def notes(which, out=None):
                 continue
             v = o[f]
             fm.append(f"{f}: " + ("[" + ", ".join(q(link(x)) for x in v) + "]" if isinstance(v, list) else "true" if v is True else q(link(v)) if f in ("where", "reveals") else v if f == "clock" else q(v)))
+        if b.anytime(i):
+            fm.append("anytime: true")
         if kind == "exit" and outs:
             fm.append("leads_to: [" + ", ".join(dict.fromkeys(q(plan(e["to"])) for e in outs)) + "]")
         s = b.session(i)
         fm += ([f"target: {s}"] if s != "Later" else []) + [f"updated: {today}"]
         body = ["## Idea", *(f"- {ln.strip()}" for ln in (text or title(i)).split("\n") if ln.strip())]
         if kind == "decision":
-            body += ["", "## Options", *(f"- {plan(e['to'])} · {e.get('label') or '(not named)'}" for e in outs)]
+            body += ["", "## Options", *(f"- {plan(e['to'])} · {e.get('label') or '(not named)'}" for e in outs), *(f"- {x.get('label') or '(not named)'} · {x.get('text') or '(outcome not written)'}" for x in o.get("options") or [])]
         ins = [e for e in b.edges if e["to"] == i and not e["from"].startswith("start") and b.live(e["from"])]
         need = [e for e in ins if b.obj(e["from"]).get("kind") not in ("decision", "exit")]
         reqs = []

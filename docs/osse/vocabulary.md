@@ -125,6 +125,7 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | `reveals` | `osse:reveals` |
 | `leads_to` | `schema:result` |
 | `critical` | `osse:critical` |
+| `anytime` | `osse:anytime` |
 | `type` | vault bookkeeping |
 | `importance_set` | vault bookkeeping |
 | `pruned` | vault bookkeeping |
@@ -338,6 +339,7 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | `osse:Exit` | `schema:DepartAction` | Someone leaves a scene, or a way the scene can end and where that leads. |
 | `osse:cue` | `schema:additionalProperty` | What triggers a beat, entrance or exit at the table. |
 | `osse:purpose` | `schema:additionalProperty` | What a scene is for: reveal a clue, introduce someone, force a choice. |
+| `osse:anytime` | `schema:additionalProperty` | A card that can come at any point in its scene, on its cue. |
 | `osse:critical` | `schema:additionalProperty` | A decision that can end or remake a player character. |
 | `osse:reveals` | `schema:object` | The secret a reveal brings out. |
 | `osse:Clock` | `schema:PlanAction` | A progress clock: time pressure in a scene, or something that happens when its segments fill. |

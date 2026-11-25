@@ -8,7 +8,10 @@ A draft is a JSON file. Every part is optional:
     "present": ["GUS", "The Party"], "purpose": "force a choice",
     "cards": [{"key": "ask", "kind": "decision", "title": "...", "text": "...", "cue": "what triggers it", "critical": true}, "p:An existing plan",
               {"kind": "reveal", "title": "...", "cue": "...", "reveals": "A secret"}, {"kind": "entrance", "title": "...", "cue": "...", "who": ["Vigil"]},
-              {"key": "out", "kind": "exit", "title": "...", "cue": "..."}]},                   an exit's links out are where it leads
+              {"key": "out", "kind": "exit", "title": "...", "cue": "..."},                     an exit's links out are where it leads
+              {"kind": "beat", "title": "...", "cue": "...", "anytime": true}]},                in the scene's Any time section: it follows no other card
+   {"kind": "scene", "title": "...", "float": true, "after": ["gala"], "before": []},         no fixed place in the running order, within those limits
+   {"kind": "decision", "title": "...", "options": [{"label": "the choice", "text": "the outcome"}]},   options with no card; a link out is an option with one
    {"key": "rumour", "kind": "pressure", "title": "...", "board": "Belaskro Tich"},        outside any scene: say which board
    {"key": "b2", "kind": "beat", "title": "...", "in": "c:9qyi0ije"}],                     into a scene already on the boards
  "place": [{"plan": "A plan", "in": "gala"}, {"plan": "Another", "session": "S15", "board": "GUS"}],
@@ -25,8 +28,9 @@ IN_SCENE = ("beat", "reveal", "complication", "decision", "entrance", "exit")
 FOR = {"where": ("scene",), "when": ("scene",), "present": ("scene",), "purpose": ("scene",), "cue": IN_SCENE, "who": ("entrance", "exit"),
        "reveals": ("reveal",), "critical": ("decision",), "clock": ("clock",)}   # the kinds each extra field belongs on
 EXTRA = tuple(FOR)
-CARD_FIELDS = ("kind", "title", "text", *EXTRA)
-PLAN_FIELDS = ("kind", "summary", "idea", *EXTRA, "note")
+PLACE = ("anytime", "float", "after", "before")   # where it stands: in its scene's Any time section; a scene with no fixed place, and the scenes it must come after or before
+CARD_FIELDS = ("kind", "title", "text", "options", *EXTRA)
+PLAN_FIELDS = ("kind", "summary", "idea", "options", *EXTRA, "note")
 has = lambda o, f: (o.get("kind") or "beat") in FOR[f] and o.get(f) not in (None, "", [], False)
 PARTS = ("items", "cards", "edits", "edges", "order", "sessions")
 PART_KEYS = {"session", "cards", "place", "links", "edit", "relabel", "unlink", "remove", "order", "layout", "base"}
@@ -75,7 +79,7 @@ def prune(doc, was):
     for i, o in doc["items"].items():
         if o.get("scene") and o["scene"] not in doc["items"]:
             o["homes"] = o.get("homes") or [o.get("born") or "The Party"]
-            for k in ("scene", "rx", "ry", "lay"):
+            for k in ("scene", "rx", "ry", "lay", "any"):
                 o.pop(k, None)
             o["at"] = {}
         if not o.get("scene"):
@@ -98,7 +102,7 @@ def nid():
 
 def apply(spec, doc, b, known):
     """Work the draft into doc. Returns (problems, warnings, ids by key)."""
-    bad, warn, ids, boards = [], [], {}, known["boards"]
+    bad, warn, ids, boards, later = [], [], {}, known["boards"], []
     doc.setdefault("cards", {}), doc.setdefault("edits", {}), doc.setdefault("edges", []), doc.setdefault("order", {})
     b.cards, b.edits, b.edges = doc["cards"], doc["edits"], doc["edges"]
     for k in spec:
@@ -149,6 +153,13 @@ def apply(spec, doc, b, known):
                 bad.append(f"{what}: {f} belongs on {' or '.join(FOR[f])}, not {c.get('kind') or 'beat'}")
         if c.get("reveals") and c["reveals"].lower() not in known["secrets"]:
             warn.append(f"{what}: {c['reveals']} is not a secret in the vault (kept as plain text)")
+        if c.get("options") and ((c.get("kind") or "beat") != "decision" or not all(is_map(x) and x.get("label") for x in c["options"])):
+            bad.append(f"{what}: options belong on a decision, each with a label (the choice) and a text (the outcome)")
+        for f in ("anytime", "float"):
+            if f in c and not isinstance(c[f], bool):
+                bad.append(f"{what}: {f} must be true or false")
+        if (c.get("kind") == "scene" and "anytime" in c) or (c.get("kind") != "scene" and any(f in c for f in ("float", "after", "before"))):
+            bad.append(f"{what}: anytime belongs on a card in a scene; float, after and before on a scene")
         if "critical" in c and not isinstance(c["critical"], bool):
             bad.append(f"{what}: critical must be true or false")
         if c.get("where") and c["where"].lower() not in known["places"]:
@@ -160,6 +171,28 @@ def apply(spec, doc, b, known):
         ry = max([132 - 176, *[doc["items"][m].get("ry", 132) for m in inside]]) + 176
         o.update(scene=sc, rx=22, ry=ry, s=so["s"], at={}, lay=1)
         so["h"] = max(so.get("h", SCH), ry + 176)
+
+    def stand(i, c, what):
+        """Any time in its scene; floating, and within which limits (worked out once every key is known)."""
+        o = doc["items"].get(i)
+        if not o:
+            return
+        if "anytime" in c:
+            o.pop("any", None)
+            if c["anytime"]:
+                if not b.scene(i):
+                    bad.append(f"{what}: anytime needs a scene")
+                else:
+                    o["any"] = max([0, *[doc["items"][m].get("any") or 0 for m in doc["items"] if b.scene(m) == b.scene(i)]]) + 1
+        if "float" in c:
+            o.pop("float", None)
+            if c["float"]:
+                o["float"] = 1
+            else:
+                o.pop("after", None), o.pop("before", None)
+        for f in ("after", "before"):
+            if f in c:
+                later.append((i, f, c[f] if isinstance(c[f], list) else [c[f]], what))
 
     def loose(i, s, k):
         doc["items"][i] = {"s": s, "homes": [k], "born": k, "at": {}}
@@ -188,7 +221,7 @@ def apply(spec, doc, b, known):
             return place(c[2:] if c.startswith("p:") else c, sc=parent)
         what = f"card '{c.get('title') or c.get('key') or '?'}'"
         for k in c:
-            if k not in ("key", "cards", "in", "session", "board", *CARD_FIELDS):
+            if k not in ("key", "cards", "in", "session", "board", *CARD_FIELDS, *PLACE):
                 bad.append(f"{what}: unknown field '{k}'")
         if not c.get("title"):
             bad.append(f"{what}: needs a title")
@@ -205,6 +238,8 @@ def apply(spec, doc, b, known):
         for f in EXTRA:
             if c.get(f):
                 doc["cards"][cid][f] = c[f]
+        if c.get("options"):
+            doc["cards"][cid]["options"] = [{"label": x["label"], "text": x.get("text", "")} for x in c["options"]]
         sc = parent or (ref(c["in"], what) if c.get("in") else None)
         if kind == "scene":
             if sc:
@@ -231,6 +266,7 @@ def apply(spec, doc, b, known):
                 into(i, sc)
             else:
                 loose(i, sess(c.get("session")), board(c.get("board"), what))
+        stand(i, c, what)
 
     for c in spec.get("cards", []):
         add(c)
@@ -242,7 +278,9 @@ def apply(spec, doc, b, known):
         i = ref(e.get("id"), "edit", False)
         if not i:
             continue
-        ch = {k: v for k, v in e.items() if k != "id"}
+        ch = {k: v for k, v in e.items() if k != "id" and k not in PLACE}
+        check({"kind": b.obj(i).get("kind") or "beat", **{k: e[k] for k in PLACE if k in e}}, f"edit {e['id']}")
+        stand(i, e, f"edit {e['id']}")
         check({"kind": b.obj(i).get("kind") or "beat", **ch}, f"edit {e['id']}")
         if i.startswith("c:"):
             if i[2:] not in doc["cards"]:
@@ -267,6 +305,13 @@ def apply(spec, doc, b, known):
             if i[2:] not in b.data:
                 bad.append(f"edit: no live plan {i}")
             doc["edits"].setdefault(i[2:], {}).update(ch)
+    for i, f, names, what in later:
+        doc["items"][i].pop(f, None)
+        got = [x for x in (ref(n, f"{what} {f}") for n in names) if x]
+        if any(not b.is_scene(x) or doc["items"][x]["s"] != doc["items"][i]["s"] for x in got):
+            bad.append(f"{what}: {f} names scenes in the same session")
+        if got:
+            doc["items"][i].update({f: got, "float": 1})
     byid = {e["id"]: e for e in doc["edges"]}
     for row in spec.get("relabel", []):
         if row[0] in byid:
@@ -317,7 +362,7 @@ def apply(spec, doc, b, known):
         doc["order"][s] = first + have + [i for i in doc["items"] if b.live(i) and b.is_scene(i) and doc["items"][i]["s"] == s and i not in first + have]
     for i in doc["items"]:
         if b.live(i) and b.obj(i).get("kind") == "decision" and i.startswith("c:") and doc["cards"][i[2:]].get("draft") == "new":
-            n = sum(e["from"] == i for e in doc["edges"])
+            n = sum(e["from"] == i for e in doc["edges"]) + len(doc["cards"][i[2:]].get("options") or [])
             if n < 2:
                 warn.append(f"decision '{doc['cards'][i[2:]]['title']}': {n} option{'' if n == 1 else 's'}; link it to what each choice leads to")
     return bad, warn, ids
@@ -356,6 +401,9 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
         for ln in txt.split("\n") if txt else []:
             if ln.strip():
                 out.append(f"{pad}    {ln.strip()}")
+        for x in o.get("options") or []:
+            if not x.get("to"):
+                out.append(f"{pad}    option: \"{x.get('label') or '(not named)'}\": {x.get('text') or '(outcome not written)'}  (listed only)")
         for e in edges:
             if e["from"] == i:
                 arrow = f"{pad}    {'option' if o.get('kind') == 'decision' else 'leads to'}: " + (f'"{e["label"]}" → ' if e.get("label") else "→ ") + name(e["to"])
@@ -382,16 +430,26 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
         if not scenes and not free:
             continue
         out.append(f"\n## {s}")
-        for n, i in enumerate(scenes, 1):
-            o = b.obj(i)
-            out.append(f"{n}. {mark(i)}SCENE {name(i)}{tag(i)}")
+        n = 0
+        for i in scenes:
+            o, fl = b.obj(i), b.floating(i)
+            n += not fl
+            out.append(f"{'~' if fl else f'{n}.'} {mark(i)}SCENE {name(i)}{tag(i)}" + (f"  ({fl})" if fl else ""))
             out.append(f"     at {o.get('where') or '(where not set)'}" + (f" · {o['when']}" if o.get("when") else "") + f" · with {', '.join(o.get('present') or []) or 'nobody yet'} · boards: {', '.join(b.lanes(i))}")
             if o.get("purpose"):
                 out.append(f"     purpose: {o['purpose']}")
             txt = (o.get("text") if i.startswith("c:") else o.get("summary")) or ""
             out += [f"     {ln.strip()}" for ln in txt.split("\n") if ln.strip()]
             out += [f"     leads to: {name(e['to'])}" + (f' · "{e["label"]}"' if e.get("label") else "") + (f"  [{e['id']}]" if withids else "") for e in edges if e["from"] == i]
-            group([m for m in live if b.scene(m) == i], 2)
+            mem = [m for m in live if b.scene(m) == i]
+            free_, flow = [m for m in mem if b.anytime(m)], [m for m in mem if not b.anytime(m)]
+            if free_:
+                out.append("     Any time:")
+                for m in sorted(free_, key=lambda m: doc["items"][m]["any"]):
+                    lines(m, 3, set(), set())
+                if flow:
+                    out.append("     In order:")
+            group(flow, 2)
         if free:
             out.append("Not in a scene:")
             for k in dict.fromkeys(b.lanes(i)[0] for i in free):

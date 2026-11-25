@@ -36,7 +36,7 @@ PROPS = [("player", "Player"), ("class", "Class"), ("race", "Race"), ("pronouns"
          ("wants", "Wants"), ("fear", "Fear"), ("leader", "Leader"), ("known_by", "Known by"), ("opened", "Opened"),
          ("closed", "Closed"), ("played_on", "Played on"), ("in_world", "In the world"), ("thread", "Thread"),
          ("where", "Where"), ("when", "When"), ("present", "Present"), ("purpose", "Purpose"), ("scene", "Scene"), ("cue", "Cue"), ("who", "Who"),
-         ("reveals", "Reveals"), ("leads_to", "Leads to"), ("critical", "Critical"), ("played", "Played"), ("pruned", "Pruned"), ("pruned_by", "Pruned because"), ("map", "Map")]
+         ("reveals", "Reveals"), ("leads_to", "Leads to"), ("critical", "Critical"), ("anytime", "Any time in its scene"), ("played", "Played"), ("pruned", "Pruned"), ("pruned_by", "Pruned because"), ("map", "Map")]
 PLAYER_PROPS = [("player", "Player"), ("class", "Class"), ("pronouns", "Pronouns")]
 LINK = re.compile(r"!?\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]+))?\]\]")
 TAG = re.compile(r"\*\(((?:S\d+|prep)[^)]*)\)\*")

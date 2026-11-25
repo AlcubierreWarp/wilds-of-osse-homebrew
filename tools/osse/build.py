@@ -268,12 +268,14 @@ aslist = lambda v: v if isinstance(v, list) else [v] if v not in (None, "") else
 CLOCK = re.compile(r"^\s*(\d+)\s*/\s*(\d+)\s*$")
 
 def parse_options(text):
-    """A decision's `## Options`: `- [[Plan]] · what the character chooses`. Returns [(plan, choice)]."""
+    """A decision's `## Options`: `- [[Plan]] · what the character chooses`, or, when the outcome is no plan of its own,
+    `- what the character chooses · what happens`. Returns [(plan or None, choice, outcome)]."""
     out = []
     for sec, s in sections(text):
         if sec == "Options" and s.startswith("- "):
-            m = LINK.search(s)
-            out.append((m.group(1).strip() if m else None, s.split("·", 1)[1].strip() if "·" in s else ""))
+            left, _, right = (x.strip() for x in s[2:].partition("·"))
+            m = re.match(r"\[\[", left) and LINK.match(left)
+            out.append((m.group(1).strip(), right, "") if m else (None, left, right))
     return out
 
 def plan_shape_checks(notes, problems):
@@ -294,7 +296,7 @@ def plan_shape_checks(notes, problems):
                 problems.append(f"{nm}: present [[{t}]] points to a missing note")
         if any(fm.get(k) for k in ("where", "when", "present", "purpose")) and kind != "scene":
             problems.append(f"{nm}: where, when, present and purpose belong on a scene: set kind: scene or move them to the scene")
-        for key, kinds in (("cue", IN_SCENE), ("who", ("entrance", "exit")), ("reveals", ("reveal",)), ("leads_to", ("exit",)), ("critical", ("decision",))):
+        for key, kinds in (("cue", IN_SCENE), ("who", ("entrance", "exit")), ("reveals", ("reveal",)), ("leads_to", ("exit",)), ("critical", ("decision",)), ("anytime", IN_SCENE)):
             if fm.get(key) and (kind or "beat") not in kinds:
                 problems.append(f"{nm}: {key} belongs on {' or '.join(kinds)}, not {kind or 'beat'}")
         for v in aslist(fm.get("who")):
@@ -309,6 +311,8 @@ def plan_shape_checks(notes, problems):
             t = link_name(v)
             if not t or t not in notes or notes[t]["type"] != "plan":
                 problems.append(f"{nm}: leads_to '{v}' must be [[a plan]]")
+        if fm.get("anytime") and not fm.get("scene"):
+            problems.append(f"{nm}: anytime belongs on a card in a scene: set scene: \"[[Scene plan]]\"")
         if kind in ("entrance", "exit") and not fm.get("scene"):
             problems.append(f"{nm}: an {kind} happens in a scene: set scene: \"[[Scene plan]]\"")
         sc = fm.get("scene")
@@ -326,9 +330,10 @@ def plan_shape_checks(notes, problems):
             if kind != "clock":
                 problems.append(f"{nm}: has a clock, so set kind: clock")
         opts = parse_options(n["text"])
-        for target, choice in opts:
+        for target, choice, outcome in opts:
             if not target:
-                problems.append(f"{nm}: option without a [[plan]]: write - [[Plan]] · what they choose")
+                if not choice or not outcome:
+                    problems.append(f"{nm}: an option is either - [[Plan]] · what they choose, or - what they choose · what happens")
             elif target not in notes or notes[target]["type"] != "plan":
                 problems.append(f"{nm}: option [[{target}]] is not a plan note")
         if opts and kind != "decision":
@@ -713,7 +718,7 @@ if __name__ == "__main__":
         for k in ("summary", "importance", "stage", "state", "state_since", "first_seen", "location", "holder", "in",
                   "status", "target", "revealed", "race", "role", "kind", "player", "number", "pronouns",
                   "for", "hp", "hp_max", "hp_temp", "slots", "conditions", "sheet_at", "ddb", "class", "played",
-                  "where", "when", "present", "purpose", "scene", "cue", "who", "reveals", "leads_to", "critical", "clock"):
+                  "where", "when", "present", "purpose", "scene", "cue", "who", "reveals", "leads_to", "critical", "anytime", "clock"):
             v = n["fm"].get(k)
             if v not in (None, "", []):
                 node[k] = LINK.sub(r"\1", v) if isinstance(v, str) else [LINK.sub(r"\1", x) if isinstance(x, str) else x for x in v] if isinstance(v, list) else v

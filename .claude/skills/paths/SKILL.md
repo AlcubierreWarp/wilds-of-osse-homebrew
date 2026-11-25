@@ -16,7 +16,9 @@ description: Draft onto Tom's Session planner boards (once called Paths ahead) f
 2. **Write a draft file** in the scratchpad, never in the repo. The format is at the top of `tools/osse/paths_draft.py`: `cards` (scenes hold their own), `place`, `links`, `edit`, `relabel`, `unlink`, `remove`, `order`, `layout`.
    - Tom's words and ideas lead. Build out what he gave; mark anything you add beyond it when you show the outline, and ask about gaps that change the story instead of filling them.
    - A scene carries its situation (where, when, who is there when it opens, what is going on) and its purpose. Its cards are beats, reveals, complications, decisions, entrances and exits, each with a `cue`: what triggers it at the table. Prefer a cue to an arrow; draw arrows only where one thing must follow another, and from a decision. Few cards: one turn each, never a chain of lines of dialogue. Give every scene its exits, each linked to the scene it leads to; `critical` marks a decision that can end or remake a character.
-   - Every decision has two or three options, each a link labelled with the choice; two choices may lead to the same card. Bring branches back together (`docs/osse/branching.md`).
+   - A card that can happen at any point in its scene gets `anytime: true` and still a cue; nothing leads to it. Cards that follow one another stay in the flow.
+   - A scene that can move in the session (it ties to no other) gets `float: true`, with `after` / `before` (scene keys or ids) only where the story limits it. `board` prints floating scenes with `~`.
+   - Every decision has two or three options. An option that opens something is a link labelled with the choice; one that only has a result is listed in `options` as `{"label": choice, "text": what happens}`. Two choices may lead to the same card. Bring branches back together (`docs/osse/branching.md`).
    - Card text is a line or two in table-ready words, to run from; a cue is one short line. Titles are short and never repeat a plan's name. Never contradict canon; never write a secret as known to a player character who does not know it.
    - A clean-up edits Tom's cards in place (`edit`, `relabel`) and keeps his meaning. Remove a card only when he agreed to it.
 3. **Preview.** `python3 tools/osse/paths_sync.py draft FILE` checks it and prints the outline. Fix what it lists. Show Tom the outline, phone-sized, with your additions and questions. Wait for his yes.
@@ -38,16 +40,17 @@ Tom plans on the Session planner page (`vault/paths.html`): two views of the who
 - **EDITED**: Tom changed a plan's kind, summary or idea, or left a note to Claude.
 - **DROP**: Tom dropped a plan.
 - **NEW LINK**: Tom's link between two vault plans, with its label.
-- **Running order**: each session's scenes, in the order Tom set in the Running order. Nothing goes into the vault; when building that session's screen (the `session-screen` skill), run the scenes in this order.
+- **any time**: a card in its scene's Any time section.
+- **Running order**: each session's scenes, in the order Tom set in the Running order, with floating scenes marked `~` and their limits. Nothing goes into the vault; when building that session's screen (the `session-screen` skill), run the scenes in this order.
 
 ## Step 2: Turn it into vault changes
 - Start from `python3 tools/osse/paths_sync.py notes SCENE`: it prints the plan notes the scene and its cards would become (add a folder to write them there, outside the vault), and flags names already taken and links that leave the scene. Tighten those; then check `python3 tools/osse/osse.py scene NAME` after the build against the board.
-- The fields on a card keep their names in the note: `when`, `purpose`, `cue`, `critical`; `who` and `present` as lists with [[links]]; `reveals: "[[Secret]]"`; an exit's links out as `leads_to:`. Never write `plan: [[exit]]` into the scene an exit leads to.
+- The fields on a card keep their names in the note: `when`, `purpose`, `cue`, `critical`, `anytime`; `who` and `present` as lists with [[links]]; `reveals: "[[Secret]]"`; an exit's links out as `leads_to:`. Never write `plan: [[exit]]` into the scene an exit leads to.
 - A scene card becomes a `kind: scene` plan with `where:` (a [[link]] when the vault has the place; plain text otherwise, and ask Tom whether it needs a place note) and `present:` (a list; [[links]] for people in the vault, plain text for the rest). Write the scene first, then the cards inside it with `scene: "[[Scene]]"`.
 - A clock card becomes a `kind: clock` plan with `clock: filled/segments`; its text is what happens when it fills.
 - A NEW CARD becomes a plan note in `Plans/`, written with a short script, following `docs/osse/plans.md`: `stage: draft`, `status: draft`, `kind:` from the card (a `note` card becomes the kind its text describes: usually a beat; ask if unclear), `target:` from its column, `for:` the board's character (not for the World; The Party when it is on the session canvas only and is for all of them; not for a scene whose `present:` already names them), a one-line `summary`, `## Idea` from the card text in Tom's words, tightened.
 - Links into a card or between plans:
-  - from a decision: each link is one option, so one `## Options` line per link, `- [[Plan]] · label`. Several links to the same plan become several lines to that plan. `show` marks an option with no label "(not named)": ask Tom for the choice;
+  - from a decision: each link is one option, so one `## Options` line per link, `- [[Plan]] · label`. Several links to the same plan become several lines to that plan. A listed option with no card becomes `- choice · what happens`. When Tom edited a plan's options, the list `show` prints replaces the whole section. `show` marks an option with no label "(not named)": ask Tom for the choice;
   - labelled "then" or unlabelled, between scenes: `plan: [[Earlier]]` in the later plan's `## Requires`;
   - from Now: no requirement; it only means "from where they stand".
   - any other label: work out what must be true and write it as a requirement (`hidden:`, `alive:`, `met:`…), or `check:` when no rule can test it.

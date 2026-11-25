@@ -197,7 +197,7 @@ def scene(g, nodes, q=None):
     for m in inn.values():
         s = sections(text(m))
         needs[m["id"]] = [x for ln in s.get("Requires", []) if ln.startswith(("- plan:", "- played:")) for x in LINK.findall(ln) if x in inn]
-        opts[m["id"]] = [(LINK.search(ln).group(1), ln.split("·", 1)[1].strip() if "·" in ln else "") for ln in s.get("Options", []) if LINK.search(ln)]
+        opts[m["id"]] = [(x.group(1), b.strip()) if x else (plain(b.strip()), plain(a.strip())) for a, _, b in (ln[2:].partition("·") for ln in s.get("Options", []) if ln.startswith("- ")) for x in [LINK.match(a.strip())]]
         opts[m["id"]] += [(x, "") for x in (m.get("leads_to") if isinstance(m.get("leads_to"), list) else [m["leads_to"]] if m.get("leads_to") else [])]
     under = {}
     for m, ps in needs.items():
@@ -219,7 +219,8 @@ def scene(g, nodes, q=None):
         for c in inn:
             if under.get(c) == mid: show(c, d + 1)
 
-    for head_, ok in (("Beats:", lambda m: m.get("kind") != "exit"), ("Exits:", lambda m: m.get("kind") == "exit")):
+    yes = lambda m: str(m.get("anytime") or "").lower() in ("true", "yes", "1")
+    for head_, ok in (("Any time:", yes), ("Beats:", lambda m: m.get("kind") != "exit" and not yes(m)), ("Exits:", lambda m: m.get("kind") == "exit" and not yes(m))):
         tops = [m for m in inn if m not in under and ok(inn[m]) and m not in seen]
         if tops: print(head_)
         for m in tops: show(m, 1)
