@@ -5,6 +5,7 @@
   python3 tools/osse/osse.py card "Mira Holt" --full   the whole note as written
   python3 tools/osse/osse.py find bell             names, aliases and summaries; --body also searches note text
   python3 tools/osse/osse.py plans                 live plans by target; --checks for the judgment calls only
+  python3 tools/osse/osse.py scene "The gala"      a scene plan as a run sheet: situation, purpose, beats with their cues, exits; no name lists them
   python3 tools/osse/osse.py walk "Mira Holt" ...  the full graph walk (tools/osse/graph.py and its options)
   python3 tools/osse/osse.py build [--dry]         rebuild the generated files and the vault/ DM pages (tools/osse/build.py)
   python3 tools/osse/osse.py page "Mira Holt"      where that entry's DM page is (vault/, rebuilt by every build)
@@ -177,6 +178,55 @@ def plans(g, nodes, checks=False):
             print(f"    check: {c}")
 
 
+def scene(g, nodes, q=None):
+    """A scene put back together from the plan notes that name it."""
+    live = [n for n in nodes.values() if n["type"] == "plan" and n.get("status") in LIVE]
+    if not q:
+        for n in sorted((n for n in live if n.get("kind") == "scene"), key=lambda n: (str(n.get("target") or "S999"), n["id"])):
+            print(f"- {n.get('target') or 'no target'} {n['id']}: {plain(n.get('purpose') or n.get('summary', ''))} ({sum(m.get('scene') == n['id'] for m in live)} cards)")
+        return
+    nid = resolve(nodes, q); n = nodes[nid]
+    many = lambda v: ", ".join(map(str, v)) if isinstance(v, list) else str(v)
+    print(f"SCENE {nid} [{n.get('status')}{', ' + n['target'] if n.get('target') else ''}]")
+    print("Situation: " + " · ".join(many(n[k]) for k in ("where", "when", "present") if n.get(k)))
+    for ln in sections(text(n)).get("Idea", []):
+        print("  " + plain(ln).lstrip("- "))
+    print(f"Purpose: {n.get('purpose') or '(not set)'}")
+    inn = {m["id"]: m for m in live if m.get("scene") == nid}
+    needs, opts = {}, {}
+    for m in inn.values():
+        s = sections(text(m))
+        needs[m["id"]] = [x for ln in s.get("Requires", []) if ln.startswith(("- plan:", "- played:")) for x in LINK.findall(ln) if x in inn]
+        opts[m["id"]] = [(LINK.search(ln).group(1), ln.split("·", 1)[1].strip() if "·" in ln else "") for ln in s.get("Options", []) if LINK.search(ln)]
+        opts[m["id"]] += [(x, "") for x in (m.get("leads_to") if isinstance(m.get("leads_to"), list) else [m["leads_to"]] if m.get("leads_to") else [])]
+    under = {}
+    for m, ps in needs.items():
+        if ps: under[m] = ps[0]
+    for m, os_ in opts.items():
+        for t, _ in os_:
+            if t in inn and inn[m].get("kind") == "decision": under.setdefault(t, m)
+    seen = set()
+
+    def show(mid, d):
+        if mid in seen: return
+        seen.add(mid); m = inn[mid]; pad = "  " * d; k = m.get("kind") or "beat"
+        print(f"{pad}- {'CRITICAL ' if str(m.get('critical', '')).lower() == 'true' else ''}{k.upper()} {mid}" + (f" ({m['clock']})" if m.get("clock") else ""))
+        if m.get("cue"): print(f"{pad}    cue: {m['cue']}")
+        if m.get("who"): print(f"{pad}    who: {many(m['who'])}")
+        if m.get("reveals"): print(f"{pad}    reveals: {many(m['reveals'])}")
+        for ln in sections(text(m)).get("Idea", []): print(f"{pad}    {plain(ln).lstrip('- ')}")
+        for t, lab in opts[mid]: print(f"{pad}    {'option: ' + lab + ' → ' if k == 'decision' else 'leads to '}{t}")
+        for c in inn:
+            if under.get(c) == mid: show(c, d + 1)
+
+    for head_, ok in (("Beats:", lambda m: m.get("kind") != "exit"), ("Exits:", lambda m: m.get("kind") == "exit")):
+        tops = [m for m in inn if m not in under and ok(inn[m]) and m not in seen]
+        if tops: print(head_)
+        for m in tops: show(m, 1)
+    for m in list(inn):
+        show(m, 1)   # anything caught in a loop
+
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if not a or a[0] in ("-h", "--help", "help"):
@@ -203,6 +253,8 @@ if __name__ == "__main__":
                 print()
     elif cmd == "find" and words:
         find(g, nodes, " ".join(words), "--body" in rest)
+    elif cmd == "scene":
+        scene(g, nodes, " ".join(words) or None)
     elif cmd == "plans":
         plans(g, nodes, "--checks" in rest)
     else:

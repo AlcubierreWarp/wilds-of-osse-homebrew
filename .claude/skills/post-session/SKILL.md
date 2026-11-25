@@ -45,7 +45,7 @@ Then two checks: every load-bearing clue (the screen's Export says which were fo
 
 ## Step 4: Plans
 For each plan from Step 2, propose one of:
-- **played**: `status: played`, `played: S<n>`, a Log line pointing to the session note. Canon comes from Step 3, not from the plan.
+- **played**: `status: played`, `played: S<n>`, a Log line pointing to the session note. Canon comes from Step 3, not from the plan. A played reveal's `reveals:` names the secret to mark `revealed` when the table heard it; of a scene's exits, the one play took is played and the others are dropped.
 - **partly played**: mark it played and propose a new draft for the part still ahead.
 - **overtaken**: `status: pruned`, `pruned: S<n>`, `pruned_by: "overtaken by S<n>: <why>"`. Suggest the requirement that would have caught it.
 - **untouched**: stays live; propose a new `target` or `dropped`.

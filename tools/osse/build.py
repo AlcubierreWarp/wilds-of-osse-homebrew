@@ -261,7 +261,10 @@ def parse_plan(n):
                 links_raw.append(s)
     return reqs, links, links_raw
 
-KINDS = {"", "beat", "scene", "decision", "pressure", "clock", "bottleneck"}   # empty means beat
+KINDS = {"", "beat", "reveal", "complication", "decision", "entrance", "exit", "scene", "pressure", "clock", "bottleneck"}   # empty means beat
+IN_SCENE = ("beat", "reveal", "complication", "decision", "entrance", "exit")   # the cards a scene is made of
+yes = lambda v: str(v or "").strip().lower() in ("true", "yes", "1")
+aslist = lambda v: v if isinstance(v, list) else [v] if v not in (None, "") else []
 CLOCK = re.compile(r"^\s*(\d+)\s*/\s*(\d+)\s*$")
 
 def parse_options(text):
@@ -281,7 +284,7 @@ def plan_shape_checks(notes, problems):
         fm = n["fm"]
         kind = str(fm.get("kind") or "").strip().lower()
         if kind not in KINDS:
-            problems.append(f"{nm}: kind '{kind}' is not beat, scene, decision, pressure, clock or bottleneck")
+            problems.append(f"{nm}: kind '{kind}' is not one of {', '.join(sorted(KINDS - {''}))}")
         where = fm.get("where")
         if where and link_name(where) and (link_name(where) not in notes or notes[link_name(where)]["type"] != "place"):
             problems.append(f"{nm}: where [[{link_name(where)}]] is not a place note")
@@ -289,8 +292,25 @@ def plan_shape_checks(notes, problems):
             t = link_name(v)
             if t and t not in notes:
                 problems.append(f"{nm}: present [[{t}]] points to a missing note")
-        if (where or fm.get("present")) and kind != "scene":
-            problems.append(f"{nm}: where and present belong on a scene: set kind: scene or move them to the scene")
+        if any(fm.get(k) for k in ("where", "when", "present", "purpose")) and kind != "scene":
+            problems.append(f"{nm}: where, when, present and purpose belong on a scene: set kind: scene or move them to the scene")
+        for key, kinds in (("cue", IN_SCENE), ("who", ("entrance", "exit")), ("reveals", ("reveal",)), ("leads_to", ("exit",)), ("critical", ("decision",))):
+            if fm.get(key) and (kind or "beat") not in kinds:
+                problems.append(f"{nm}: {key} belongs on {' or '.join(kinds)}, not {kind or 'beat'}")
+        for v in aslist(fm.get("who")):
+            t = link_name(v)
+            if t and t not in notes:
+                problems.append(f"{nm}: who [[{t}]] points to a missing note")
+        for v in aslist(fm.get("reveals")):
+            t = link_name(v)
+            if t and (t not in notes or notes[t]["type"] != "secret"):
+                problems.append(f"{nm}: reveals [[{t}]] is not a secret note")
+        for v in aslist(fm.get("leads_to")):
+            t = link_name(v)
+            if not t or t not in notes or notes[t]["type"] != "plan":
+                problems.append(f"{nm}: leads_to '{v}' must be [[a plan]]")
+        if kind in ("entrance", "exit") and not fm.get("scene"):
+            problems.append(f"{nm}: an {kind} happens in a scene: set scene: \"[[Scene plan]]\"")
         sc = fm.get("scene")
         if sc:
             t = link_name(sc)
@@ -441,6 +461,11 @@ def check_plans(notes, edges, current, problems):
                 for end_ in (l["from"], l["to"]):
                     if end_ in notes and end_ not in explicit and notes[end_]["type"] != "plan" and ("alive", f"[[{end_}]]") not in implicit:
                         implicit.append(("alive", f"[[{end_}]]"))
+            fm, kind = notes[nm]["fm"], str(notes[nm]["fm"].get("kind") or "").strip().lower()
+            for key, k, req in (("who", "entrance", "alive"), ("reveals", "reveal", "hidden")):   # who comes in must be able to; a secret can only come out once
+                for t in (link_name(v) for v in aslist(fm.get(key))) if kind == k else ():
+                    if t in notes and t not in explicit and (req, f"[[{t}]]") not in implicit:
+                        implicit.append((req, f"[[{t}]]"))
             results = []
             for r in reqs + [x for x in implicit if x not in reqs]:
                 res, why = evaluate(r, notes, edges, current, status_of)
@@ -688,7 +713,7 @@ if __name__ == "__main__":
         for k in ("summary", "importance", "stage", "state", "state_since", "first_seen", "location", "holder", "in",
                   "status", "target", "revealed", "race", "role", "kind", "player", "number", "pronouns",
                   "for", "hp", "hp_max", "hp_temp", "slots", "conditions", "sheet_at", "ddb", "class", "played",
-                  "where", "present", "scene", "clock"):
+                  "where", "when", "present", "purpose", "scene", "cue", "who", "reveals", "leads_to", "critical", "clock"):
             v = n["fm"].get(k)
             if v not in (None, "", []):
                 node[k] = LINK.sub(r"\1", v) if isinstance(v, str) else [LINK.sub(r"\1", x) if isinstance(x, str) else x for x in v] if isinstance(v, list) else v

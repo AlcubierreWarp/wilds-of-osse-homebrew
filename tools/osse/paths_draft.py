@@ -4,23 +4,32 @@ Run through paths_sync.py: `board`, `draft` and `undraft`. Nothing here writes t
 A draft is a JSON file. Every part is optional:
 {"session": "S14",                       the session new cards go to, unless a card names its own
  "cards": [
-   {"key": "gala", "kind": "scene", "title": "The gala", "text": "...", "where": "Aerrowyn Manor", "present": ["GUS", "The Party"],
-    "cards": [{"key": "ask", "kind": "decision", "title": "...", "text": "..."}, "p:An existing plan"]},
+   {"key": "gala", "kind": "scene", "title": "The gala", "text": "the situation", "where": "Aerrowyn Manor", "when": "that night",
+    "present": ["GUS", "The Party"], "purpose": "force a choice",
+    "cards": [{"key": "ask", "kind": "decision", "title": "...", "text": "...", "cue": "what triggers it", "critical": true}, "p:An existing plan",
+              {"kind": "reveal", "title": "...", "cue": "...", "reveals": "A secret"}, {"kind": "entrance", "title": "...", "cue": "...", "who": ["Vigil"]},
+              {"key": "out", "kind": "exit", "title": "...", "cue": "..."}]},                   an exit's links out are where it leads
    {"key": "rumour", "kind": "pressure", "title": "...", "board": "Belaskro Tich"},        outside any scene: say which board
    {"key": "b2", "kind": "beat", "title": "...", "in": "c:9qyi0ije"}],                     into a scene already on the boards
  "place": [{"plan": "A plan", "in": "gala"}, {"plan": "Another", "session": "S15", "board": "GUS"}],
  "links": [["ask", "tells", "tells the truth"], ["c:9qyi0ije", "p:A plan"]],               from a decision: the label is the choice
  "edit":  [{"id": "c:abc", "title": "...", "text": "..."}, {"id": "p:A plan", "summary": "..."}],
  "relabel": [["e999yrti", "a clearer choice"]], "unlink": ["eqe5643p"], "remove": ["c:abc"],
- "order": ["gala", "c:9qyi0ije"]}                                                          running order of that session's scenes
+ "order": ["gala", "c:9qyi0ije"],                                                          running order of that session's scenes
+ "layout": ["c:9qyi0ije"]}                                                                 lay these scenes' cards out again on the canvas
 Cards are named by key, c:id (Tom's card) or p:Plan name (a vault plan). Ids come from `board`."""
 import copy, json, os, random, re, string, tempfile, time
 
-KINDS = ("scene", "beat", "decision", "clock", "pressure", "bottleneck", "note")
-CARD_FIELDS = ("kind", "title", "text", "where", "present", "clock")
-PLAN_FIELDS = ("kind", "summary", "idea", "where", "present", "clock", "note")
+KINDS = ("scene", "beat", "reveal", "complication", "decision", "entrance", "exit", "clock", "pressure", "bottleneck", "note")
+IN_SCENE = ("beat", "reveal", "complication", "decision", "entrance", "exit")
+FOR = {"where": ("scene",), "when": ("scene",), "present": ("scene",), "purpose": ("scene",), "cue": IN_SCENE, "who": ("entrance", "exit"),
+       "reveals": ("reveal",), "critical": ("decision",), "clock": ("clock",)}   # the kinds each extra field belongs on
+EXTRA = tuple(FOR)
+CARD_FIELDS = ("kind", "title", "text", *EXTRA)
+PLAN_FIELDS = ("kind", "summary", "idea", *EXTRA, "note")
+has = lambda o, f: (o.get("kind") or "beat") in FOR[f] and o.get(f) not in (None, "", [], False)
 PARTS = ("items", "cards", "edits", "edges", "order", "sessions")
-PART_KEYS = {"session", "cards", "place", "links", "edit", "relabel", "unlink", "remove", "order", "base"}
+PART_KEYS = {"session", "cards", "place", "links", "edit", "relabel", "unlink", "remove", "order", "layout", "base"}
 SCW, SCH = 572, 396
 
 
@@ -130,12 +139,18 @@ def apply(spec, doc, b, known):
             bad.append(f"{what}: kind '{c.get('kind')}' is not one of {', '.join(KINDS)}")
         if c.get("clock") and not re.fullmatch(r"\d+/\d+", str(c["clock"])):
             bad.append(f"{what}: clock must read filled/segments, like 0/6")
-        if "present" in c and not isinstance(c["present"], list):
-            bad.append(f"{what}: present must be a list")
-        else:
-            for n in c.get("present") or []:
-                if n.lower() not in known["people"]:
-                    warn.append(f"{what}: {n} is not in the vault (kept as plain text)")
+        for f in ("present", "who"):
+            if f in c and not isinstance(c[f], list):
+                bad.append(f"{what}: {f} must be a list")
+            else:
+                warn.extend(f"{what}: {n} is not in the vault (kept as plain text)" for n in c.get(f) or [] if n.lower() not in known["people"])
+        for f in EXTRA:
+            if c.get(f) and (c.get("kind") or "beat") not in FOR[f]:
+                bad.append(f"{what}: {f} belongs on {' or '.join(FOR[f])}, not {c.get('kind') or 'beat'}")
+        if c.get("reveals") and c["reveals"].lower() not in known["secrets"]:
+            warn.append(f"{what}: {c['reveals']} is not a secret in the vault (kept as plain text)")
+        if "critical" in c and not isinstance(c["critical"], bool):
+            bad.append(f"{what}: critical must be true or false")
         if c.get("where") and c["where"].lower() not in known["places"]:
             warn.append(f"{what}: {c['where']} is not a place in the vault (kept as plain text)")
 
@@ -187,7 +202,7 @@ def apply(spec, doc, b, known):
                 bad.append(f"{what}: key '{c['key']}' is used twice")
             ids[c["key"]] = i
         doc["cards"][cid] = {"kind": kind, "title": c.get("title", ""), "text": c.get("text", ""), "draft": "new"}
-        for f in ("where", "present", "clock"):
+        for f in EXTRA:
             if c.get(f):
                 doc["cards"][cid][f] = c[f]
         sc = parent or (ref(c["in"], what) if c.get("in") else None)
@@ -240,6 +255,9 @@ def apply(spec, doc, b, known):
             if (c.get("kind") == "scene") != (ch.get("kind", c.get("kind")) == "scene"):
                 bad.append(f"edit {i}: turn a card into a scene, or back, on the page")
             c.update(ch)
+            for f in EXTRA:
+                if f in ch and not ch[f] and f not in ("where", "present"):
+                    c.pop(f, None)
             if c.get("draft") != "new":
                 c["draft"] = "edit"
         else:
@@ -285,6 +303,13 @@ def apply(spec, doc, b, known):
             warn.append(f"link {row}: already there")
             continue
         doc["edges"].append({"id": "e" + nid()[:7], "from": f, "to": t, "label": lab})
+    for x in spec.get("layout", []):
+        sc = ref(x, "layout")
+        if sc and not b.is_scene(sc):
+            bad.append(f"layout {x}: not a scene")
+        for m in doc["items"] if sc else []:
+            if b.scene(m) == sc:
+                doc["items"][m]["lay"] = 1
     if spec.get("order"):
         s = sess(None)
         first = [i for i in (ref(x, "order") for x in spec["order"]) if i]
@@ -309,6 +334,9 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
         for o in (d or {}).get("options", []):
             if b.live("p:" + o["to"]) and not any(e["from"] == i and e["to"] == "p:" + o["to"] and (e.get("label") or "") == o["label"] for e in edges):
                 edges.append({"id": "vault", "from": i, "to": "p:" + o["to"], "label": o["label"]})
+        for t in (d or {}).get("leads", []):
+            if b.live("p:" + t) and not any(e["from"] == i and e["to"] == "p:" + t for e in edges):
+                edges.append({"id": "vault", "from": i, "to": "p:" + t, "label": ""})
         for r in (d or {}).get("req", []):
             f = "p:" + str(r["a"])
             if r["k"] in ("plan", "played") and b.live(f) and not any(e["from"] == f and e["to"] == i for e in edges):
@@ -318,7 +346,13 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
     def lines(i, depth, seen, inn):
         o, pad = b.obj(i), "  " * depth
         txt = (o.get("text") if i.startswith("c:") else o.get("summary")) or ""
-        out.append(f"{pad}- {mark(i)}{(o.get('kind') or 'beat').upper()} {name(i)}{tag(i)}" + (f" ({o['clock']})" if o.get("clock") else ""))
+        out.append(f"{pad}- {mark(i)}{'CRITICAL ' if has(o, 'critical') else ''}{(o.get('kind') or 'beat').upper()} {name(i)}{tag(i)}" + (f" ({o['clock']})" if has(o, "clock") else ""))
+        if has(o, "cue"):
+            out.append(f"{pad}    cue: {o['cue']}")
+        if has(o, "who"):
+            out.append(f"{pad}    who: {', '.join(o['who'])}")
+        if has(o, "reveals"):
+            out.append(f"{pad}    reveals: {o['reveals']}")
         for ln in txt.split("\n") if txt else []:
             if ln.strip():
                 out.append(f"{pad}    {ln.strip()}")
@@ -332,7 +366,7 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
                 lines(e["to"], depth + 1, seen, inn)
 
     def group(ms, depth):
-        ms = sorted(ms, key=lambda m: (doc["items"][m].get("ry", 0), doc["items"][m].get("rx", 0)))
+        ms = sorted(ms, key=lambda m: (b.obj(m).get("kind") == "exit", doc["items"][m].get("ry", 0), doc["items"][m].get("rx", 0)))   # the ways out last
         led = {e["to"] for e in edges if e["from"] in ms}
         seen = set()
         for i in [m for m in ms if m not in led] + [m for m in ms if m in led]:
@@ -351,7 +385,9 @@ def outline(doc, b, sessions=None, mark=lambda i: "", withids=True):
         for n, i in enumerate(scenes, 1):
             o = b.obj(i)
             out.append(f"{n}. {mark(i)}SCENE {name(i)}{tag(i)}")
-            out.append(f"     at {o.get('where') or '(where not set)'} · with {', '.join(o.get('present') or []) or 'nobody yet'} · boards: {', '.join(b.lanes(i))}")
+            out.append(f"     at {o.get('where') or '(where not set)'}" + (f" · {o['when']}" if o.get("when") else "") + f" · with {', '.join(o.get('present') or []) or 'nobody yet'} · boards: {', '.join(b.lanes(i))}")
+            if o.get("purpose"):
+                out.append(f"     purpose: {o['purpose']}")
             txt = (o.get("text") if i.startswith("c:") else o.get("summary")) or ""
             out += [f"     {ln.strip()}" for ln in txt.split("\n") if ln.strip()]
             out += [f"     leads to: {name(e['to'])}" + (f' · "{e["label"]}"' if e.get("label") else "") + (f"  [{e['id']}]" if withids else "") for e in edges if e["from"] == i]

@@ -5,6 +5,7 @@ The store holds one copy of everything (items, cards, edits, edges); `lanes` are
   python3 tools/osse/paths_sync.py board [SESSION ...] everything on the boards with its ids: scenes in order, their cards as a tree
   python3 tools/osse/paths_sync.py draft FILE [--write]     check a draft and print its outline; --write puts it on the boards (tools/osse/paths_draft.py has the format)
   python3 tools/osse/paths_sync.py undraft [WHEN] [--write] take a draft back off, keeping what Tom changed since; with no WHEN, the last one
+  python3 tools/osse/paths_sync.py notes SCENE [DIR]    the plan notes a scene on the boards and its cards would become; with DIR, written there
   python3 tools/osse/paths_sync.py adopt CARD "Plan name"   swap one of Tom's cards for the plan written from it, on every board
   python3 tools/osse/paths_sync.py tidy                drop Tom's links the vault now says itself, and plans no longer live (run after build.py)
   python3 tools/osse/paths_sync.py settle              clear Tom's edits and drops once the vault holds them (run after build.py)
@@ -12,7 +13,7 @@ The store holds one copy of everything (items, cards, edits, edges); `lanes` are
   python3 tools/osse/paths_sync.py arcs                the Arc planner: each arc, what it starts and ends on, and its session cards in order
 Add --mock to use the local relay stand-in (relay/gus/mock.py, key test-gm).
 The game master key is read from the macOS Keychain inside this process and never printed. Writes only to the relay."""
-import copy, json, os, re, subprocess, sys, urllib.request
+import copy, datetime, json, os, re, subprocess, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -81,7 +82,7 @@ class Board:
         if i.startswith("c:"):
             return self.cards.get(i[2:], {})
         d, e = self.data.get(i[2:], {}), self.edits.get(i[2:], {})
-        return {**d, **{k: e[k] for k in ("kind", "present", "where", "clock", "summary") if k in e}}
+        return {**d, **{k: e[k] for k in ("kind", "summary", *paths_draft.EXTRA) if k in e}}
 
     def is_scene(self, i):
         return self.obj(i).get("kind") == "scene"
@@ -95,7 +96,8 @@ class Board:
 
     def cast(self, i):
         out = []
-        for n in self.obj(i).get("present") or []:
+        comers = [n for m in self.items if self.scene(m) == i and self.obj(m).get("kind") == "entrance" for n in self.obj(m).get("who") or []]
+        for n in (self.obj(i).get("present") or []) + comers:   # there when it opens, or who comes in
             low = n.strip().lower()
             if low in ("the party", "the whole party"):
                 out += [*self.pcs, "The Party"]
@@ -124,6 +126,8 @@ class Board:
         a, b, data = e["from"][2:], e["to"][2:], self.data
         if a in data and self.obj(e["from"]).get("kind") == "decision":   # each link out of a decision is its own option
             return any(o["to"] == b and o["label"].strip().lower() == (e.get("label") or "").strip().lower() for o in data[a]["options"])
+        if a in data and self.obj(e["from"]).get("kind") == "exit":
+            return b in data[a]["leads"]
         if b in data and any(r["k"] in ("plan", "played") and r["a"] == a for r in data[b]["req"]):
             return True
         return a in data and any(o["to"] == b for o in data[a]["options"])
@@ -162,12 +166,9 @@ def show(only=None):
                 lines.append(f'    on the boards of: {", ".join(ks)}')
             elif not sc and len(ks) > 1:
                 lines.append(f'    on {", ".join(ks)}')
-            if o.get("where"):
-                lines.append(f'    where: {o["where"]}')
-            if o.get("present"):
-                lines.append(f'    present: {", ".join(o["present"])}')
-            if o.get("clock"):
-                lines.append(f'    clock: {o["clock"]}')
+            for f in paths_draft.EXTRA:
+                if paths_draft.has(o, f):
+                    lines.append(f'    {f}: {", ".join(o[f]) if isinstance(o[f], list) else o[f]}')
             if sc:
                 lines.append(f"    in the scene {b.label(sc)}")
             for e in b.edges:
@@ -175,7 +176,7 @@ def show(only=None):
                 if e["to"] == i:
                     lines.append(f'    from {b.label(e["from"])}{choice}' + (f' · "{e["label"]}"' if e.get("label") else " · (not named)" if choice else ""))
                 if e["from"] == i:
-                    lines.append(f'   {choice} to {b.label(e["to"])}' + (f' · "{e["label"]}"' if e.get("label") else " · (not named)" if choice else ""))
+                    lines.append(f'   {" leads to" if o.get("kind") == "exit" else choice + " to"} {b.label(e["to"])}' + (f' · "{e["label"]}"' if e.get("label") else " · (not named)" if choice else ""))
             say(i, "\n".join(lines))
     for pid, d in data.items():
         ed, i = b.edits.get(pid, {}), "p:" + pid
@@ -184,9 +185,8 @@ def show(only=None):
         if ed.get("drop"):
             put.append((i, f"- DROP [[{pid}]]: Tom dropped it → status: dropped, log line"))
             continue
-        changes = [f'{k}: "{ed[k]}"' for k in ("kind", "summary", "where", "clock") if k in ed]
-        if "present" in ed:
-            changes.append("present: " + ", ".join(ed["present"]) if ed["present"] else "present: (nobody)")
+        changes = [f'{k}: "{ed[k]}"' for k in ("kind", "summary", *(f for f in paths_draft.EXTRA if f not in ("present", "who"))) if k in ed]
+        changes += [f"{k}: " + (", ".join(ed[k]) or "(nobody)") for k in ("present", "who") if k in ed]
         if "idea" in ed:
             changes.append("idea (rewrite ## Idea, linking names as [[ ]]):\n      " + ed["idea"].replace("\n", "\n      "))
         if ed.get("note"):
@@ -224,7 +224,7 @@ def known(b):
     alias.update({k.split()[0].lower(): k for k in b.pcs}, **{"the party": "The Party", "party": "The Party", "world": "world", "around the party": "world", "canvas": "The Party", "session canvas": "The Party"})
     names = lambda ok: {x.lower() for n in g["nodes"] if ok(n["type"]) for x in [n["id"], *(n.get("aliases") or [])]}
     return {"boards": boards, "alias": alias, "places": names(lambda t: t == "place"),
-            "people": names(lambda t: t in ("npc", "pc", "party", "faction")) | {"the party", "the whole party"}}
+            "secrets": names(lambda t: t == "secret"), "people": names(lambda t: t in ("npc", "pc", "party", "faction")) | {"the party", "the whole party"}}
 
 
 def board(sessions):
@@ -292,6 +292,83 @@ def undraft(when, write):
     put(doc)
     os.rename(os.path.join(d, when + ".json"), os.path.join(d, when + ".undone"))
     print("Done.")
+
+
+def notes(which, out=None):
+    """A scene on the boards as plan notes: the scene, then each card in it. A first draft for Claude to tighten; it never writes to the vault."""
+    doc = store()
+    data, cur = plan_facts(None)
+    b = Board(doc, data, cur)
+    g, nodes = graph()
+    title = lambda i: i[2:] if i.startswith("p:") else b.cards[i[2:]].get("title") or "Untitled"
+    sid = next((i for i in b.items if b.live(i) and b.is_scene(i) and (which in (i, i[2:]) or title(i).lower() == which.lower())), None)
+    if not sid:
+        sys.exit(f"No scene '{which}' on the boards.")
+    byname = {}
+    for n in g["nodes"]:
+        for x in [n["id"], *(n.get("aliases") or [])]:
+            byname.setdefault(str(x).lower(), n["id"])
+    for n in g["nodes"]:
+        byname[n["id"].lower()] = n["id"]
+    link = lambda x: f"[[{byname[x.strip().lower()]}]]" if x.strip().lower() in byname else x.strip()
+    safe = lambda t: re.sub(r"\s+", " ", re.sub(r'[\[\]#^|\\/:*?"<>]', "", t)).strip()
+    plan = lambda i: f"[[{safe(title(i))}]]"
+    q = lambda v: '"' + str(v).replace('"', "'").replace("\n", " ") + '"'
+    members = [m for m in b.items if b.live(m) and b.scene(m) == sid]
+    members.sort(key=lambda m: (b.items[m].get("ry", 0), b.items[m].get("rx", 0)))
+    today, made = datetime.date.today().isoformat(), []
+    for i in [sid, *members]:
+        if i.startswith("p:"):
+            print(f"(already a plan: [[{i[2:]}]]" + (f'; set scene: "{plan(sid)}"' if i != sid and data[i[2:]]["scene"] != title(sid) else "") + ")")
+            continue
+        o, kind = b.obj(i), b.obj(i).get("kind") or "beat"
+        text = (o.get("text") or "").strip()
+        kind = "beat" if kind == "note" else kind
+        first = re.split(r"(?<=[.!?])\s", text.split("\n")[0])[0] if text else title(i)
+        fm = ["type: plan", "stage: draft", "status: draft", f"kind: {kind}", f"summary: {q(first)}"]
+        outs = [e for e in b.edges if e["from"] == i and b.live(e["to"])]
+        if i != sid:
+            fm.append(f'scene: "{plan(sid)}"')
+        for f in paths_draft.EXTRA:
+            if not paths_draft.has(o, f):
+                continue
+            v = o[f]
+            fm.append(f"{f}: " + ("[" + ", ".join(q(link(x)) for x in v) + "]" if isinstance(v, list) else "true" if v is True else q(link(v)) if f in ("where", "reveals") else v if f == "clock" else q(v)))
+        if kind == "exit" and outs:
+            fm.append("leads_to: [" + ", ".join(dict.fromkeys(q(plan(e["to"])) for e in outs)) + "]")
+        s = b.session(i)
+        fm += ([f"target: {s}"] if s != "Later" else []) + [f"updated: {today}"]
+        body = ["## Idea", *(f"- {ln.strip()}" for ln in (text or title(i)).split("\n") if ln.strip())]
+        if kind == "decision":
+            body += ["", "## Options", *(f"- {plan(e['to'])} · {e.get('label') or '(not named)'}" for e in outs)]
+        ins = [e for e in b.edges if e["to"] == i and not e["from"].startswith("start") and b.live(e["from"])]
+        need = [e for e in ins if b.obj(e["from"]).get("kind") not in ("decision", "exit")]
+        reqs = []
+        if len(need) == 1 and len(ins) == 1:   # one way in: it needs that plan. Several ways in: none of them is needed
+            reqs.append(f"- plan: {plan(need[0]['from'])}")
+        reqs += [f"- check: {e['label']}" for e in need if e.get("label") and e["label"].lower() != "then"] if len(ins) == 1 and not o.get("cue") else []   # a cue already says it
+        if reqs:
+            body += ["", "## Requires", *reqs]
+        body += ["", "## Log", f"- S{cur}: from the Session planner."]
+        made.append((safe(title(i)), "---\n" + "\n".join(fm) + "\n---\n\n" + "\n".join(body) + "\n"))
+    names = [t for t, _ in made]
+    for t in names:
+        if t in nodes:
+            print(f"NAME TAKEN: the vault already has a note called '{t}': retitle the card first.")
+        if names.count(t) > 1:
+            print(f"NAME TWICE: two cards are called '{t}': retitle one.")
+    known_plans = set(names) | {n["id"] for n in g["nodes"]}
+    for t, s in made:
+        for x in build.LINK.findall(s):
+            if x not in known_plans:
+                print(f"OUTSIDE THE SCENE: '{t}' points to [[{x}]], which is not a plan yet: bring its scene in too.")
+        if out:
+            os.makedirs(out, exist_ok=True)
+            open(os.path.join(out, t + ".md"), "w", encoding="utf-8").write(s)
+        else:
+            print(f"\n===== Plans/{t}.md\n{s}")
+    if out:
+        print(f"Wrote {len(made)} note(s) to {out}. Not in the vault yet.")
 
 
 def adopt(card, plan):
@@ -414,6 +491,8 @@ if __name__ == "__main__":
         draft(a[1], WRITE)
     elif a[0] == "undraft" and len(a) <= 2:
         undraft(a[1] if len(a) > 1 else None, WRITE)
+    elif a[0] == "notes" and len(a) in (2, 3):
+        notes(a[1], a[2] if len(a) == 3 else None)
     elif a[0] == "adopt" and len(a) == 3:
         adopt(a[1], a[2])
     elif a[0] == "settle":

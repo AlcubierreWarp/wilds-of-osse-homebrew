@@ -7,10 +7,11 @@ A plan is one idea for the future: a scene, a reveal, a twist, an NPC's next mov
 type: plan
 stage: draft
 status: draft        # draft | ready | played | dropped | pruned
-kind: beat           # beat (or empty) | scene | decision | clock | pressure | bottleneck (docs/osse/branching.md)
+kind: beat           # beat (or empty) | reveal | complication | decision | entrance | exit | scene | clock | pressure | bottleneck (docs/osse/branching.md)
 for: "[[Mira Holt]]"  # optional: the player character (or The Party) whose board it sits on
 summary: "one line"
 scene: "[[The night market]]"   # optional: the scene plan this happens in
+cue: "Mira sees the knife"       # optional, in a scene: what triggers it
 target: S14          # optional: the session it is aimed at
 thread: "[[The Grey Patron]]"   # optional
 updated: 2026-11-18
@@ -36,7 +37,7 @@ What happens and why it is interesting.
 ## Log
 ```
 
-**Kinds and options.** A `decision` lists its choices under `## Options`, one per line: `- [[Plan]] · what they choose`; several choices may lead to the same plan. A `scene` sets the stage: `where:` (a place, as a [[link]] when the vault has it) and `present:` (a list of who is there). Beats, decisions, clocks and pressures that happen during it name it with `scene:`. A `clock` carries `clock: 0/6` (segments filled / segments). Kinds, boards and the research behind them: [branching.md](branching.md).
+**Kinds and options.** A `decision` lists its choices under `## Options`, one per line: `- [[Plan]] · what they choose`; several choices may lead to the same plan. A `scene` sets the stage: `where:` (a place, as a [[link]] when the vault has it), `when:`, `present:` (a list of who is there when it opens) and `purpose:`. Its cards name it with `scene:` and carry a `cue:`: beats, reveals (`reveals: "[[A secret]]"`), complications, decisions (`critical: true` when it can end or remake a character), entrances (`who:`) and exits (`leads_to: ["[[Next scene]]"]`, or `who:` for someone leaving). A `clock` carries `clock: 0/6` (segments filled / segments). Kinds, boards and the research behind them: [branching.md](branching.md).
 
 **Statuses.** `draft`: an idea. `ready`: Tom wants it at the next table. `played`: it happened (set `played: S14`). `dropped`: Tom set it aside. `pruned`: the build found it impossible. Only `draft` and `ready` are live.
 
@@ -59,7 +60,7 @@ One per line under `## Requires`. The build checks every live plan against curre
 | `by: S18` | the current session is before S18 |
 | `check: words` | a judgment the script cannot test; listed for Tom every session (`osse.py plans --checks`) |
 
-**Implicit requirements.** Every note named in `## Links` must be alive (or standing, intact, active). A plan that needs one in another state says so with `dead:` or `state:`, and the implicit one is dropped.
+**Implicit requirements.** Every note named in `## Links` must be alive (or standing, intact, active). A plan that needs one in another state says so with `dead:` or `state:`, and the implicit one is dropped. An entrance needs its `who:` alive; a reveal needs its `reveals:` secret hidden.
 
 **Draft links** use the connection grammar with both ends written out: `- [[A]] · family/type · weight · [[B]] · note`. A stamp on a draft link is the hoped-for session, not canon. Draft links never go on entity notes; `osse.py walk NAME --plans` shows them.
 

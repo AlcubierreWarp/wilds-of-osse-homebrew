@@ -13,7 +13,8 @@ Session planner, once called Paths ahead (`vault/paths.html`, built by `tools/os
 | **Fronts and grim portents** | *Dungeon World*, Fronts | The world moves when the party does not. What a danger does if no one stops it is `kind: pressure`: a plan that fires when they stall. |
 | **Secrets and clues, apart from where they are found** | Mike Shea, *Return of the Lazy Dungeon Master* | Secrets are written without fixing how they come out. Ossë already keeps secrets as their own notes; plans only say they need one hidden or revealed. |
 | **Character-first prep; flags** | Shea, *Review the Characters*; Burning Wheel Beliefs | Start from each character and what they want, not from the plot. Each board starts from where the character stands at the end of the last session. |
-| **Scenes and beats** | Robert McKee, *Story*; screenwriting practice | A scene is a unit of place, time and people that sets the stage; a beat is one exchange or turn inside it. Ossë marks the stage as `kind: scene` (with `where:` and `present:`) and the moments inside it as beats, decisions, clocks and pressures that name it with `scene:`. |
+| **Scenes and beats** | Robert McKee, *Story*; screenwriting practice | A scene is a unit of place, time and people that sets the stage; a beat is one exchange or turn inside it. Ossë marks the stage as `kind: scene` with its situation (`where:`, `when:`, `present:`, and the Idea) and its `purpose:`; the cards inside it name it with `scene:`. |
+| **French scenes; cues** | French classical theatre; stage practice | A new unit starts whenever someone comes in or goes out. Ossë marks these `kind: entrance` and `kind: exit`. Every card in a scene carries a `cue:`, what triggers it, so most beats need no fixed order. |
 | **Progress clocks** | John Harper, *Blades in the Dark* | A clock is a circle cut into segments; fill one when time passes or things go wrong, and something happens when it is full. Ossë marks it `kind: clock` with `clock: filled/segments`. |
 | **Decision points** | Choice-based design generally | A decision is a choice the character faces, with options. Two choices can lead to the same outcome. Ossë marks it `kind: decision` with an `## Options` section. |
 
@@ -29,11 +30,11 @@ Session planner, once called Paths ahead (`vault/paths.html`, built by `tools/os
 | **Links** | Solid: the vault already joins them. Dashed red: Tom's, not in the vault yet | `plan: [[X]]` in the later plan's Requires, or a decision's `## Options` |
 | **Options** | Each link out of a decision is one option, labelled with the choice; the card lists them. Two choices can lead to the same card: draw a link for each (or tap "Another choice leading here" on the first) | One `## Options` line per link |
 | **Secret chips** | A secret a card needs hidden or revealed. Tap to try a what-if | `hidden:` / `revealed:` requirements |
-| **Scenes on the board** | A scene is a box with its details in a header: where, who is present, the situation. Drag it by the header and the cards inside move with it; drag the corner to resize it. Drop a card inside to set it in the scene. Where and who are picked from the vault's places and people, or typed | `where:`, `present:`; `scene:` on the cards inside |
+| **Scenes on the board** | A scene is a box with its details in a header: its situation (where, when, who is there, what is going on) and its purpose. Its cards are beats, reveals, complications, decisions, entrances and exits, each with a cue; its panel has a button to add each. Drag it by the header and the cards inside move with it; drag the corner to resize it. Drop a card inside to set it in the scene. Where and who are picked from the vault's places and people, or typed | `where:`, `when:`, `present:`, `purpose:`; `scene:` and `cue:` on the cards inside |
 | **One copy** | Every plan, card, scene and link exists once, however many boards show it: change it on one and it changes on all. Session tabs are shared too. Only a thing's place on each canvas is its own; a card inside a scene keeps the same place in the box everywhere | |
-| **Scenes on several boards** | A scene shows, with its cards, on the board of every player character listed as present (The Party: every character's board), on the session canvas, and on any board it was put on. The × on it takes it off that board only, and takes that character off who is present | `present:` |
+| **Scenes on several boards** | A scene shows, with its cards, on the board of every player character listed as present or named by an entrance (The Party: every character's board), on the session canvas, and on any board it was put on. The × on it takes it off that board only, and takes that character off who is present | `present:` |
 | **Session canvas** | The second of the two whole-session buttons. Everything in the session, whoever it is for: scenes numbered and joined in running order, loose cards underneath in a column per board. Line up lays it out again from the running order. A plan dropped here goes on the boards it is tied to; × takes it off every board | Nothing |
-| **Running order** | The first of the two whole-session buttons. Per session, its scenes as small cards in running order: drag one by its ⠿ to move it, or onto another session's tab. + Scene (or Add a scene) starts a new one; + Players on a scene adds or removes players, and the scene appears on or leaves their boards to match; + Card adds a card inside. So a session can be built scenes first. Tap a scene to list its cards as a tree: each sits under the card whose arrow leads to it. Drag a card onto another to make it follow that one (onto a decision, it becomes an option and asks for the choice), between two to sit beside them, onto a scene to add it there, or back to "Not in a scene". Arrows and places on the canvas follow, and a card with others under it takes them along. Drag in plans not placed yet from the list on the right. Tap a card to open its panel. Name pills use the session screens' colours (filled: listed as present; outlined: on their board only); tap one to open the scene on that board | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
+| **Running order** | The first of the two whole-session buttons. Per session, its scenes as small cards in running order: drag one by its ⠿ to move it, or onto another session's tab. + Scene (or Add a scene) starts a new one; + Players on a scene adds or removes players, and the scene appears on or leaves their boards to match; + Beat, + Reveal and the rest add a card inside. Exits come last and say where they lead. So a session can be built scenes first. Tap a scene to list its cards as a tree: each sits under the card whose arrow leads to it. Drag a card onto another to make it follow that one (onto a decision, it becomes an option and asks for the choice), between two to sit beside them, onto a scene to add it there, or back to "Not in a scene". Arrows and places on the canvas follow, and a card with others under it takes them along. Drag in plans not placed yet from the list on the right. Tap a card to open its panel. Name pills use the session screens' colours (filled: listed as present; outlined: on their board only); tap one to open the scene on that board | Nothing; the running order stays on the relay (`order`), and Claude follows it when building the session screen |
 | **Zoom** | + and − at the top right of the canvas, beside Fit and Key; also pinch or Command-scroll | |
 | **Tom's own cards** | New ideas drawn on the board | Become plan notes when Tom asks (the `paths` skill) |
 | **Claude's drafts** | Tom brain dumps in a session of this repo, or asks for a clean-up; Claude shows an outline, then puts scenes, cards and links on the boards. Cards say "Claude's draft" until Tom changes them, and a whole draft can be taken back off | Nothing until Tom asks (the `paths` skill) |
@@ -46,14 +47,20 @@ Session planner, once called Paths ahead (`vault/paths.html`, built by `tools/os
 
 | Kind | Use it for | On the board | Term |
 | --- | --- | --- | --- |
-| `scene` | The stage: a place, who is there, what is going on. `where:` and `present:` | A box; the cards inside it happen during the scene | `osse:Scene` |
-| `beat` | One key moment in a scene or encounter | A card | `osse:Beat` |
-| `decision` | A choice the character faces; each link out of it is one option | A card listing its options | `schema:ChooseAction` |
+| `scene` | The stage. Situation: `where:`, `when:`, `present:` (who is there when it opens) and the Idea. `purpose:` what it is for | A box; the cards inside it happen during the scene | `osse:Scene` |
+| `beat` | A turn that could happen in a scene. `cue:` | A card | `osse:Beat` |
+| `reveal` | A beat where something comes out. `cue:`, `reveals:` (the secret) | A card | `osse:Reveal` |
+| `complication` | A beat that turns the scene against what someone wants. `cue:` | A card | `osse:Complication` |
+| `decision` | A choice the character faces; each link out of it is one option. `cue:`; `critical: true` when it can end or remake a character | A card listing its options; a critical one is filled red | `schema:ChooseAction` |
+| `entrance` | Someone comes in. `cue:`, `who:` | A card | `osse:Entrance` |
+| `exit` | A way the scene can end, `leads_to:` the next scenes; or someone leaving, `who:`. `cue:` | A card listing where it leads | `osse:Exit` |
 | `clock` | Time pressure, or something that happens when it fills. `clock: 2/6` | A card with a segmented clock; tap it to fill a segment | `osse:Clock` |
 | `pressure` | What the world does if no one acts | A card | `osse:Pressure` |
 | `bottleneck` | A beat most paths reach, where branches meet | A card with a double edge | `osse:Bottleneck` |
 
-A beat, decision, clock or pressure inside a scene names it with `scene: "[[Scene plan]]"`. Scenes do not nest.
+A card inside a scene names it with `scene: "[[Scene plan]]"`. Scenes do not nest. Beat, reveal, complication, decision, entrance and exit are the kinds offered inside a scene; clocks, pressures and bottlenecks belong outside (one placed in a scene before this still works).
+
+What the graph does with them: an `entrance` needs its `who:` alive, and a `reveal` needs its secret still hidden, so the build prunes either when that stops being true. An exit's `leads_to:` requires nothing of the next scene, so several exits can lead to it. `python3 tools/osse/osse.py scene NAME` puts a scene back together from its notes; `python3 tools/osse/paths_sync.py notes SCENE` turns a scene on the boards into notes.
 
 ```
 ---
@@ -62,6 +69,8 @@ kind: scene
 status: draft
 summary: "A masked ball at the manor, the night the steward goes missing"
 where: "[[Aerrowyn Manor]]"
+when: "the night of the ball"
+purpose: "introduce the courier; force a choice about the steward"
 present: ["[[Corvane Aerrowyn]]", "[[The Party]]", "a masked courier"]
 target: S15
 ---

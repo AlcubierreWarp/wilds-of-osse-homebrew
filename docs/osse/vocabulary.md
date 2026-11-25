@@ -53,6 +53,10 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | thread | any | `osse:Thread` |
 | plan | any | `osse:Beat` |
 | plan | beat | `osse:Beat` |
+| plan | reveal | `osse:Reveal` |
+| plan | complication | `osse:Complication` |
+| plan | entrance | `osse:Entrance` |
+| plan | exit | `osse:Exit` |
 | plan | scene | `osse:Scene` |
 | plan | clock | `osse:Clock` |
 | plan | decision | `schema:ChooseAction` |
@@ -114,6 +118,13 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | `present` | `schema:attendee` |
 | `scene` | `schema:superEvent` |
 | `clock` | `osse:clock` |
+| `when` | `schema:temporal` |
+| `purpose` | `osse:purpose` |
+| `cue` | `osse:cue` |
+| `who` | `schema:agent` |
+| `reveals` | `osse:reveals` |
+| `leads_to` | `schema:result` |
+| `critical` | `osse:critical` |
 | `type` | vault bookkeeping |
 | `importance_set` | vault bookkeeping |
 | `pruned` | vault bookkeeping |
@@ -319,8 +330,16 @@ XFN, SKOS and PROV-O, and an `osse:` term only for magic and for the game itself
 | `osse:planStatus` | `schema:actionStatus` | draft, ready, played, dropped or pruned. |
 | `osse:Pressure` | `schema:PlanAction` | What the world does if the party does not act: a front's grim portent. Fires when they stall. |
 | `osse:Bottleneck` | `schema:PlanAction` | A beat most branches reach, where paths meet again (branch and bottleneck). |
-| `osse:Scene` | `schema:PlanAction` | A planned scene: a place, the people present and the situation; it sets the stage for the beats, decisions, pressures and clocks inside it. |
+| `osse:Scene` | `schema:PlanAction` | A planned scene: its situation (where, when, who is present) and its purpose; the beats, entrances and exits inside it name it. |
 | `osse:Beat` | `schema:PlanAction` | One key moment inside a scene or encounter. |
+| `osse:Reveal` | `schema:PlanAction` | A beat where something comes out: a secret, a clue, a truth. |
+| `osse:Complication` | `schema:PlanAction` | A beat that turns the scene against what someone wants. |
+| `osse:Entrance` | `schema:ArriveAction` | Someone comes into a scene, which changes it (a French scene). |
+| `osse:Exit` | `schema:DepartAction` | Someone leaves a scene, or a way the scene can end and where that leads. |
+| `osse:cue` | `schema:additionalProperty` | What triggers a beat, entrance or exit at the table. |
+| `osse:purpose` | `schema:additionalProperty` | What a scene is for: reveal a clue, introduce someone, force a choice. |
+| `osse:critical` | `schema:additionalProperty` | A decision that can end or remake a player character. |
+| `osse:reveals` | `schema:object` | The secret a reveal brings out. |
 | `osse:Clock` | `schema:PlanAction` | A progress clock: time pressure in a scene, or something that happens when its segments fill. |
 | `osse:clock` | `schema:additionalProperty` | A clock's progress: segments filled / segments. |
 | `osse:pathOf` | `schema:about` | The player character, or The Party, whose path a plan sits on in Paths ahead. |

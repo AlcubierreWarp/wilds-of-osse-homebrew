@@ -35,7 +35,8 @@ PLAYER_SKIP = SKIP_SECTIONS | {"Idea", "Requires", "Links", "Log", "Plans", "Who
 PROPS = [("player", "Player"), ("class", "Class"), ("race", "Race"), ("pronouns", "Pronouns"), ("voice", "Voice"),
          ("wants", "Wants"), ("fear", "Fear"), ("leader", "Leader"), ("known_by", "Known by"), ("opened", "Opened"),
          ("closed", "Closed"), ("played_on", "Played on"), ("in_world", "In the world"), ("thread", "Thread"),
-         ("played", "Played"), ("pruned", "Pruned"), ("pruned_by", "Pruned because"), ("map", "Map")]
+         ("where", "Where"), ("when", "When"), ("present", "Present"), ("purpose", "Purpose"), ("scene", "Scene"), ("cue", "Cue"), ("who", "Who"),
+         ("reveals", "Reveals"), ("leads_to", "Leads to"), ("critical", "Critical"), ("played", "Played"), ("pruned", "Pruned"), ("pruned_by", "Pruned because"), ("map", "Map")]
 PLAYER_PROPS = [("player", "Player"), ("class", "Class"), ("pronouns", "Pronouns")]
 LINK = re.compile(r"!?\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]+))?\]\]")
 TAG = re.compile(r"\*\(((?:S\d+|prep)[^)]*)\)\*")
